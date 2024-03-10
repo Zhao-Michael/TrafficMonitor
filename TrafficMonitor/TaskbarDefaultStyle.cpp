@@ -26,16 +26,15 @@ void CTaskbarDefaultStyle::LoadConfig()
         swprintf_s(buff, L"default%d_", i + 1);
         wstring key_name = buff;
         ini.LoadTaskbarWndColors(L"taskbar_default_style", (key_name + L"text_color").c_str(), m_default_style[i].text_colors, default_text_color);
-        m_default_style[i].back_color = ini.GetInt(L"taskbar_default_style", (key_name + L"back_color").c_str(), default_back_color);
-        m_default_style[i].transparent_color = ini.GetInt(L"taskbar_default_style", (key_name + L"transparent_color").c_str(), default_transparent_color);
-        m_default_style[i].status_bar_color = ini.GetInt(L"taskbar_default_style", (key_name + L"status_bar_color").c_str(), default_status_bar_color);
+        m_default_style[i].back_color = ini.GetInt(L"taskbar_default_style", (key_name + L"back_color").c_str(), default_back_color, 16);
+        m_default_style[i].transparent_color = ini.GetInt(L"taskbar_default_style", (key_name + L"transparent_color").c_str(), default_transparent_color, 16);
+        m_default_style[i].status_bar_color = ini.GetInt(L"taskbar_default_style", (key_name + L"status_bar_color").c_str(), default_status_bar_color, 16);
         m_default_style[i].specify_each_item_color = ini.GetBool(L"taskbar_default_style", (key_name + L"specify_each_item_color").c_str(), false);
 	}
 }
 
 void CTaskbarDefaultStyle::SaveConfig() const
 {
-
 	CIniHelper ini{ theApp.m_config_path };
 	for (int i = 0; i < TASKBAR_DEFAULT_STYLE_NUM; i++)
 	{
@@ -45,9 +44,9 @@ void CTaskbarDefaultStyle::SaveConfig() const
         if (IsTaskBarStyleDataValid(m_default_style[i]))           //保存前检查当前颜色预设是否有效
         {
             ini.SaveTaskbarWndColors(L"taskbar_default_style", (key_name + L"text_color").c_str(), m_default_style[i].text_colors);
-            ini.WriteInt(L"taskbar_default_style", (key_name + L"back_color").c_str(), m_default_style[i].back_color);
-            ini.WriteInt(L"taskbar_default_style", (key_name + L"transparent_color").c_str(), m_default_style[i].transparent_color);
-            ini.WriteInt(L"taskbar_default_style", (key_name + L"status_bar_color").c_str(), m_default_style[i].status_bar_color);
+            ini.WriteInt(L"taskbar_default_style", (key_name + L"back_color").c_str(), m_default_style[i].back_color, 16);
+            ini.WriteInt(L"taskbar_default_style", (key_name + L"transparent_color").c_str(), m_default_style[i].transparent_color, 16);
+            ini.WriteInt(L"taskbar_default_style", (key_name + L"status_bar_color").c_str(), m_default_style[i].status_bar_color, 16);
             ini.WriteBool(L"taskbar_default_style", (key_name + L"specify_each_item_color").c_str(), m_default_style[i].specify_each_item_color);
         }
         else

@@ -27,6 +27,8 @@ BEGIN_MESSAGE_MAP(CTrafficMonitorApp, CWinApp)
     ON_COMMAND(ID_UPDATE_LOG, &CTrafficMonitorApp::OnUpdateLog)
 END_MESSAGE_MAP()
 
+// 唯一的一个 CTrafficMonitorApp 对象
+CTrafficMonitorApp theApp;
 
 CTrafficMonitorApp* CTrafficMonitorApp::self = NULL;
 
@@ -167,9 +169,9 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::TransparentColorConvert(m_taskbar_data.back_color);
         CCommon::TransparentColorConvert(m_taskbar_data.transparent_color);
     }
-    m_taskbar_data.status_bar_color = ini.GetInt(_T("task_bar"), _T("status_bar_color"), m_taskbar_data.dft_status_bar_color);
     //m_taskbar_data.text_color = GetPrivateProfileInt(_T("task_bar"), _T("task_bar_text_color"), 0x00ffffffU, m_config_path.c_str());
     ini.LoadTaskbarWndColors(_T("task_bar"), _T("task_bar_text_color"), m_taskbar_data.text_colors, m_taskbar_data.dft_text_colors);
+    m_taskbar_data.status_bar_color = ini.GetInt(_T("task_bar"), _T("status_bar_color"), m_taskbar_data.dft_status_bar_color, 16);
     m_taskbar_data.specify_each_item_color = ini.GetBool(L"task_bar", L"specify_each_item_color", false);
     //m_cfg_data.m_tbar_show_cpu_memory = ini.GetBool(_T("task_bar"), _T("task_bar_show_cpu_memory"), false);
     m_taskbar_data.m_tbar_display_item = ini.GetInt(L"task_bar", L"tbar_display_item", TDI_UP | TDI_DOWN);
@@ -382,10 +384,10 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt(L"notify_tip", L"mainboard_temperature_tip_value", m_general_data.mainboard_temp_tip.tip_value);
 
     //任务栏窗口设置
-    ini.WriteInt(L"task_bar", L"task_bar_back_color", m_taskbar_data.back_color);
-    ini.WriteInt(L"task_bar", L"transparent_color", m_taskbar_data.transparent_color);
-    ini.WriteInt(L"task_bar", L"status_bar_color", m_taskbar_data.status_bar_color);
     ini.SaveTaskbarWndColors(L"task_bar", L"task_bar_text_color", m_taskbar_data.text_colors);
+    ini.WriteInt(L"task_bar", L"task_bar_back_color", m_taskbar_data.back_color, 16);
+    ini.WriteInt(L"task_bar", L"transparent_color", m_taskbar_data.transparent_color, 16);
+    ini.WriteInt(L"task_bar", L"status_bar_color", m_taskbar_data.status_bar_color, 16);
     ini.WriteBool(L"task_bar", L"specify_each_item_color", m_taskbar_data.specify_each_item_color);
     //ini.WriteBool(L"task_bar", L"task_bar_show_cpu_memory", m_cfg_data.m_tbar_show_cpu_memory);
     ini.WriteInt(L"task_bar", L"tbar_display_item", m_taskbar_data.m_tbar_display_item);
@@ -906,13 +908,7 @@ void CTrafficMonitorApp::AutoSelectNotifyIcon()
     }
 }
 
-// 唯一的一个 CTrafficMonitorApp 对象
-
-CTrafficMonitorApp theApp;
-
-
 // CTrafficMonitorApp 初始化
-
 BOOL CTrafficMonitorApp::InitInstance()
 {
     //替换掉对话框程序的默认类名

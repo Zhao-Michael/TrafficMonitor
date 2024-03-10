@@ -17,7 +17,9 @@ public:
 	void WriteString(const wchar_t* AppName, const wchar_t* KeyName, const wstring& str);
 	wstring GetString(const wchar_t* AppName, const wchar_t* KeyName, const wchar_t* default_str) const;
 	void WriteInt(const wchar_t * AppName, const wchar_t * KeyName, int value);
+	void WriteInt(const wchar_t * AppName, const wchar_t* KeyName, int value, int base);
 	int GetInt(const wchar_t * AppName, const wchar_t * KeyName, int default_value) const;
+	int GetInt(const wchar_t * AppName, const wchar_t* KeyName, int default_value, int base) const;
 	void WriteBool(const wchar_t * AppName, const wchar_t * KeyName, bool value);
 	bool GetBool(const wchar_t * AppName, const wchar_t * KeyName, bool default_value) const;
 	void WriteIntArray(const wchar_t * AppName, const wchar_t * KeyName, const int* values, int size);		//写入一个int数组，元素个数为size
