@@ -170,7 +170,7 @@ protected:
 
     bool IsTaskbarWndValid() const;
 
-    void TaskbarShowHideItem(DisplayItem type);
+    void TaskbarShowHideItem(EBuiltinDisplayItem type);
 
     //判断一个点在哪个显示项目的区域内，并保存到m_clicked_item
     void CheckClickedItem(CPoint point);

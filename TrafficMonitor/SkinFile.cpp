@@ -16,7 +16,7 @@ CSkinFile::~CSkinFile()
 {
 }
 
-static CSkinFile::LayoutItem LayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
+static CSkinFile::LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
 {
     CSkinFile::LayoutItem layout_item;
     layout_item.x = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
@@ -27,30 +27,32 @@ static CSkinFile::LayoutItem LayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
     return layout_item;
 }
 
-CSkinFile::Layout CSkinFile::LayoutFromXmlNode(tinyxml2::XMLElement* ele)
+CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
 {
     CSkinFile::Layout layout;
-    layout.width = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout.height = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.width    = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout.height   = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
-            string str_layout_item = CTinyXml2Helper::ElementName(ele_layout_item);
-            for (auto display_item : AllDisplayItems)
+            string layout_item_cfg_name = CTinyXml2Helper::ElementName(ele_layout_item);
+            for (auto builtin_item : sAllDisplayItems)
             {
-                if (str_layout_item == CSkinFile::GetDisplayItemXmlNodeName(display_item))
+                if (layout_item_cfg_name == CSkinFile::GetDisplayItemXmlNodeName(builtin_item))
                 {
-                    layout.layout_items[display_item] = LayoutItemFromXmlNode(ele_layout_item);
+                    //如果是内置的"UP"等，就找到了。
+                    //插件item不能map到内置的"UP"等，否则当内置项处理了。
+                    layout.layout_items[builtin_item] = GetLayoutItemFromXmlNode(ele_layout_item);
                     break;
                 }
             }
-            wstring plugin_id = CCommon::StrToUnicode(m_plugin_map[str_layout_item].c_str(), true);
+            wstring plugin_id = CCommon::StrToUnicode(m_plugin_map[layout_item_cfg_name].c_str(), true);
             if (!plugin_id.empty())
             {
-                for (const auto& plugin_item : theApp.m_plugins.GetPluginItems())
+                for (const auto& iplugin_item : theApp.m_plugin_manager.GetPluginItems())
                 {
-                    if (plugin_id == plugin_item->GetItemId())
+                    if (plugin_id == iplugin_item->GetItemId())
                     {
-                        layout.layout_items[plugin_item] = LayoutItemFromXmlNode(ele_layout_item);
+                        layout.layout_items[iplugin_item] = GetLayoutItemFromXmlNode(ele_layout_item);
                         break;
                     }
                 }
@@ -76,7 +78,7 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, DrawStr draw_str, CRect rect, C
     }
 }
 
-void CSkinFile::Load(const wstring& file_path)
+void CSkinFile::LoadCfgAndBGImage(const wstring& file_path)
 {
     CFilePathHelper file_path_helper{ file_path };
     wstring ext = file_path_helper.GetFileExtension();
@@ -129,12 +131,12 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 }
                             }
 
-                            if (m_skin_info.text_color.size() < theApp.m_plugins.AllDisplayItemsWithPlugins().size())
+                            if (m_skin_info.text_color.size() < theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size())
                             {
                                 COLORREF default_color{};
                                 if (!m_skin_info.text_color.empty())
                                     default_color = m_skin_info.text_color.front();
-                                m_skin_info.text_color.resize(theApp.m_plugins.AllDisplayItemsWithPlugins().size(), default_color);
+                                m_skin_info.text_color.resize(theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size(), default_color);
                             }
                             //指定每个项目的颜色
                             else if (skin_item_name == "specify_each_item_color")
@@ -163,7 +165,7 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                     {
                                         string item_name = CTinyXml2Helper::ElementName(display_text_item);
                                         wstring item_text = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(display_text_item), true);
-                                        for (auto display_item : AllDisplayItems)
+                                        for (auto display_item : sAllDisplayItems)
                                         {
                                             if (item_name == CSkinFile::GetDisplayItemXmlNodeName(display_item))
                                             {
@@ -184,9 +186,9 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                         {
                             string str_layout = CTinyXml2Helper::ElementName(ele_layout);
                             if (str_layout == "layout_l")
-                                m_layout_info.layout_l = LayoutFromXmlNode(ele_layout);
+                                m_layout_info.layout_l = GetLayoutFromXmlNode(ele_layout);
                             else if (str_layout == "layout_s")
-                                m_layout_info.layout_s = LayoutFromXmlNode(ele_layout);
+                                m_layout_info.layout_s = GetLayoutFromXmlNode(ele_layout);
                         });
                 }
                 //预览图
@@ -221,7 +223,6 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 }
             });
     }
-
 }
 
 void CSkinFile::LoadFromIni(const wstring& file_path)
@@ -229,6 +230,9 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     m_skin_info = SkinInfo();
     m_layout_info = LayoutInfo();
     m_preview_info = PreviewInfo();
+
+    CSkinFile::Layout& rLayout_L = m_layout_info.layout_l;
+    CSkinFile::Layout& rLayout_S = m_layout_info.layout_s;
 
     //获取皮肤信息
     CIniHelper ini(file_path);
@@ -239,7 +243,6 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     {
         m_skin_info.text_color.push_back(item.second);
     }
-
     m_skin_info.specify_each_item_color = ini.GetBool(_T("skin"), _T("specify_each_item_color"), false);
     //获取当前皮肤的字体
     FontInfo default_font{};
@@ -247,10 +250,10 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     //获取皮肤作者
     m_skin_info.skin_author = ini.GetString(_T("skin"), _T("skin_author"), _T("unknow"));
     //获取显示文本
-    m_skin_info.display_text.Get(TDI_UP) = ini.GetString(_T("skin"), _T("up_string"), NONE_STR);
-    m_skin_info.display_text.Get(TDI_DOWN) = ini.GetString(_T("skin"), _T("down_string"), NONE_STR);
-    m_skin_info.display_text.Get(TDI_CPU) = ini.GetString(_T("skin"), _T("cpu_string"), NONE_STR);
-    m_skin_info.display_text.Get(TDI_MEMORY) = ini.GetString(_T("skin"), _T("memory_string"), NONE_STR);
+    m_skin_info.display_text.Get(TDI_UP)        = ini.GetString(_T("skin"), _T("up_string"),        NONE_STR);
+    m_skin_info.display_text.Get(TDI_DOWN)      = ini.GetString(_T("skin"), _T("down_string"),      NONE_STR);
+    m_skin_info.display_text.Get(TDI_CPU)       = ini.GetString(_T("skin"), _T("cpu_string"),       NONE_STR);
+    m_skin_info.display_text.Get(TDI_MEMORY)    = ini.GetString(_T("skin"), _T("memory_string"),    NONE_STR);
     //获取预览区大小
     m_preview_info.width = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_width"), 238));
     m_preview_info.height = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_height"), 105));
@@ -259,57 +262,56 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     m_layout_info.text_height = theApp.DPI(ini.GetInt(_T("layout"), _T("text_height"), 20));
     m_layout_info.no_label = ini.GetBool(_T("layout"), _T("no_text"), false);
 
-    m_layout_info.layout_l.width = theApp.DPI(ini.GetInt(_T("layout"), _T("width_l"), 220));
-    m_layout_info.layout_l.height = theApp.DPI(ini.GetInt(_T("layout"), _T("height_l"), 43));
-    m_layout_info.layout_l.layout_items[TDI_UP].x = theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_l"), 6));
-    m_layout_info.layout_l.layout_items[TDI_UP].y = theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_l"), 2));
-    m_layout_info.layout_l.layout_items[TDI_UP].width = theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_l"), 108));
-    m_layout_info.layout_l.layout_items[TDI_UP].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_l"), 0));
-    m_layout_info.layout_l.layout_items[TDI_DOWN].x = theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_l"), 114));
-    m_layout_info.layout_l.layout_items[TDI_DOWN].y = theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_l"), 2));
-    m_layout_info.layout_l.layout_items[TDI_DOWN].width = theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_l"), 110));
-    m_layout_info.layout_l.layout_items[TDI_DOWN].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_l"), 0));
-    m_layout_info.layout_l.layout_items[TDI_CPU].x = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_l"), 6));
-    m_layout_info.layout_l.layout_items[TDI_CPU].y = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_l"), 21));
-    m_layout_info.layout_l.layout_items[TDI_CPU].width = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_l"), 108));
-    m_layout_info.layout_l.layout_items[TDI_CPU].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_l"), 0));
-    m_layout_info.layout_l.layout_items[TDI_MEMORY].x = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_l"), 114));
-    m_layout_info.layout_l.layout_items[TDI_MEMORY].y = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_l"), 21));
-    m_layout_info.layout_l.layout_items[TDI_MEMORY].width = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_l"), 110));
-    m_layout_info.layout_l.layout_items[TDI_MEMORY].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_l"), 0));
-    m_layout_info.layout_l.layout_items[TDI_UP].show = ini.GetBool(_T("layout"), _T("show_up_l"), true);
-    m_layout_info.layout_l.layout_items[TDI_DOWN].show = ini.GetBool(_T("layout"), _T("show_down_l"), true);
-    m_layout_info.layout_l.layout_items[TDI_CPU].show = ini.GetBool(_T("layout"), _T("show_cpu_l"), true);
-    m_layout_info.layout_l.layout_items[TDI_MEMORY].show = ini.GetBool(_T("layout"), _T("show_memory_l"), true);
-    m_preview_info.l_pos.x = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_l"), 0));
-    m_preview_info.l_pos.y = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_l"), 47));
+    rLayout_L.width                             =             theApp.DPI(ini.GetInt(_T("layout"), _T("width_l"), 220));
+    rLayout_L.height                            =             theApp.DPI(ini.GetInt(_T("layout"), _T("height_l"), 43));
+    rLayout_L.layout_items[TDI_UP].x            =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_l"), 6));
+    rLayout_L.layout_items[TDI_UP].y            =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_l"), 2));
+    rLayout_L.layout_items[TDI_UP].width        =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_l"), 108));
+    rLayout_L.layout_items[TDI_UP].align        = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_l"), 0));
+    rLayout_L.layout_items[TDI_DOWN].x          =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_l"), 114));
+    rLayout_L.layout_items[TDI_DOWN].y          =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_l"), 2));
+    rLayout_L.layout_items[TDI_DOWN].width      =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_l"), 110));
+    rLayout_L.layout_items[TDI_DOWN].align      = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_l"), 0));
+    rLayout_L.layout_items[TDI_CPU].x =                       theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_l"), 6));
+    rLayout_L.layout_items[TDI_CPU].y =                       theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_l"), 21));
+    rLayout_L.layout_items[TDI_CPU].width       =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_l"), 108));
+    rLayout_L.layout_items[TDI_CPU].align       = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_l"), 0));
+    rLayout_L.layout_items[TDI_MEMORY].x        =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_l"), 114));
+    rLayout_L.layout_items[TDI_MEMORY].y        =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_l"), 21));
+    rLayout_L.layout_items[TDI_MEMORY].width    =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_l"), 110));
+    rLayout_L.layout_items[TDI_MEMORY].align    = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_l"), 0));
+    rLayout_L.layout_items[TDI_UP].show         =                        ini.GetBool(_T("layout"), _T("show_up_l"), true);
+    rLayout_L.layout_items[TDI_DOWN].show       =                        ini.GetBool(_T("layout"), _T("show_down_l"), true);
+    rLayout_L.layout_items[TDI_CPU].show        =                        ini.GetBool(_T("layout"), _T("show_cpu_l"), true);
+    rLayout_L.layout_items[TDI_MEMORY].show     =                        ini.GetBool(_T("layout"), _T("show_memory_l"), true);
+    m_preview_info.l_pos.x                      =             theApp.DPI(ini.GetInt (_T("layout"), _T("preview_x_l"), 0));
+    m_preview_info.l_pos.y                      =             theApp.DPI(ini.GetInt (_T("layout"), _T("preview_y_l"), 47));
 
-    m_layout_info.layout_s.width = theApp.DPI(ini.GetInt(_T("layout"), _T("width_s"), 220));
-    m_layout_info.layout_s.height = theApp.DPI(ini.GetInt(_T("layout"), _T("height_s"), 28));
-    m_layout_info.layout_s.layout_items[TDI_UP].x = theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_s"), 6));
-    m_layout_info.layout_s.layout_items[TDI_UP].y = theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_s"), 4));
-    m_layout_info.layout_s.layout_items[TDI_UP].width = theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_s"), 108));
-    m_layout_info.layout_s.layout_items[TDI_UP].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_DOWN].x = theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_s"), 114));
-    m_layout_info.layout_s.layout_items[TDI_DOWN].y = theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_s"), 4));
-    m_layout_info.layout_s.layout_items[TDI_DOWN].width = theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_s"), 110));
-    m_layout_info.layout_s.layout_items[TDI_DOWN].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_CPU].x = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_CPU].y = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_CPU].width = theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_CPU].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_MEMORY].x = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_MEMORY].y = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_MEMORY].width = theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_MEMORY].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_s"), 0));
-    m_layout_info.layout_s.layout_items[TDI_UP].show = ini.GetBool(_T("layout"), _T("show_up_s"), true);
-    m_layout_info.layout_s.layout_items[TDI_DOWN].show = ini.GetBool(_T("layout"), _T("show_down_s"), true);
-    m_layout_info.layout_s.layout_items[TDI_CPU].show = ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
-    m_layout_info.layout_s.layout_items[TDI_MEMORY].show = ini.GetBool(_T("layout"), _T("show_memory_s"), false);
-    m_preview_info.s_pos.x = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_s"), 0));
-    m_preview_info.s_pos.y = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_s"), 0));
+    rLayout_S.width                             =             theApp.DPI(ini.GetInt(_T("layout"), _T("width_s"), 220));
+    rLayout_S.height                            =             theApp.DPI(ini.GetInt(_T("layout"), _T("height_s"), 28));
+    rLayout_S.layout_items[TDI_UP].x            =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_s"), 6));
+    rLayout_S.layout_items[TDI_UP].y            =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_s"), 4));
+    rLayout_S.layout_items[TDI_UP].width        =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_s"), 108));
+    rLayout_S.layout_items[TDI_UP].align        = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_s"), 0));
+    rLayout_S.layout_items[TDI_DOWN].x          =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_s"), 114));
+    rLayout_S.layout_items[TDI_DOWN].y          =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_s"), 4));
+    rLayout_S.layout_items[TDI_DOWN].width      =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_s"), 110));
+    rLayout_S.layout_items[TDI_DOWN].align      = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_s"), 0));
+    rLayout_S.layout_items[TDI_CPU].x           =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_s"), 0));
+    rLayout_S.layout_items[TDI_CPU].y           =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_s"), 0));
+    rLayout_S.layout_items[TDI_CPU].width       =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_s"), 0));
+    rLayout_S.layout_items[TDI_CPU].align       = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_s"), 0));
+    rLayout_S.layout_items[TDI_MEMORY].x        =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_s"), 0));
+    rLayout_S.layout_items[TDI_MEMORY].y        =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_s"), 0));
+    rLayout_S.layout_items[TDI_MEMORY].width    =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_s"), 0));
+    rLayout_S.layout_items[TDI_MEMORY].align    = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_s"), 0));
+    rLayout_S.layout_items[TDI_UP].show         =                       ini.GetBool(_T("layout"), _T("show_up_s"), true);
+    rLayout_S.layout_items[TDI_DOWN].show       =                       ini.GetBool(_T("layout"), _T("show_down_s"), true);
+    rLayout_S.layout_items[TDI_CPU].show        =                       ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
+    rLayout_S.layout_items[TDI_MEMORY].show     =                       ini.GetBool(_T("layout"), _T("show_memory_s"), false);
+    m_preview_info.s_pos.x                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_s"), 0));
+    m_preview_info.s_pos.y                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_s"), 0));
 }
-
 
 void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 {
@@ -333,12 +335,13 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     draw.DrawBitmap(m_background_l, rect_l.TopLeft(), rect_l.Size());
 
     //获取每个项目显示的文本
-    std::map<DisplayItem, DrawStr> map_str;
-    for (auto iter = AllDisplayItems.begin(); iter != AllDisplayItems.end(); ++iter)
+    std::map<EBuiltinDisplayItem, DrawStr> map_str;
+    for (auto iter = sAllDisplayItems.begin(); iter != sAllDisplayItems.end(); ++iter)
     {
+        MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
         //wstring disp_text = m_skin_info.display_text.Get(*iter);
         //if (disp_text == NONE_STR)
-        //    disp_text = theApp.m_main_wnd_data.disp_str.Get(*iter);
+        //    disp_text = rMainWndData.disp_str.Get(*iter);
         DrawStr draw_str;
         switch (*iter)
         {
@@ -368,7 +371,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             break;
         }
         if (m_skin_info.display_text.Get(*iter) == NONE_STR)
-            m_skin_info.display_text.Get(*iter) = theApp.m_main_wnd_data.disp_str.Get(*iter);
+            m_skin_info.display_text.Get(*iter) = rMainWndData.disp_str.Get(*iter);
         if (!m_layout_info.no_label)
             draw_str.label = m_skin_info.display_text.Get(*iter).c_str();
         map_str[*iter] = draw_str;
@@ -379,7 +382,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     if (m_skin_info.specify_each_item_color)
     {
         int i{};
-        for (const auto& item : theApp.m_plugins.AllDisplayItemsWithPlugins())
+        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
             if (i < static_cast<int>(m_skin_info.text_color.size()))
                 text_colors[item] = m_skin_info.text_color[i];
@@ -388,7 +391,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     }
     else if (!m_skin_info.text_color.empty())
     {
-        for (const auto& item : theApp.m_plugins.AllDisplayItemsWithPlugins())
+        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
             if (!m_skin_info.text_color.empty())
                 text_colors[item] = m_skin_info.text_color[0];
@@ -413,7 +416,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         }
 
         //绘制插件项目
-        for (const auto& plugin_item : theApp.m_plugins.GetPluginItems())
+        for (const auto& plugin_item : theApp.m_plugin_manager.GetPluginItems())
         {
             LayoutItem layout_item = layout.GetItem(plugin_item);
             if (layout_item.show)
@@ -432,7 +435,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                 if (plugin_item->IsCustomDraw())
                 {
                     int brightness{ (GetRValue(cl) + GetGValue(cl) + GetBValue(cl)) / 2 };
-                    ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(plugin_item);
+                    ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(plugin_item);
                     if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
                     {
                         plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(cl).c_str());
@@ -462,6 +465,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 
 void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
 {
+    MainWndSettingData&     rMainWndData = theApp.m_main_wnd_data;
     //绘制背景图
     CImage& background_image{ show_more_info ? m_background_l : m_background_s };
     Layout& layout{ show_more_info ? m_layout_info.layout_l : m_layout_info.layout_s };
@@ -474,61 +478,61 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     draw.DrawBitmap(background_image, CPoint(0, 0), CSize(layout.width, layout.height));
 
     //获取每个项目显示的文本
-    std::map<DisplayItem, DrawStr> map_str;
+    std::map<EBuiltinDisplayItem, DrawStr> map_str;
     if (!m_layout_info.no_label)
     {
-        map_str[TDI_UP].label = theApp.m_main_wnd_data.disp_str.Get(TDI_UP).c_str();
-        map_str[TDI_DOWN].label = theApp.m_main_wnd_data.disp_str.Get(TDI_DOWN).c_str();
-        map_str[TDI_TOTAL_SPEED].label = theApp.m_main_wnd_data.disp_str.Get(TDI_TOTAL_SPEED).c_str();
-        map_str[TDI_CPU].label = theApp.m_main_wnd_data.disp_str.Get(TDI_CPU).c_str();
-        map_str[TDI_MEMORY].label = theApp.m_main_wnd_data.disp_str.Get(TDI_MEMORY).c_str();
-        map_str[TDI_GPU_USAGE].label = theApp.m_main_wnd_data.disp_str.Get(TDI_GPU_USAGE).c_str();
-        map_str[TDI_HDD_USAGE].label = theApp.m_main_wnd_data.disp_str.Get(TDI_HDD_USAGE).c_str();
-        map_str[TDI_CPU_TEMP].label = theApp.m_main_wnd_data.disp_str.Get(TDI_CPU_TEMP).c_str();
-        map_str[TDI_CPU_FREQ].label = theApp.m_main_wnd_data.disp_str.Get(TDI_CPU_FREQ).c_str();
-        map_str[TDI_GPU_TEMP].label = theApp.m_main_wnd_data.disp_str.Get(TDI_GPU_TEMP).c_str();
-        map_str[TDI_HDD_TEMP].label = theApp.m_main_wnd_data.disp_str.Get(TDI_HDD_TEMP).c_str();
-        map_str[TDI_MAIN_BOARD_TEMP].label = theApp.m_main_wnd_data.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
+        map_str[TDI_UP].label               = rMainWndData.disp_str.Get(TDI_UP).c_str();
+        map_str[TDI_DOWN].label             = rMainWndData.disp_str.Get(TDI_DOWN).c_str();
+        map_str[TDI_CPU].label              = rMainWndData.disp_str.Get(TDI_CPU).c_str();
+        map_str[TDI_MEMORY].label           = rMainWndData.disp_str.Get(TDI_MEMORY).c_str();
+        map_str[TDI_GPU_USAGE].label        = rMainWndData.disp_str.Get(TDI_GPU_USAGE).c_str();
+        map_str[TDI_CPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_CPU_TEMP).c_str();
+        map_str[TDI_GPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_GPU_TEMP).c_str();
+        map_str[TDI_HDD_TEMP].label         = rMainWndData.disp_str.Get(TDI_HDD_TEMP).c_str();
+        map_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
+        map_str[TDI_HDD_USAGE].label        = rMainWndData.disp_str.Get(TDI_HDD_USAGE).c_str();
+        map_str[TDI_TOTAL_SPEED].label      = rMainWndData.disp_str.Get(TDI_TOTAL_SPEED).c_str();
+        map_str[TDI_CPU_FREQ].label         = rMainWndData.disp_str.Get(TDI_CPU_FREQ).c_str();
     }
 
     //上传/下载
-    CString in_speed = CCommon::DataSizeToString(theApp.m_in_speed, theApp.m_main_wnd_data);
-    CString out_speed = CCommon::DataSizeToString(theApp.m_out_speed, theApp.m_main_wnd_data);
-    CString total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, theApp.m_main_wnd_data);
-    if (!theApp.m_main_wnd_data.hide_unit || theApp.m_main_wnd_data.speed_unit == SpeedUnit::AUTO)
+    CString in_speed    = CCommon::DataSizeToString(theApp.m_in_speed,                      rMainWndData);
+    CString out_speed   = CCommon::DataSizeToString(theApp.m_out_speed,                     rMainWndData);
+    CString total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, rMainWndData);
+    if (!rMainWndData.hide_unit || rMainWndData.speed_unit == SpeedUnit::AUTO)
     {
         in_speed += _T("/s");
         out_speed += _T("/s");
         total_speed += _T("/s");
     }
-    map_str[TDI_UP].value = out_speed.GetString();
-    map_str[TDI_DOWN].value = in_speed.GetString();
-    map_str[TDI_TOTAL_SPEED].value = total_speed.GetString();
+    map_str[TDI_UP].value           = out_speed.GetString();
+    map_str[TDI_DOWN].value         = in_speed.GetString();
+    map_str[TDI_TOTAL_SPEED].value  = total_speed.GetString();
 
-    if (theApp.m_main_wnd_data.swap_up_down) //交换上传和下载位置
+    if (rMainWndData.swap_up_down) //交换上传和下载位置
     {
         std::swap(map_str[TDI_UP], map_str[TDI_DOWN]);
     }
 
     //CPU/内存/显卡利用率
-    map_str[TDI_CPU].value = CCommon::UsageToString(theApp.m_cpu_usage, theApp.m_main_wnd_data);
+    map_str[TDI_CPU].value = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
  
-    map_str[TDI_CPU_FREQ].value = CCommon::FreqToString(theApp.m_cpu_freq, theApp.m_main_wnd_data);
+    map_str[TDI_CPU_FREQ].value = CCommon::FreqToString(theApp.m_cpu_freq, rMainWndData);
     CString str_memory_value;
-    if (theApp.m_main_wnd_data.memory_display == MemoryDisplay::MEMORY_USED)
-        str_memory_value = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, theApp.m_main_wnd_data.separate_value_unit_with_space);
-    else if (theApp.m_main_wnd_data.memory_display == MemoryDisplay::MEMORY_AVAILABLE)
-        str_memory_value = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, theApp.m_main_wnd_data.separate_value_unit_with_space);
+    if (rMainWndData.memory_display == MemoryDisplay::MEMORY_USED)
+        str_memory_value = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWndData.separate_value_unit_with_space);
+    else if (rMainWndData.memory_display == MemoryDisplay::MEMORY_AVAILABLE)
+        str_memory_value = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, rMainWndData.separate_value_unit_with_space);
     else
-        str_memory_value = CCommon::UsageToString(theApp.m_memory_usage, theApp.m_main_wnd_data);
-    map_str[TDI_MEMORY].value = str_memory_value;
-    map_str[TDI_GPU_USAGE].value = CCommon::UsageToString(theApp.m_gpu_usage, theApp.m_main_wnd_data);
-    map_str[TDI_HDD_USAGE].value = CCommon::UsageToString(theApp.m_hdd_usage, theApp.m_main_wnd_data);
+        str_memory_value = CCommon::UsageToString(theApp.m_memory_usage, rMainWndData);
+    map_str[TDI_MEMORY].value       = str_memory_value;
+    map_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
+    map_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
 
     //温度
-    auto getTemperatureStr = [&](DisplayItem display_item, float temperature)
+    auto getTemperatureStr = [&](EBuiltinDisplayItem display_item, float temperature)
     {
-        map_str[display_item].value = CCommon::TemperatureToString(temperature, theApp.m_main_wnd_data);
+        map_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);
     };
     getTemperatureStr(TDI_CPU_TEMP, theApp.m_cpu_temperature);
     getTemperatureStr(TDI_GPU_TEMP, theApp.m_gpu_temperature);
@@ -537,15 +541,15 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
 
     //获取文本颜色
     std::map<CommonDisplayItem, COLORREF> text_colors{};
-    if (theApp.m_main_wnd_data.specify_each_item_color)
+    if (rMainWndData.specify_each_item_color)
     {
-        text_colors = theApp.m_main_wnd_data.text_colors;
+        text_colors = rMainWndData.text_colors;
     }
-    else if (!theApp.m_main_wnd_data.text_colors.empty())
+    else if (!rMainWndData.text_colors.empty())
     {
-        for (const auto& item : theApp.m_plugins.AllDisplayItemsWithPlugins())
+        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
-            text_colors[item] = theApp.m_main_wnd_data.text_colors.begin()->second;
+            text_colors[item] = rMainWndData.text_colors.begin()->second;
         }
     }
 
@@ -572,7 +576,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 
     //绘制插件项目
-    for (const auto& plugin_item : theApp.m_plugins.GetPluginItems())
+    for (const auto& plugin_item : theApp.m_plugin_manager.GetPluginItems())
     {
         const auto& layout_item = layout.GetItem(plugin_item);
         if (layout_item.show)
@@ -587,7 +591,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
             if (plugin_item->IsCustomDraw())
             {
                 int brightness{ (GetRValue(cl) + GetGValue(cl) + GetBValue(cl)) / 2 };
-                ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(plugin_item);
+                ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(plugin_item);
                 if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
                 {
                     plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(cl).c_str());
@@ -603,7 +607,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
 
                 //绘制文本
                 DrawStr draw_str;
-                draw_str.label = theApp.m_main_wnd_data.disp_str.Get(plugin_item).c_str();
+                draw_str.label = rMainWndData.disp_str.Get(plugin_item).c_str();
                 draw_str.value = plugin_item->GetItemValueText();
                 DrawSkinText(draw, draw_str, rect, cl, layout_item.align);
             }
@@ -611,7 +615,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 }
 
-string CSkinFile::GetDisplayItemXmlNodeName(DisplayItem display_item)
+string CSkinFile::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
 {
     switch (display_item)
     {

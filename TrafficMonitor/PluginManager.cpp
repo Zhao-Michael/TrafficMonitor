@@ -20,8 +20,8 @@ CPluginManager::CPluginManager()
 CPluginManager::~CPluginManager()
 {
     //卸载插件
-    for (const auto& m : m_modules)
-        FreeLibrary(m.plugin_module);
+    for (const auto& m : V_PluginManageUnit)
+        FreeLibrary(m.m_plugin_module);
 }
 
 static wstring WcharArrayToWString(const wchar_t* str)
@@ -42,10 +42,10 @@ void CPluginManager::LoadPlugins()
     for (const auto& file : plugin_files)
     {
         //插件信息
-        m_modules.push_back(PluginInfo());
-        PluginInfo& plugin_info{ m_modules.back() };
+        V_PluginManageUnit.push_back(PluginManageUnit());                       //存入新的空PluginManageUnit
+        PluginManageUnit& plugin_manage_unit{ V_PluginManageUnit.back() };      //得到刚存入的空PluginManageUnit引用，以便接下来存入数据。
         //插件dll的路径
-        plugin_info.file_path = plugin_dir + file;
+        plugin_manage_unit.m_file_path = plugin_dir + file;
         //插件文件名
         std::wstring file_name{ file };
         if (!file_name.empty() && (file_name[0] == L'\\' || file_name[0] == L'/'))
@@ -53,64 +53,64 @@ void CPluginManager::LoadPlugins()
         //如果插件被禁用，则不加载插件
         if (theApp.m_cfg_data.plugin_disabled.Contains(file_name))
         {
-            plugin_info.state = PluginState::PS_DISABLE;
+            plugin_manage_unit.state = PluginState::PS_DISABLE;
             continue;
         }
         //载入dll
-        plugin_info.plugin_module = LoadLibrary(plugin_info.file_path.c_str());
-        if (plugin_info.plugin_module == NULL)
+        plugin_manage_unit.m_plugin_module = LoadLibrary(plugin_manage_unit.m_file_path.c_str());
+        if (NULL == plugin_manage_unit.m_plugin_module)
         {
-            plugin_info.state = PluginState::PS_MUDULE_LOAD_FAILED;
-            plugin_info.error_code = GetLastError();
+            plugin_manage_unit.state = PluginState::PS_MUDULE_LOAD_FAILED;
+            plugin_manage_unit.error_code = GetLastError();
             continue;
         }
         // hook插件导入的User32.dll下的DrawText系列函数
-        ReplacePluginDrawTextFunction(plugin_info.plugin_module);
+        ReplacePluginDrawTextFunction(plugin_manage_unit.m_plugin_module);
         //获取函数的入口地址
-        pfTMPluginGetInstance TMPluginGetInstance = (pfTMPluginGetInstance)::GetProcAddress(plugin_info.plugin_module, "TMPluginGetInstance");
+        pfTMPluginGetInstance TMPluginGetInstance = (pfTMPluginGetInstance)::GetProcAddress(plugin_manage_unit.m_plugin_module, "TMPluginGetInstance");
         if (TMPluginGetInstance == NULL)
         {
-            plugin_info.state = PluginState::PS_FUNCTION_GET_FAILED;
-            plugin_info.error_code = GetLastError();
+            plugin_manage_unit.state = PluginState::PS_FUNCTION_GET_FAILED;
+            plugin_manage_unit.error_code = GetLastError();
             continue;
         }
         //创建插件对象
-        plugin_info.plugin = TMPluginGetInstance();
-        if (plugin_info.plugin == nullptr)
+        plugin_manage_unit.plugin = TMPluginGetInstance();
+        if (plugin_manage_unit.plugin == nullptr)
             continue;
         //检查插件版本
-        int version = plugin_info.plugin->GetAPIVersion();
+        int version = plugin_manage_unit.plugin->GetAPIVersion();
         if (version <= PLUGIN_UNSUPPORT_VERSION)
         {
-            plugin_info.state = PluginState::PS_VERSION_NOT_SUPPORT;
+            plugin_manage_unit.state = PluginState::PS_VERSION_NOT_SUPPORT;
             continue;
         }
-        //向插件传递配置文件的路径
+        //向插件传递插件自己使用的配置文件的路径
         std::wstring config_dir = theApp.m_config_dir;
         config_dir += L"plugins\\";
         if (version >= 2)
         {
             CreateDirectory(config_dir.c_str(), NULL);       //如果plugins不存在，则创建它
-            plugin_info.plugin->OnExtenedInfo(ITMPlugin::EI_CONFIG_DIR, config_dir.c_str());
+            plugin_manage_unit.plugin->OnExtenedInfo(ITMPlugin::EI_CONFIG_DIR, config_dir.c_str());
         }
 
-        //获取插件信息
+        //获取插件信息(名称、描述、版本等)
         for (int i{}; i < ITMPlugin::TMI_MAX; i++)
         {
             ITMPlugin::PluginInfoIndex index{ static_cast<ITMPlugin::PluginInfoIndex>(i) };
-            plugin_info.properties[index] = WcharArrayToWString(plugin_info.plugin->GetInfo(index));
+            plugin_manage_unit.M_properties[index] = WcharArrayToWString(plugin_manage_unit.plugin->GetInfo(index));
         }
 
-        //获取插件显示项目
+        //获取插件支持的所有显示项目(插件可能会通过用户设置的形式来增加、修改、删除其支持的所有显示项目)
         int index = 0;
         while (true)
         {
-            IPluginItem* item = plugin_info.plugin->GetItem(index);
+            IPluginItem* item = plugin_manage_unit.plugin->GetItem(index);
             if (item == nullptr)
                 break;
-            plugin_info.plugin_items.push_back(item);
-            m_plugins.push_back(item);
-            m_plguin_item_map[item] = plugin_info.plugin;
+            plugin_manage_unit.V_PI_PluginItem.push_back(item);                //将所有ITMPlugin的所有ITMPlugin都存入一个vector
+            V_PI_PluginItem.push_back(item);
+            M_IPlguinItem_to_ITMPlugin[item] = plugin_manage_unit.plugin;       //记录每个IPlguinItem属于哪个ITMPlugin
             index++;
         }
     }
@@ -118,29 +118,29 @@ void CPluginManager::LoadPlugins()
     ReplaceMfcDrawTextFunction();
 
     //初始化所有任务栏显示项目
-    for (const auto& display_item : AllDisplayItems)
+    for (const auto& display_item : sAllDisplayItems)
     {
-        m_all_display_items_with_plugins.insert(display_item);
+        S_all_display_items_with_plugins.insert(display_item);
     }
-    for (const auto& display_item : m_plugins)
+    for (const auto& display_item : V_PI_PluginItem)
     {
-        m_all_display_items_with_plugins.insert(display_item);
+        S_all_display_items_with_plugins.insert(display_item);
     }
 }
 
 const std::vector<IPluginItem*>& CPluginManager::GetPluginItems() const
 {
-    return m_plugins;
+    return V_PI_PluginItem;
 }
 
-const std::vector<CPluginManager::PluginInfo>& CPluginManager::GetPlugins() const
+const std::vector<CPluginManager::PluginManageUnit>& CPluginManager::GetAllPluginManageUnit() const
 {
-    return m_modules;
+    return V_PluginManageUnit;
 }
 
 IPluginItem* CPluginManager::GetItemById(const std::wstring& item_id)
 {
-    for (const auto& item : m_plugins)
+    for (const auto& item : V_PI_PluginItem)
     {
         if (item->GetItemId() == item_id)
             return item;
@@ -150,41 +150,41 @@ IPluginItem* CPluginManager::GetItemById(const std::wstring& item_id)
 
 IPluginItem* CPluginManager::GetItemByIndex(int index)
 {
-    if (index >= 0 && index < static_cast<int>(m_plugins.size()))
-        return m_plugins[index];
+    if (index >= 0 && index < static_cast<int>(V_PI_PluginItem.size()))
+        return V_PI_PluginItem[index];
     return nullptr;
 }
 
 int CPluginManager::GetItemIndex(IPluginItem* item) const
 {
-    for (auto iter = m_plugins.begin(); iter != m_plugins.end(); ++iter)
+    for (auto iter = V_PI_PluginItem.begin(); iter != V_PI_PluginItem.end(); ++iter)
     {
         if (*iter == item)
-            return iter - m_plugins.begin();
+            return iter - V_PI_PluginItem.begin();
     }
     return -1;
 }
 
-ITMPlugin* CPluginManager::GetPluginByItem(IPluginItem* pItem)
+ITMPlugin* CPluginManager::GetITMPluginByIPlguinItem(IPluginItem* pItem)
 {
     if (pItem == nullptr)
         return nullptr;
-    return m_plguin_item_map[pItem];
+    return M_IPlguinItem_to_ITMPlugin[pItem];
 }
 
-int CPluginManager::GetPluginIndex(ITMPlugin* plugin) const
+int CPluginManager::GetIPluginIndex(ITMPlugin* plugin) const
 {
-    for (auto iter = m_modules.begin(); iter != m_modules.end(); ++iter)
+    for (auto iter = V_PluginManageUnit.begin(); iter != V_PluginManageUnit.end(); ++iter)
     {
         if (iter->plugin == plugin)
-            return iter - m_modules.begin();
+            return iter - V_PluginManageUnit.begin();
     }
     return -1;
 }
 
 void CPluginManager::EnumPlugin(std::function<void(ITMPlugin*)> func) const
 {
-    for (const auto& item : m_modules)
+    for (const auto& item : V_PluginManageUnit)
     {
         if (item.plugin != nullptr)
         {
@@ -195,7 +195,7 @@ void CPluginManager::EnumPlugin(std::function<void(ITMPlugin*)> func) const
 
 void CPluginManager::EnumPluginItem(std::function<void(IPluginItem*)> func) const
 {
-    for (const auto& item : m_plugins)
+    for (const auto& item : V_PI_PluginItem)
     {
         if (item != nullptr)
         {
@@ -206,14 +206,14 @@ void CPluginManager::EnumPluginItem(std::function<void(IPluginItem*)> func) cons
 
 const std::set<CommonDisplayItem>& CPluginManager::AllDisplayItemsWithPlugins()
 {
-    return m_all_display_items_with_plugins;
+    return S_all_display_items_with_plugins;
 }
 
 
 int CPluginManager::GetItemWidth(IPluginItem* pItem, CDC* pDC)
 {
     int width = 0;
-    ITMPlugin* plugin = GetPluginByItem(pItem);
+    ITMPlugin* plugin = GetITMPluginByIPlguinItem(pItem);
     if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
     {
         width = pItem->GetItemWidthEx(pDC->GetSafeHdc());       //优先使用GetItemWidthEx接口获取宽度
@@ -225,10 +225,10 @@ int CPluginManager::GetItemWidth(IPluginItem* pItem, CDC* pDC)
     return width;
 }
 
-std::wstring CPluginManager::PluginInfo::Property(ITMPlugin::PluginInfoIndex index) const
+std::wstring CPluginManager::PluginManageUnit::Property(ITMPlugin::PluginInfoIndex index) const
 {
-    auto iter = properties.find(index);
-    if (iter != properties.end())
+    auto iter = M_properties.find(index);
+    if (iter != M_properties.end())
         return iter->second;
     return wstring();
 }

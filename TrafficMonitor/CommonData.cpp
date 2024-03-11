@@ -88,7 +88,7 @@ bool DispStrings::IsInvalid() const
 
 void DispStrings::Load(const std::wstring& plugin_id, const std::wstring& disp_str)
 {
-    auto plugin = theApp.m_plugins.GetItemById(plugin_id);
+    auto plugin = theApp.m_plugin_manager.GetItemById(plugin_id);
     if (plugin != nullptr)
     {
         map_str[plugin] = disp_str;

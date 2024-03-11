@@ -21,15 +21,18 @@ public:
     };
 
     //插件信息
-    struct PluginInfo
+    struct PluginManageUnit
     {
-        wstring file_path;      //文件路径
-        HMODULE plugin_module{};  //dll module
-        ITMPlugin* plugin{};      //插件对象
-        std::vector<IPluginItem*> plugin_items; //插件提供的所有显示项目
-        PluginState state{};    //插件的状态
-        DWORD error_code{};     //错误代码（GetLastError的返回值）
-        std::map<ITMPlugin::PluginInfoIndex, std::wstring> properties;    //插件属性
+        //V: vector; S: set; M: map; I: interface; P: pointer
+        wstring                                             m_file_path;        //文件路径
+        HMODULE                                             m_plugin_module{};  //dll module
+        PluginState                                         state{};            //插件的状态
+        DWORD                                               error_code{};       //错误代码（GetLastError的返回值）
+        std::map<ITMPlugin::PluginInfoIndex, std::wstring>  M_properties;       //插件属性
+        ITMPlugin*                                          plugin{};           //插件接口ITMPlugin指针
+        std::vector<IPluginItem*>                           V_PI_PluginItem;    //插件接口ITMPlugin提供的所有显示项目
+
+        //成员函数
         std::wstring Property(ITMPlugin::PluginInfoIndex) const;
     };
 
@@ -37,13 +40,13 @@ public:
     ~CPluginManager();
     void LoadPlugins();
 
-    const std::vector<IPluginItem*>& GetPluginItems() const;
-    const std::vector<PluginInfo>& GetPlugins() const;
-    IPluginItem* GetItemById(const std::wstring& item_id);
-    IPluginItem* GetItemByIndex(int index);
-    int GetItemIndex(IPluginItem* item) const;
-    ITMPlugin* GetPluginByItem(IPluginItem* pItem);
-    int GetPluginIndex(ITMPlugin* plugin) const;
+    const std::vector<IPluginItem*>&        GetPluginItems() const;
+    const std::vector<PluginManageUnit>&    GetAllPluginManageUnit() const;
+    IPluginItem*                            GetItemById(const std::wstring& item_id);
+    IPluginItem*                            GetItemByIndex(int index);
+    int                                     GetItemIndex(IPluginItem* item) const;
+    ITMPlugin*                              GetITMPluginByIPlguinItem(IPluginItem* pItem);
+    int                                     GetIPluginIndex(ITMPlugin* plugin) const;
 
     //遍历所有插件
     //func: 参数为遍历到的ITMPlugin对象
@@ -62,8 +65,9 @@ private:
     static void ReplaceMfcDrawTextFunction() noexcept;
 
 private:
-    std::vector<IPluginItem*> m_plugins;
-    std::vector<PluginInfo> m_modules;
-    std::set<CommonDisplayItem> m_all_display_items_with_plugins;   //包含插件在内的所有任务栏显示项目
-    std::map<IPluginItem*, ITMPlugin*> m_plguin_item_map;          //用于根据插件项目查找对应插件的map
+    //V: vector; S: set; M: map; I: interface; P: pointer
+    std::vector<PluginManageUnit>       V_PluginManageUnit;
+    std::vector<IPluginItem*>           V_PI_PluginItem;                    //将所有ITMPlugin的所有ITMPlugin都存入一个vector
+    std::set<CommonDisplayItem>         S_all_display_items_with_plugins;   //包含插件在内的所有任务栏显示项目
+    std::map<IPluginItem*, ITMPlugin*>  M_IPlguinItem_to_ITMPlugin;         //用于根据插件项目查找对应插件的map
 };

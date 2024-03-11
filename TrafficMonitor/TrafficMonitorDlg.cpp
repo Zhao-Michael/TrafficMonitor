@@ -168,37 +168,39 @@ CString CTrafficMonitorDlg::GetMouseTipsInfo()
 #ifndef WITHOUT_TEMPERATURE
     if (IsTemperatureNeeded())
     {
-        if (theApp.m_general_data.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_GPU_USAGE).show && theApp.m_gpu_usage >= 0)
+        GeneralSettingData& rGeneralData = theApp.m_general_data;
+
+        if (rGeneralData.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_GPU_USAGE).show && theApp.m_gpu_usage >= 0)
         {
             temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_GPU_USAGE), theApp.m_gpu_usage);
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_CPU_FREQ).show && theApp.m_cpu_freq >= 0)
+        if (rGeneralData.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_CPU_FREQ).show && theApp.m_cpu_freq >= 0)
         {
             temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_CPU_FREQ), theApp.m_cpu_freq);
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_CPU) && !skin_layout.GetItem(TDI_CPU_TEMP).show && theApp.m_cpu_temperature > 0)
+        if (rGeneralData.IsHardwareEnable(HI_CPU) && !skin_layout.GetItem(TDI_CPU_TEMP).show && theApp.m_cpu_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_CPU_TEMPERATURE), CCommon::TemperatureToString(theApp.m_cpu_temperature, theApp.m_main_wnd_data));
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_GPU_TEMP).show && theApp.m_gpu_temperature > 0)
+        if (rGeneralData.IsHardwareEnable(HI_GPU) && !skin_layout.GetItem(TDI_GPU_TEMP).show && theApp.m_gpu_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_GPU_TEMPERATURE), CCommon::TemperatureToString(theApp.m_gpu_temperature, theApp.m_main_wnd_data));
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_HDD) && !skin_layout.GetItem(TDI_HDD_TEMP).show && theApp.m_hdd_temperature > 0)
+        if (rGeneralData.IsHardwareEnable(HI_HDD) && !skin_layout.GetItem(TDI_HDD_TEMP).show && theApp.m_hdd_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_HDD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_hdd_temperature, theApp.m_main_wnd_data));
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_MBD) && !skin_layout.GetItem(TDI_MAIN_BOARD_TEMP).show && theApp.m_main_board_temperature > 0)
+        if (rGeneralData.IsHardwareEnable(HI_MBD) && !skin_layout.GetItem(TDI_MAIN_BOARD_TEMP).show && theApp.m_main_board_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_main_board_temperature, theApp.m_main_wnd_data));
             tip_info += temp;
         }
-        if (theApp.m_general_data.IsHardwareEnable(HI_HDD) && !skin_layout.GetItem(TDI_HDD_USAGE).show && theApp.m_hdd_usage >= 0)
+        if (rGeneralData.IsHardwareEnable(HI_HDD) && !skin_layout.GetItem(TDI_HDD_USAGE).show && theApp.m_hdd_usage >= 0)
         {
             temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_HDD_USAGE), theApp.m_hdd_usage);
             tip_info += temp;
@@ -824,7 +826,7 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     wstring skin_cfg_path{ theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.xml" };
     if (!CCommon::FileExist(skin_cfg_path.c_str()))
         skin_cfg_path = theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.ini";
-    m_skin.Load(skin_cfg_path);
+    m_skin.LoadCfgAndBGImage(skin_cfg_path);
     if (m_skin.GetLayoutInfo().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
         theApp.m_main_wnd_data.swap_up_down = false;
 }
@@ -884,7 +886,7 @@ bool CTrafficMonitorDlg::IsTaskbarWndValid() const
     return m_tBarDlg != nullptr && ::IsWindow(m_tBarDlg->GetSafeHwnd());
 }
 
-void CTrafficMonitorDlg::TaskbarShowHideItem(DisplayItem type)
+void CTrafficMonitorDlg::TaskbarShowHideItem(EBuiltinDisplayItem type)
 {
     if (IsTaskbarWndValid())
     {
@@ -1375,24 +1377,24 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
 #endif
 
     //通知插件获取数据，以及向插件传递监控数据
-    for (const auto& plugin_info : theApp.m_plugins.GetPlugins())
+    for (const auto& pluginManageUnit : theApp.m_plugin_manager.GetAllPluginManageUnit())
     {
-        if (plugin_info.plugin != nullptr)
+        if (pluginManageUnit.plugin != nullptr)
         {
-            plugin_info.plugin->DataRequired();
+            pluginManageUnit.plugin->DataRequired();
             ITMPlugin::MonitorInfo monitor_info;
-            monitor_info.up_speed = theApp.m_out_speed;
-            monitor_info.down_speed = theApp.m_in_speed;
-            monitor_info.cpu_usage = theApp.m_cpu_usage;
-            monitor_info.memory_usage = theApp.m_memory_usage;
-            monitor_info.gpu_usage = theApp.m_gpu_usage;
-            monitor_info.hdd_usage = theApp.m_hdd_usage;
-            monitor_info.cpu_temperature = theApp.m_cpu_temperature;
-            monitor_info.gpu_temperature = theApp.m_gpu_temperature;
-            monitor_info.hdd_temperature = theApp.m_hdd_temperature;
-            monitor_info.cpu_freq = theApp.m_cpu_freq;
+            monitor_info.up_speed               = theApp.m_out_speed;
+            monitor_info.down_speed             = theApp.m_in_speed;
+            monitor_info.cpu_usage              = theApp.m_cpu_usage;
+            monitor_info.memory_usage           = theApp.m_memory_usage;
+            monitor_info.gpu_usage              = theApp.m_gpu_usage;
+            monitor_info.hdd_usage              = theApp.m_hdd_usage;
+            monitor_info.cpu_temperature        = theApp.m_cpu_temperature;
+            monitor_info.gpu_temperature        = theApp.m_gpu_temperature;
+            monitor_info.hdd_temperature        = theApp.m_hdd_temperature;
+            monitor_info.cpu_freq               = theApp.m_cpu_freq;
             monitor_info.main_board_temperature = theApp.m_main_board_temperature;
-            plugin_info.plugin->OnMonitorInfo(monitor_info);
+            pluginManageUnit.plugin->OnMonitorInfo(monitor_info);
         }
     }
 
@@ -1733,8 +1735,6 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
         }
 
         UpdateNotifyIconTip();
-
-
     }
 
     if (nIDEvent == DELAY_TIMER)
@@ -1782,7 +1782,7 @@ void CTrafficMonitorDlg::OnRButtonUp(UINT nFlags, CPoint point)
     ITMPlugin* plugin{};
     if (is_plugin_item_clicked)
     {
-        plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_RCLICKED, point.x, point.y, (void*)GetSafeHwnd(), 0) != 0)
@@ -1844,7 +1844,7 @@ void CTrafficMonitorDlg::OnLButtonDown(UINT nFlags, CPoint point)
     bool plugin_item_clicked = false;   //是否响应了插件项目的左键点击事件
     if (m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)      //点击的是否为插件项目
     {
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_LCLICKED, point.x, point.y, (void*)GetSafeHwnd(), 0) != 0)
@@ -1987,7 +1987,7 @@ BOOL CTrafficMonitorDlg::OnCommand(WPARAM wParam, LPARAM lParam)
         int index = uMsg - ID_PLUGIN_COMMAND_START;
         if (m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)
         {
-            ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+            ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
             if (plugin != nullptr && plugin->GetAPIVersion() >= 5)
             {
                 plugin->OnPluginCommand(index, (void*)GetSafeHwnd(), nullptr);
@@ -2039,7 +2039,7 @@ void CTrafficMonitorDlg::OnInitMenu(CMenu* pMenu)
     pMenu->EnableMenuItem(ID_CHECK_UPDATE, MF_BYCOMMAND | (theApp.IsCheckingForUpdate() ? MF_GRAYED : MF_ENABLED));
 
     //设置插件命令的勾选状态
-    ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+    ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
     if (plugin != nullptr && plugin->GetAPIVersion() >= 5)
     {
         for (int i = ID_PLUGIN_COMMAND_START; i <= ID_PLUGIN_COMMAND_MAX; i++)
@@ -2070,7 +2070,7 @@ BOOL CTrafficMonitorDlg::PreTranslateMessage(MSG* pMsg)
         bool ctrl = (GetKeyState(VK_CONTROL) & 0x80);
         bool shift = (GetKeyState(VK_SHIFT) & 0x8000);
         bool alt = (GetKeyState(VK_MENU) & 0x8000);
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 4)
         {
             if (m_clicked_item.plugin_item->OnKeboardEvent(pMsg->wParam, ctrl, shift, alt, (void*)GetSafeHwnd(), IPluginItem::KF_TASKBAR_WND) != 0)
@@ -2387,8 +2387,8 @@ void CTrafficMonitorDlg::OnChangeSkin()
         LoadBackGroundImage();
         //获取皮肤的文字颜色
         theApp.m_main_wnd_data.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
-        int i{};
-        for (const auto& item : theApp.m_plugins.AllDisplayItemsWithPlugins())
+        size_t i{};
+        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
             theApp.m_main_wnd_data.text_colors[item] = skinDlg.GetSkinData().GetSkinInfo().TextColor(i);
             i++;
@@ -2444,7 +2444,7 @@ void CTrafficMonitorDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
     CheckClickedItem(point);
     if (m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)
     {
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_DBCLICKED, point.x, point.y, (void*)GetSafeHwnd(), 0) != 0)
@@ -2758,7 +2758,7 @@ void CTrafficMonitorDlg::OnPluginOptions()
     if (m_clicked_item.is_plugin)
     {
         //找到对应的插件
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr)
         {
             //显示插件的选项设置
@@ -2775,10 +2775,10 @@ void CTrafficMonitorDlg::OnPluginDetail()
     if (m_clicked_item.is_plugin)
     {
         //找到对应的插件
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr)
         {
-            int index = theApp.m_plugins.GetPluginIndex(plugin);
+            int index = theApp.m_plugin_manager.GetIPluginIndex(plugin);
             CPluginInfoDlg dlg(index);
             dlg.DoModal();
         }
@@ -2792,7 +2792,7 @@ void CTrafficMonitorDlg::OnPluginOptionsTaksbar()
     if (IsTaskbarWndValid() && m_tBarDlg->GetClickedItem().is_plugin)
     {
         //找到对应的插件
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_tBarDlg->GetClickedItem().plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_tBarDlg->GetClickedItem().plugin_item);
         if (plugin != nullptr)
         {
             //显示插件的选项设置
@@ -2814,10 +2814,10 @@ void CTrafficMonitorDlg::OnPluginDetailTaksbar()
     if (IsTaskbarWndValid() && m_tBarDlg->GetClickedItem().is_plugin)
     {
         //找到对应的插件
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_tBarDlg->GetClickedItem().plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_tBarDlg->GetClickedItem().plugin_item);
         if (plugin != nullptr)
         {
-            int index = theApp.m_plugins.GetPluginIndex(plugin);
+            int index = theApp.m_plugin_manager.GetIPluginIndex(plugin);
             CPluginInfoDlg dlg(index);
             dlg.DoModal();
         }

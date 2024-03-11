@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "TrafficMonitor.h"
 
-CommonDisplayItem::CommonDisplayItem(DisplayItem item)
+CommonDisplayItem::CommonDisplayItem(EBuiltinDisplayItem item)
 {
     is_plugin = false;
     item_type = item;
@@ -25,7 +25,7 @@ bool CommonDisplayItem::operator<(const CommonDisplayItem& item) const
     else if (!is_plugin)
         return item_type < item.item_type;
     else
-        return theApp.m_plugins.GetItemIndex(plugin_item) < theApp.m_plugins.GetItemIndex(item.plugin_item);
+        return theApp.m_plugin_manager.GetItemIndex(plugin_item) < theApp.m_plugin_manager.GetItemIndex(item.plugin_item);
 }
 
 CString CommonDisplayItem::GetItemName() const
@@ -106,7 +106,7 @@ CTaskbarItemOrderHelper::CTaskbarItemOrderHelper(bool displayed_only)
 
 void CTaskbarItemOrderHelper::Init()
 {
-    for (const auto& item : theApp.m_plugins.AllDisplayItemsWithPlugins())
+    for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
     {
         m_all_item_in_default_order.push_back(item);
     }
@@ -236,7 +236,7 @@ bool CTaskbarItemOrderHelper::IsItemDisplayed(CommonDisplayItem item)
 void CTaskbarItemOrderHelper::NormalizeItemOrder()
 {
     //检查是否有超出范围的序号
-    int item_num = static_cast<int>(theApp.m_plugins.AllDisplayItemsWithPlugins().size());
+    int item_num = static_cast<int>(theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size());
     for (auto iter = m_item_order.begin(); iter != m_item_order.end();)
     {
         if (*iter < 0 || *iter >= item_num)

@@ -26,24 +26,26 @@ CGeneralSettingsDlg::~CGeneralSettingsDlg()
 
 void CGeneralSettingsDlg::CheckTaskbarDisplayItem()
 {
+    GeneralSettingData& rGeneralData = theApp.m_general_data;
+
     //如果选项设置中关闭了某个硬件监控，则不显示对应的温度监控相关项目
     int taskbar_displat_item_ori = theApp.m_taskbar_data.m_tbar_display_item;
-    if (!theApp.m_general_data.IsHardwareEnable(HI_CPU))
+    if (!rGeneralData.IsHardwareEnable(HI_CPU))
     {
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_CPU_TEMP;
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_CPU_FREQ;
     }
-    if (!theApp.m_general_data.IsHardwareEnable(HI_GPU))
+    if (!rGeneralData.IsHardwareEnable(HI_GPU))
     {
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_GPU_USAGE;
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_GPU_TEMP;
     }
-    if (!theApp.m_general_data.IsHardwareEnable(HI_HDD))
+    if (!rGeneralData.IsHardwareEnable(HI_HDD))
     {
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_HDD_TEMP;
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_HDD_USAGE;
     }
-    if (!theApp.m_general_data.IsHardwareEnable(HI_MBD))
+    if (!rGeneralData.IsHardwareEnable(HI_MBD))
         theApp.m_taskbar_data.m_tbar_display_item &= ~TDI_MAIN_BOARD_TEMP;
 }
 
@@ -387,17 +389,18 @@ void CGeneralSettingsDlg::OnOK()
     m_data.mainboard_temp_tip.tip_value = m_mbd_temp_tip_edit.GetValue();
     checkTipValue(m_data.mainboard_temp_tip.tip_value);
 
+    GeneralSettingData& rGeneralData = theApp.m_general_data;
     //获取语言的设置
     m_data.language = static_cast<Language>(m_language_combo.GetCurSel());
-    if (m_data.language != theApp.m_general_data.language)
+    if (m_data.language != rGeneralData.language)
     {
         MessageBox(CCommon::LoadText(IDS_LANGUAGE_CHANGE_INFO), NULL, MB_ICONINFORMATION | MB_OK);
     }
-    m_show_all_interface_modified = (m_data.show_all_interface != theApp.m_general_data.show_all_interface);
+    m_show_all_interface_modified = (m_data.show_all_interface != rGeneralData.show_all_interface);
 
     //获取数据文件保存位置的设置
     m_data.portable_mode = (((CButton*)GetDlgItem(IDC_SAVE_TO_PROGRAM_DIR_RADIO))->GetCheck() != 0);
-    if (m_data.portable_mode != theApp.m_general_data.portable_mode)
+    if (m_data.portable_mode != rGeneralData.portable_mode)
     {
         MessageBox(CCommon::LoadText(IDS_CFG_DIR_CHANGED_INFO), NULL, MB_ICONINFORMATION | MB_OK);
     }

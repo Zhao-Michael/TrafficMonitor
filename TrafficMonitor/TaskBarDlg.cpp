@@ -265,7 +265,7 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
 #endif
 }
 
-void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, DisplayItem type, CRect rect, int label_width, bool vertical)
+void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type, CRect rect, int label_width, bool vertical)
 {
     m_item_rects[type] = rect;
     //设置要绘制的文本颜色
@@ -497,7 +497,7 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
         const COLORREF& bk{ theApp.m_taskbar_data.back_color };
         int background_brightness{ (GetRValue(bk) + GetGValue(bk) + GetBValue(bk)) / 3 };
         //由插件自绘
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
         {
             plugin->OnExtenedInfo(ITMPlugin::EI_LABEL_TEXT_COLOR, std::to_wstring(label_text_color).c_str());
@@ -961,7 +961,7 @@ void CTaskBarDlg::CalculateWindowSize()
     m_pDC->SelectObject(&m_font);
     //计算标签宽度
     //const auto& item_map = theApp.m_taskbar_data.disp_str.GetAllItems();
-    for (auto iter = theApp.m_plugins.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugins.AllDisplayItemsWithPlugins().end(); ++iter)
+    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); ++iter)
     {
         if (iter->is_plugin)
         {
@@ -1063,14 +1063,14 @@ void CTaskBarDlg::CalculateWindowSize()
     item_widths[TDI_MAIN_BOARD_TEMP].value_width = value_width;
 
     //计算插件项目的宽度
-    for (const auto& plugin : theApp.m_plugins.GetPluginItems())
+    for (const auto& plugin : theApp.m_plugin_manager.GetPluginItems())
     {
         int& value_width{ item_widths[plugin].value_width };
         if (plugin != nullptr && theApp.m_taskbar_data.plugin_display_item.Contains(plugin->GetItemId()))
         {
             if (plugin->IsCustomDraw())
             {
-                value_width = theApp.m_plugins.GetItemWidth(plugin, m_pDC);
+                value_width = theApp.m_plugin_manager.GetItemWidth(plugin, m_pDC);
             }
             else
             {
@@ -1173,7 +1173,7 @@ void CTaskBarDlg::UpdateToolTips()
     }
 }
 
-bool CTaskBarDlg::IsItemShow(DisplayItem item)
+bool CTaskBarDlg::IsItemShow(EBuiltinDisplayItem item)
 {
     return (theApp.m_taskbar_data.m_tbar_display_item & item);
 }
@@ -1296,7 +1296,7 @@ void CTaskBarDlg::OnRButtonUp(UINT nFlags, CPoint point)
     bool is_plugin_item_clicked = (CheckClickedItem(point) && m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr);
     if (is_plugin_item_clicked)
     {
-        plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_RCLICKED, point.x, point.y, (void*)GetSafeHwnd(), IPluginItem::MF_TASKBAR_WND) != 0)
@@ -1364,7 +1364,7 @@ void CTaskBarDlg::OnInitMenu(CMenu* pMenu)
     }
 
     //设置插件命令的勾选状态
-    ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+    ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
     if (plugin != nullptr && plugin->GetAPIVersion() >= 5)
     {
         for (int i = ID_PLUGIN_COMMAND_START; i <= ID_PLUGIN_COMMAND_MAX; i++)
@@ -1397,7 +1397,7 @@ BOOL CTaskBarDlg::PreTranslateMessage(MSG* pMsg)
         bool ctrl = (GetKeyState(VK_CONTROL) & 0x80);
         bool shift = (GetKeyState(VK_SHIFT) & 0x8000);
         bool alt = (GetKeyState(VK_MENU) & 0x8000);
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 4)
         {
             if (m_clicked_item.plugin_item->OnKeboardEvent(pMsg->wParam, ctrl, shift, alt, (void*)GetSafeHwnd(), IPluginItem::KF_TASKBAR_WND) != 0)
@@ -1420,7 +1420,7 @@ void CTaskBarDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
     // TODO: 在此添加消息处理程序代码和/或调用默认值
     if (CheckClickedItem(point) && m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)
     {
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_DBCLICKED, point.x, point.y, (void*)GetSafeHwnd(), IPluginItem::MF_TASKBAR_WND) != 0)
@@ -1482,7 +1482,7 @@ BOOL CTaskBarDlg::OnCommand(WPARAM wParam, LPARAM lParam)
     //选择了“显示项目”中的插件项目
     if (uMsg >= ID_SHOW_PLUGIN_ITEM_START && uMsg <= ID_SHOW_PLUGIN_ITEM_MAX)
     {
-        IPluginItem* item = theApp.m_plugins.GetItemByIndex(uMsg - ID_SHOW_PLUGIN_ITEM_START);
+        IPluginItem* item = theApp.m_plugin_manager.GetItemByIndex(uMsg - ID_SHOW_PLUGIN_ITEM_START);
         if (item != nullptr)
         {
             bool displayed = theApp.m_taskbar_data.plugin_display_item.Contains(item->GetItemId());
@@ -1496,7 +1496,7 @@ BOOL CTaskBarDlg::OnCommand(WPARAM wParam, LPARAM lParam)
         int index = uMsg - ID_PLUGIN_COMMAND_START;
         if (m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)
         {
-            ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+            ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
             if (plugin != nullptr && plugin->GetAPIVersion() >= 5)
             {
                 plugin->OnPluginCommand(index, (void*)GetSafeHwnd(), nullptr);
@@ -1563,7 +1563,7 @@ void CTaskBarDlg::OnPaint()
 
 }
 
-void CTaskBarDlg::AddHisToList(DisplayItem item_type, int current_usage_percent)
+void CTaskBarDlg::AddHisToList(EBuiltinDisplayItem item_type, int current_usage_percent)
 {
     int& data_count{ m_history_data_count[item_type] };
     std::list<int>& list = m_map_history_data[item_type];
@@ -1616,7 +1616,7 @@ bool CTaskBarDlg::CheckClickedItem(CPoint point)
     return false;
 }
 
-void CTaskBarDlg::TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, DisplayItem item_type)
+void CTaskBarDlg::TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type)
 {
     std::list<int>& list = m_map_history_data[item_type];
     if (theApp.m_taskbar_data.show_graph_dashed_box)
@@ -1649,7 +1649,7 @@ void CTaskBarDlg::OnLButtonUp(UINT nFlags, CPoint point)
     // TODO: 在此添加消息处理程序代码和/或调用默认值
     if (CheckClickedItem(point) && m_clicked_item.is_plugin && m_clicked_item.plugin_item != nullptr)
     {
-        ITMPlugin* plugin = theApp.m_plugins.GetPluginByItem(m_clicked_item.plugin_item);
+        ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(m_clicked_item.plugin_item);
         if (plugin != nullptr && plugin->GetAPIVersion() >= 3)
         {
             if (m_clicked_item.plugin_item->OnMouseEvent(IPluginItem::MT_LCLICKED, point.x, point.y, (void*)GetSafeHwnd(), IPluginItem::MF_TASKBAR_WND) != 0)

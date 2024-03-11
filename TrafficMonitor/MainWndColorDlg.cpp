@@ -61,7 +61,7 @@ BOOL CMainWndColorDlg::OnInitDialog()
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
     //向列表中插入行
-    for (auto iter = theApp.m_plugins.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugins.AllDisplayItemsWithPlugins().end(); ++iter)
+    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); ++iter)
     {
         CString item_name = iter->GetItemName();
         if (!item_name.IsEmpty())
@@ -73,12 +73,9 @@ BOOL CMainWndColorDlg::OnInitDialog()
         }
     }
 
-
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
-
-
 
 void CMainWndColorDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {

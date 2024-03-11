@@ -66,42 +66,42 @@ public:
     bool m_module_dir_writable{ true };         //指示程序所在目录是否可写
 
     //选项设置数据
-    MainWndSettingData m_main_wnd_data;
-    TaskBarSettingData m_taskbar_data;
-    GeneralSettingData m_general_data;
+    GeneralSettingData      m_general_data;
+    MainWndSettingData      m_main_wnd_data;
+    TaskBarSettingData      m_taskbar_data;
     //其他设置数据
-    MainConfigData m_cfg_data;
-    int m_notify_interval;      //弹出通知消息的时间间隔
-    bool m_debug_log{};
-    bool m_taksbar_transparent_color_enable{};
-    bool m_last_light_mode{};
-    bool m_show_mouse_panetrate_tip{};  //是否显示开启“鼠标穿透”时的提示消息。
-    bool m_show_dot_net_notinstalled_tip{};
-    bool m_is_windows11_taskbar{ false };  //是否为Windows11的任务栏
+    MainConfigData          m_cfg_data;
+    int                     m_notify_interval;                      //弹出通知消息的时间间隔
+    bool                    m_debug_log{};
+    bool                    m_taksbar_transparent_color_enable{};
+    bool                    m_last_light_mode{};
+    bool                    m_show_mouse_panetrate_tip{};           //是否显示开启“鼠标穿透”时的提示消息。
+    bool                    m_show_dot_net_notinstalled_tip{};
+    bool                    m_is_windows11_taskbar{ false };        //是否为Windows11的任务栏
 
     //bool m_is_windows10_fall_creator;
-    CWinVersionHelper m_win_version;        //当前Windows的版本
+    CWinVersionHelper       m_win_version;                          //当前Windows的版本
 
-    HICON m_notify_icons[MAX_NOTIFY_ICON];
+    HICON                   m_notify_icons[MAX_NOTIFY_ICON];
 
-    CTaskbarDefaultStyle m_taskbar_default_style;
-    CPluginManager m_plugins;
-    CDllFunctions m_dll_functions;
+    CTaskbarDefaultStyle    m_taskbar_default_style;
+    CPluginManager          m_plugin_manager;                       //插件管理器
+    CDllFunctions           m_dll_functions;
 
-    CMenu m_main_menu;          //主窗口右键菜单
-    CMenu m_main_menu_plugin;   //右击主窗口插件区域的右键菜单
-    CMenu m_main_menu_plugin_sub_menu;
-    CMenu m_taskbar_menu;       //任务栏窗口右键菜单
-    CMenu m_taskbar_menu_plugin;    //右击任务栏窗口插件区域的右键菜单
-    CMenu m_taskbar_menu_plugin_sub_menu;
+    CMenu                   m_main_menu;                            //主窗口右键菜单
+    CMenu                   m_main_menu_plugin;                     //右击主窗口插件区域的右键菜单
+    CMenu                   m_main_menu_plugin_sub_menu;
+    CMenu                   m_taskbar_menu;                         //任务栏窗口右键菜单
+    CMenu                   m_taskbar_menu_plugin;                  //右击任务栏窗口插件区域的右键菜单
+    CMenu                   m_taskbar_menu_plugin_sub_menu;
 
 #ifndef WITHOUT_TEMPERATURE
     //OpenHardwareMonitor 接口的指针
     std::shared_ptr<OpenHardwareMonitorApi::IOpenHardwareMonitor> m_pMonitor{};
 #endif // !WITHOUT_TEMPERATURE
 
-    CCriticalSection m_minitor_lib_critical;        //用于访问OpenHardwareMonitor进行线程同步的临界区对象
-    //CCriticalSection m_lftable_critical;            //用于访问LfTable2进行线程同步的临界区对象
+    CCriticalSection        m_minitor_lib_critical;                 //用于访问OpenHardwareMonitor进行线程同步的临界区对象
+    //CCriticalSection      m_lftable_critical;                     //用于访问LfTable2进行线程同步的临界区对象
     CLazyConstructable<class CTaskBarDlgDrawCommonSupport> m_d2d_taskbar_draw_common_support{}; // 当使用D2D渲染时自动初始化的全局依赖
 
 public:
@@ -120,17 +120,17 @@ public:
     int GetDpi() const { return m_dpi; }
     void SetDPI(int dpi) { m_dpi = dpi; }
 
-    void CheckUpdate(bool message);     //检查更新，如果message为true，则在检查时弹出提示信息
-    void CheckUpdateInThread(bool message); //在后台线程中检查更新
+    void CheckUpdate(bool message);                     //检查更新，如果message为true，则在检查时弹出提示信息
+    void CheckUpdateInThread(bool message);             //在后台线程中检查更新
     //启动时检查更新线程函数
     static UINT CheckUpdateThreadFunc(LPVOID lpParam);
     static UINT InitOpenHardwareMonitorLibThreadFunc(LPVOID lpParam);
 
     bool SetAutoRun(bool auto_run);
-    bool GetAutoRun(wstring* auto_run_path);        //判断是否开机自动进行，如果是，将开机自动运行的路径写入auto_run_path
+    bool GetAutoRun(wstring* auto_run_path);            //判断是否开机自动进行，如果是，将开机自动运行的路径写入auto_run_path
 
-    bool SetAutoRunByRegistry(bool auto_run);       //通过注册表实现开机自启动
-    bool SetAutoRunByTaskScheduler(bool auto_run);  //通过任务计划实现开机自启动
+    bool SetAutoRunByRegistry(bool auto_run);           //通过注册表实现开机自启动
+    bool SetAutoRunByTaskScheduler(bool auto_run);      //通过任务计划实现开机自启动
 
     //获取系统信息文本
     CString GetSystemInfoString();
@@ -145,29 +145,29 @@ public:
 
     bool IsCheckingForUpdate() const { return m_checking_update; }      //是否正在检查更新
 
-    void InitOpenHardwareLibInThread();     //开启一个后台线程初始化OpenHardwareMonitor
-    void UpdateOpenHardwareMonitorEnableState();    //更新硬件监控的启用/禁用状态
+    void InitOpenHardwareLibInThread();                 //开启一个后台线程初始化OpenHardwareMonitor
+    void UpdateOpenHardwareMonitorEnableState();        //更新硬件监控的启用/禁用状态
 
-    //void UpdateTaskbarWndMenu();      //更新任务栏窗口右键菜单
-    bool IsForceShowNotifyIcon();       //是否需要强制显示通知区图标
+    //void UpdateTaskbarWndMenu();                      //更新任务栏窗口右键菜单
+    bool IsForceShowNotifyIcon();                       //是否需要强制显示通知区图标
 
     std::wstring GetPlauginTooltipInfo() const;
     bool IsTaksbarItemDisplayed(CommonDisplayItem item) const;
 
-    void SendSettingsToPlugin();    //向所有插件发送当前的选项设置
+    void SendSettingsToPlugin();                        //向所有插件发送当前的选项设置
 
     //更新插件子菜单
     static void UpdatePluginMenu(CMenu* pMenu, ITMPlugin* plugin);
 
 private:
-    //int m_no_multistart_warning_time{};       //用于设置在开机后多长时间内不弹出“已经有一个程序正在运行”的警告提示
-    bool m_no_multistart_warning{};         //如果为false，则永远都不会弹出“已经有一个程序正在运行”的警告提示
-    bool m_exit_when_start_by_restart_manager{ true };      //如果程序被Windows重启管理器重新启动，则退出程序
+    //int m_no_multistart_warning_time{};               //用于设置在开机后多长时间内不弹出“已经有一个程序正在运行”的警告提示
+    bool m_no_multistart_warning{};                     //如果为false，则永远都不会弹出“已经有一个程序正在运行”的警告提示
+    bool m_exit_when_start_by_restart_manager{ true };  //如果程序被Windows重启管理器重新启动，则退出程序
     int m_dpi{ 96 };
 
-    bool m_checking_update{ false };        //是否正在检查更新
+    bool m_checking_update{ false };                    //是否正在检查更新
 
-    std::map<UINT, HICON> m_menu_icons;      //菜单图标资源。key是图标资源的ID，vlaue是图标的句柄
+    std::map<UINT, HICON> m_menu_icons;                 //菜单图标资源。key是图标资源的ID，vlaue是图标的句柄
 
 // 重写
 public:

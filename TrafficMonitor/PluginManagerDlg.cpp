@@ -40,17 +40,17 @@ void CPluginManagerDlg::EnableControl()
 
 bool CPluginManagerDlg::IsSelectedValid()
 {
-    return m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugins.GetPlugins().size());
+    return m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugin_manager.GetAllPluginManageUnit().size());
 }
 
 bool CPluginManagerDlg::IsSelectedPluginEnable()
 {
-    CPluginManager::PluginInfo plugin_info{};
+    CPluginManager::PluginManageUnit plugin_manage_unit{};
     bool plugin_loaded{ false };
     if (IsSelectedValid())
     {
-        plugin_info = theApp.m_plugins.GetPlugins()[m_item_selected];
-        plugin_loaded = (plugin_info.state == CPluginManager::PluginState::PS_SUCCEED);
+        plugin_manage_unit = theApp.m_plugin_manager.GetAllPluginManageUnit()[m_item_selected];
+        plugin_loaded = (plugin_manage_unit.state == CPluginManager::PluginState::PS_SUCCEED);
     }
 
     return plugin_loaded;
@@ -98,9 +98,9 @@ BOOL CPluginManagerDlg::OnInitDialog()
     m_list_ctrl.InsertColumn(2, CCommon::LoadText(IDS_STATUS), LVCFMT_LEFT, width2);
 
     //添加图标
-    int item_num = theApp.m_plugins.GetPlugins().size();
+    int item_num = theApp.m_plugin_manager.GetAllPluginManageUnit().size();
     m_plugin_icon_list.Create(theApp.DPI(16), theApp.DPI(16), ILC_COLOR32, item_num, item_num);
-    for (const auto& plugin : theApp.m_plugins.GetPlugins())
+    for (const auto& plugin : theApp.m_plugin_manager.GetAllPluginManageUnit())
     {
         HICON hIcon{};
         if (plugin.plugin != nullptr && plugin.plugin->GetAPIVersion() >= 5)
@@ -114,9 +114,9 @@ BOOL CPluginManagerDlg::OnInitDialog()
     m_list_ctrl.SetImageList(&m_plugin_icon_list, LVSIL_SMALL);
 
     //向列表中插入行
-    for (const auto& plugin : theApp.m_plugins.GetPlugins())
+    for (const auto& plugin : theApp.m_plugin_manager.GetAllPluginManageUnit())
     {
-        std::wstring file_name = CFilePathHelper(plugin.file_path).GetFileName();
+        std::wstring file_name = CFilePathHelper(plugin.m_file_path).GetFileName();
         CString status;
         switch (plugin.state)
         {
@@ -187,9 +187,9 @@ void CPluginManagerDlg::OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 void CPluginManagerDlg::OnBnClickedOptinsButton()
 {
     // TODO: 在此添加控件通知处理程序代码
-    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugins.GetPlugins().size()))
+    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugin_manager.GetAllPluginManageUnit().size()))
     {
-        auto plugin_info = theApp.m_plugins.GetPlugins()[m_item_selected];
+        auto plugin_info = theApp.m_plugin_manager.GetAllPluginManageUnit()[m_item_selected];
         if (plugin_info.plugin != nullptr)
         {
             ITMPlugin::OptionReturn rtn = plugin_info.plugin->ShowOptionsDialog(m_hWnd);
@@ -234,11 +234,11 @@ void CPluginManagerDlg::OnInitMenu(CMenu* pMenu)
     pMenu->EnableMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | (IsSelectedValid() ? MF_ENABLED : MF_GRAYED));
 
     bool disabled{};
-    CPluginManager::PluginInfo plugin_info;
-    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugins.GetPlugins().size()))
+    CPluginManager::PluginManageUnit plugin_manage_unit;
+    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugin_manager.GetAllPluginManageUnit().size()))
     {
-        plugin_info = theApp.m_plugins.GetPlugins()[m_item_selected];
-        std::wstring file_name = CFilePathHelper(plugin_info.file_path).GetFileName();
+        plugin_manage_unit = theApp.m_plugin_manager.GetAllPluginManageUnit()[m_item_selected];
+        std::wstring file_name = CFilePathHelper(plugin_manage_unit.m_file_path).GetFileName();
         disabled = theApp.m_cfg_data.plugin_disabled.Contains(file_name);
     }
     pMenu->CheckMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | (disabled ? MF_CHECKED : MF_UNCHECKED));
@@ -259,10 +259,10 @@ void CPluginManagerDlg::OnPluginOptions()
 
 void CPluginManagerDlg::OnPluginDisable()
 {
-    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugins.GetPlugins().size()))
+    if (m_item_selected >= 0 && m_item_selected < static_cast<int>(theApp.m_plugin_manager.GetAllPluginManageUnit().size()))
     {
-        CPluginManager::PluginInfo plugin_info = theApp.m_plugins.GetPlugins()[m_item_selected];
-        std::wstring file_name = CFilePathHelper(plugin_info.file_path).GetFileName();
+        CPluginManager::PluginManageUnit plugin_manage_unit = theApp.m_plugin_manager.GetAllPluginManageUnit()[m_item_selected];
+        std::wstring file_name = CFilePathHelper(plugin_manage_unit.m_file_path).GetFileName();
         bool disabled = theApp.m_cfg_data.plugin_disabled.Contains(file_name);
         theApp.m_cfg_data.plugin_disabled.SetStrContained(file_name, !disabled);
         MessageBox(CCommon::LoadText(IDS_RESTART_TO_APPLY_CHANGE_INFO), nullptr, MB_OK | MB_ICONINFORMATION);

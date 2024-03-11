@@ -243,7 +243,6 @@ struct MainWndSettingData : public PublicSettingData
     bool m_lock_window_pos{ false };    //锁定窗口位置
     bool m_mouse_penetrate{ false };    //鼠标穿透
     bool m_alow_out_of_border{ false };     //是否允许悬浮窗超出屏幕边界
-
 };
 
 //#define TASKBAR_COLOR_NUM 18      //任务栏窗口颜色数量

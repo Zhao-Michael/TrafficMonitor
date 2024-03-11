@@ -9,22 +9,18 @@ public:
     CSkinFile();
     ~CSkinFile();
 
-
-    //从文件载入皮肤信息
-    void Load(const wstring& file_path);
-
     //皮肤信息
     struct SkinInfo
     {
-        std::vector<COLORREF> text_color;   //文本颜色
-        bool specify_each_item_color{};     //是否指定每个项目的颜色
-        wstring skin_author;                //皮肤的作者
-        FontInfo font_info;                 //字体信息
-        DispStrings display_text;    //每一项的显示文本
+        wstring                 skin_author;                //皮肤的作者
+        FontInfo                font_info;                  //字体信息
+        DispStrings             display_text;               //每一项的显示文本
+        bool                    specify_each_item_color{};  //是否指定每个项目的颜色
+        std::vector<COLORREF>   text_color;                 //文本颜色
 
         COLORREF TextColor(size_t i) const
         {
-            if (i >= 0 && i < text_color.size())
+            if (i < text_color.size())
                 return text_color[i];
             else if (!text_color.empty())
                 return text_color.front();
@@ -33,7 +29,7 @@ public:
         }
     };
 
-    //皮肤中每一项的布局信息
+    //皮肤中每个显示项的布局信息
     struct LayoutItem
     {
         int x{};            //X位置
@@ -81,28 +77,27 @@ public:
         Pos s_pos;      //不“显示更多信息”时的窗口在预览图中的位置
     };
 
-    const SkinInfo& GetSkinInfo() const { return m_skin_info; }
-    const LayoutInfo& GetLayoutInfo() const { return m_layout_info; }
-    const PreviewInfo& GetPreviewInfo() const { return m_preview_info; }
+    const CImage&       GetBackgroundL()    const { return m_background_l;  }
+    const CImage&       GetBackgroundS()    const { return m_background_s;  }
+    const SkinInfo&     GetSkinInfo()       const { return m_skin_info;     }
+    const LayoutInfo&   GetLayoutInfo()     const { return m_layout_info;   }
+    const PreviewInfo&  GetPreviewInfo()    const { return m_preview_info;  }
 
-    const CImage& GetBackgroundL() const { return m_background_l; }
-    const CImage& GetBackgroundS() const { return m_background_s; }
+    static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
+    //从文件载入皮肤信息
+    void LoadCfgAndBGImage(const wstring& file_path);
 
     //绘制预览图
     //pDC: 绘图的CDC
     //rect: 绘图区域
     void DrawPreview(CDC* pDC, CRect rect);
-
     //绘制主界面
     void DrawInfo(CDC* pDC, bool show_more_info, CFont& font);
-
-    static string GetDisplayItemXmlNodeName(DisplayItem display_item);
-
 private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
     void LoadFromIni(const wstring& file_path);     //从ini文件读取皮肤数据（用于兼容旧版皮肤）
 
-    CSkinFile::Layout LayoutFromXmlNode(tinyxml2::XMLElement* ele);
+    CSkinFile::Layout GetLayoutFromXmlNode(tinyxml2::XMLElement* ele);
 
     struct DrawStr
     {

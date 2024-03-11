@@ -51,8 +51,8 @@ void CTest::TestGetLicense()
 void CTest::TestSkin()
 {
     CSkinFile skin;
-    //skin.Load(L"C:\\Users\\zhong\\OneDrive\\文档\\TrafficMonitorSkin.xml");
-    skin.Load(L"D:\\Projects\\GitHub Project\\TrafficMonitor\\TrafficMonitor\\skins\\0默认皮肤\\skin.ini");
+    //skin.LoadCfgAndBGImage(L"C:\\Users\\zhong\\OneDrive\\文档\\TrafficMonitorSkin.xml");
+    skin.LoadCfgAndBGImage(L"D:\\Projects\\GitHub Project\\TrafficMonitor\\TrafficMonitor\\skins\\0默认皮肤\\skin.ini");
     int a = 0;
 }
 
@@ -66,9 +66,9 @@ void CTest::TestCrash()
 
 void CTest::TestPlugin()
 {
-    if (!theApp.m_plugins.GetPlugins().empty())
+    if (!theApp.m_plugin_manager.GetAllPluginManageUnit().empty())
     {
-        theApp.m_plugins.GetPlugins()[0].plugin->ShowOptionsDialog(theApp.m_pMainWnd->m_hWnd);
+        theApp.m_plugin_manager.GetAllPluginManageUnit()[0].plugin->ShowOptionsDialog(theApp.m_pMainWnd->m_hWnd);
     }
 }
 

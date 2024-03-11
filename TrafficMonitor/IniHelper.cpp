@@ -247,7 +247,7 @@ void CIniHelper::LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyN
         return;
     }
     size_t index = 0;
-    for (auto iter = theApp.m_plugins.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugins.AllDisplayItemsWithPlugins().end(); iter++, index++)
+    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++, index++)
     {
         const wchar_t * color_str   = nullptr;
         if (index < ColorsStr_num)
@@ -290,7 +290,7 @@ void CIniHelper::LoadTaskbarWndColors(const wchar_t * AppName, const wchar_t * K
         return;
     }
     size_t index = 0;
-    for (auto iter = theApp.m_plugins.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugins.AllDisplayItemsWithPlugins().end(); iter++)
+    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++)
     {
         const wchar_t* color_str = nullptr;
         if (index < ColorsStr_num)
@@ -338,7 +338,7 @@ void CIniHelper::LoadPluginDisplayStr(bool is_main_window)
 {
     DispStrings& disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
     std::wstring app_name{ is_main_window ? L"plugin_display_str_main_window" : L"plugin_display_str_taskbar_window" };
-    for (const auto& plugin : theApp.m_plugins.GetPluginItems())
+    for (const auto& plugin : theApp.m_plugin_manager.GetPluginItems())
     {
         disp_str.Load(plugin->GetItemId(), GetString(app_name.c_str(), plugin->GetItemId(), plugin->GetItemLableText()));
     }
@@ -348,7 +348,7 @@ void CIniHelper::SavePluginDisplayStr(bool is_main_window)
 {
     DispStrings& disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
     std::wstring app_name{ is_main_window ? L"plugin_display_str_main_window" : L"plugin_display_str_taskbar_window" };
-    for (const auto& plugin : theApp.m_plugins.GetPluginItems())
+    for (const auto& plugin : theApp.m_plugin_manager.GetPluginItems())
     {
         WriteString(app_name.c_str(), plugin->GetItemId(), disp_str.Get(plugin));
     }

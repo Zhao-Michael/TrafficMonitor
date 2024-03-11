@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "PluginInterface.h"
 
-//显示的项目
-enum DisplayItem
+//所有内置显示项目
+enum EBuiltinDisplayItem
 {
     TDI_UP = 1 << 0,
     TDI_DOWN = 1 << 1,
@@ -18,25 +18,8 @@ enum DisplayItem
     TDI_CPU_FREQ = 1 << 11
 };
 
-//显示的项目
-struct CommonDisplayItem
-{
-    bool is_plugin{};           //是否为插件项目
-    DisplayItem item_type{};    //内建的显示项目
-    IPluginItem* plugin_item{}; //插件显示项目
-
-    CommonDisplayItem() {}
-    CommonDisplayItem(DisplayItem item);
-    CommonDisplayItem(IPluginItem* item);
-
-    bool operator<(const CommonDisplayItem&) const;
-    bool operator==(const CommonDisplayItem&) const;
-
-    CString GetItemName() const;
-};
-
-//所有显示项目的集合
-const std::set<DisplayItem> AllDisplayItems
+//所有内置显示项目的集合
+const std::set<EBuiltinDisplayItem> sAllDisplayItems
 {
     TDI_UP, TDI_DOWN, TDI_CPU, TDI_MEMORY
 #ifndef WITHOUT_TEMPERATURE
@@ -45,6 +28,22 @@ const std::set<DisplayItem> AllDisplayItems
     , TDI_TOTAL_SPEED
 };
 
+//显示的项目
+struct CommonDisplayItem
+{
+    bool                            is_plugin{};    //是否为插件项目
+    EBuiltinDisplayItem             item_type{};    //内建的显示项目
+    IPluginItem*                    plugin_item{};  //插件显示项目
+
+    CommonDisplayItem() {}
+    CommonDisplayItem(EBuiltinDisplayItem item);
+    CommonDisplayItem(IPluginItem* item);
+
+    bool operator<(const CommonDisplayItem&) const;
+    bool operator==(const CommonDisplayItem&) const;
+
+    CString GetItemName() const;
+};
 
 class CTaskbarItemOrderHelper
 {

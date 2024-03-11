@@ -29,7 +29,7 @@ public:
     void ShowInfo(CDC* pDC); 	//将信息绘制到控件上
     void TryDrawStatusBar(IDrawCommon& drawer, const CRect& rect_bar, int usage_percent); //绘制CPU/内存状态条
 
-    void TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, DisplayItem item_type);		// 绘制CPU/内存动态图
+    void TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type);		// 绘制CPU/内存动态图
 
     bool AdjustWindowPos();	//设置窗口在任务栏中的位置
     void ApplyWindowTransparentColor();
@@ -132,36 +132,36 @@ protected:
         {}
     };
 
-    std::vector<ItemWidthInfo> m_item_widths;   //任务栏窗口每个部分的宽度
-    std::map<CommonDisplayItem, CRect> m_item_rects;    //任务栏窗口每个部分的矩形区域
-    CommonDisplayItem m_clicked_item;           //鼠标点击的任务栏项目
+    std::vector<ItemWidthInfo>                      m_item_widths;          //任务栏窗口每个部分的宽度
+    std::map<CommonDisplayItem, CRect>              m_item_rects;           //任务栏窗口每个部分的矩形区域
+    CommonDisplayItem                               m_clicked_item;         //鼠标点击的任务栏项目
 
-    int m_min_bar_width;	//最小化窗口缩小宽度后的宽度
-    int m_min_bar_height;	//最小化窗口缩小高度后的高度（用于任务栏在屏幕左侧或右侧时）
+    int                                             m_min_bar_width;	    //最小化窗口缩小宽度后的宽度
+    int                                             m_min_bar_height;	    //最小化窗口缩小高度后的高度（用于任务栏在屏幕左侧或右侧时）
 
-    std::map<DisplayItem, std::list<int>> m_map_history_data;  //保存各项数据历史数据的链表，链表保存按照时间顺序，越靠近头部数据越新
-    std::map<DisplayItem, int> m_history_data_count;            //统计添加到历史数据链表的次数
+    std::map<EBuiltinDisplayItem, std::list<int>>   m_map_history_data;     //保存各项数据历史数据的链表，链表保存按照时间顺序，越靠近头部数据越新
+    std::map<EBuiltinDisplayItem, int>              m_history_data_count;   //统计添加到历史数据链表的次数
 
-    int m_left_space{};			//最小化窗口和二级窗口窗口左侧的边距
-    int m_top_space{};			//最小化窗口和二级窗口窗口顶部的边距（用于任务栏在屏幕左侧或右侧时）
+    int                                             m_left_space{};			//最小化窗口和二级窗口窗口左侧的边距
+    int                                             m_top_space{};			//最小化窗口和二级窗口窗口顶部的边距（用于任务栏在屏幕左侧或右侧时）
 
-    bool m_connot_insert_to_task_bar{ false };	//如果窗口无法嵌入任务栏，则为true
-    bool m_taskbar_on_top_or_bottom{ true };		//如果任务栏在屏幕顶部或底部，则为ture
-    int m_error_code{};
-    bool m_menu_popuped{ false };               //指示当前是否有菜单处于弹出状态
+    bool                                            m_connot_insert_to_task_bar{ false };	//如果窗口无法嵌入任务栏，则为true
+    bool                                            m_taskbar_on_top_or_bottom{ true };		//如果任务栏在屏幕顶部或底部，则为ture
+    int                                             m_error_code{};
+    bool                                            m_menu_popuped{ false };               //指示当前是否有菜单处于弹出状态
 
-    UINT m_taskbar_dpi{};//TaskBarDlg自身专用dpi
+    UINT                                            m_taskbar_dpi{};        //TaskBarDlg自身专用dpi
 
-    CFont m_font;			//字体
+    CFont                                           m_font;			        //字体
 
-    CDC* m_pDC{};		//窗口的DC，用来计算窗口的宽度
+    CDC*                                            m_pDC{};		        //窗口的DC，用来计算窗口的宽度
 
     void CheckTaskbarOnTopOrBottom();		//检查任务栏是否在屏幕的顶部或底部，并将结果保存在m_taskbar_on_top_or_bottom中
-    CString GetMouseTipsInfo();		//获取鼠标提示
+    CString GetMouseTipsInfo();		        //获取鼠标提示
 
-    void AddHisToList(DisplayItem item_type, int current_usage_percent);		//将当前利用率数值添加进链表
+    void AddHisToList(EBuiltinDisplayItem item_type, int current_usage_percent);    //将当前利用率数值添加进链表
 
-    int CalculateNetspeedPercent(unsigned __int64 net_speed);     //计算网速占网速占用图的最大值的百分比
+    int CalculateNetspeedPercent(unsigned __int64 net_speed);               //计算网速占网速占用图的最大值的百分比
 
     //判断一个点在哪个显示项目的区域内，并保存到m_clicked_item。如果返回false，则该点不在任何一个项目的区域内，否则返回true
     bool CheckClickedItem(CPoint point);
@@ -172,7 +172,7 @@ protected:
     //  rect: 绘制矩形区域
     //  label_width: 标签区域的宽度
     //  vertical: 如果为true，则标签和数值上下显示
-    void DrawDisplayItem(IDrawCommon& drawer, DisplayItem type, CRect rect, int label_width, bool vertical = false);
+    void DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type, CRect rect, int label_width, bool vertical = false);
 
     //绘制任务栏窗口中的一个插件项目
    //  drawer: 绘图类的对象
@@ -198,7 +198,7 @@ public:
     int GetErrorCode() const { return m_error_code; }
     bool IsTasksbarOnTopOrBottom() const { return m_taskbar_on_top_or_bottom; }
 
-    static bool IsItemShow(DisplayItem item);
+    static bool IsItemShow(EBuiltinDisplayItem item);
     static bool IsShowCpuMemory();
     static bool IsShowNetSpeed();
 
