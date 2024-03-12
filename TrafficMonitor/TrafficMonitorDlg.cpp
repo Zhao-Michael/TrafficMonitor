@@ -452,7 +452,7 @@ void CTrafficMonitorDlg::IniConnection()
                 m_connection_selected = i;
         }
     }
-    if (m_connection_selected < 0 || m_connection_selected >= m_connections.size())
+    if (m_connection_selected >= m_connections.size())
         m_connection_selected = 0;
     theApp.m_cfg_data.m_connection_name = GetConnection(m_connection_selected).description_2;
 
@@ -466,9 +466,9 @@ void CTrafficMonitorDlg::IniConnection()
     m_connection_change_flag = true;
 }
 
-MIB_IFROW CTrafficMonitorDlg::GetConnectIfTable(int connection_index)
+MIB_IFROW CTrafficMonitorDlg::GetConnectIfTable(size_t connection_index)
 {
-    if (connection_index >= 0 && connection_index < static_cast<int>(m_connections.size()))
+    if (connection_index < m_connections.size())
     {
         int index = m_connections[connection_index].index;
         if (m_pIfTable != nullptr && index >= 0 && index < m_pIfTable->dwNumEntries)
@@ -477,9 +477,9 @@ MIB_IFROW CTrafficMonitorDlg::GetConnectIfTable(int connection_index)
     return MIB_IFROW();
 }
 
-NetWorkConection CTrafficMonitorDlg::GetConnection(int connection_index)
+NetWorkConection CTrafficMonitorDlg::GetConnection(size_t connection_index)
 {
-    if (connection_index >= 0 && connection_index < static_cast<int>(m_connections.size()))
+    if (connection_index < m_connections.size())
         return m_connections[connection_index];
     else
         return NetWorkConection();

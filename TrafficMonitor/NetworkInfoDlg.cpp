@@ -11,7 +11,7 @@
 
 IMPLEMENT_DYNAMIC(CNetworkInfoDlg, CBaseDialog)
 
-CNetworkInfoDlg::CNetworkInfoDlg(vector<NetWorkConection>& adapters, MIB_IFROW* pIfRow, int connection_selected, CWnd* pParent /*=NULL*/)
+CNetworkInfoDlg::CNetworkInfoDlg(vector<NetWorkConection>& adapters, MIB_IFROW* pIfRow, size_t connection_selected, CWnd* pParent /*=NULL*/)
     : CBaseDialog(IDD_NETWORK_INFO_DIALOG, pParent), m_connections(adapters), m_pIfRow(pIfRow), m_connection_selected(connection_selected)
 {
     m_current_connection = connection_selected;
