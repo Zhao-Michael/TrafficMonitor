@@ -221,7 +221,7 @@ CString CCommon::UsageToString(float usage, const PublicSettingData& cfg)
     if (usage < 0)
         str_val = _T("--");
     else
-        str_val.Format(_T("%d"), usage);
+        str_val.Format(_T("%d"), static_cast<UCHAR>(usage));
     if (!cfg.hide_percent)
     {
         if (cfg.separate_value_unit_with_space)

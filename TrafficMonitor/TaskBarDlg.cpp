@@ -599,6 +599,7 @@ HWND CTaskBarDlg::GetShellTrayWndHandleAndSaveWindows11TaskBarExistenceInfoToThe
 
 void CTaskBarDlg::TryDrawHorizontalHistogram(IDrawCommon& drawer, const CRect& rect_bar, int usage_percent)
 {
+    //注意：当显示网速占用时，如果上传下载的流量很少导致数值接近为0时，则柱状图或滚动图几乎看不到。其它监控项也类似。
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     CSize                   fill_size       = CSize(rect_bar.Width() * usage_percent / 100, rect_bar.Height()); //横向的柱状图
     CRect                   rect_fill(rect_bar.TopLeft(), fill_size);
@@ -1639,6 +1640,7 @@ bool CTaskBarDlg::CheckClickedItem(CPoint point)
 
 void CTaskBarDlg::TryDrawHorizontalScrollChart(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type)
 {
+    //注意：当显示网速占用时，如果上传下载的流量很少导致数值接近为0时，则柱状图或滚动图几乎看不到。其它监控项也类似。
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     std::list<int>&         list            = m_map_history_data[item_type];
     if (rTaskbarData.b_show_graph_dashed_box)
