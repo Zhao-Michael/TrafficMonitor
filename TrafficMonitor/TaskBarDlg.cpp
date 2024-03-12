@@ -303,7 +303,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
         || type == TDI_GPU_TEMP || type == TDI_HDD_TEMP || type == TDI_MAIN_BOARD_TEMP || type == TDI_HDD_USAGE
         || type == TDI_UP || type == TDI_DOWN || type == TDI_TOTAL_SPEED/* ||type==TDI_CPU_FREQ*/)
     {
-        int figure_value{};
+        float figure_value{};
         switch (type)
         {
         case TDI_CPU:
@@ -346,17 +346,17 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
             break;
         }
 
-        if ((type != TDI_UP && type != TDI_DOWN && type != TDI_TOTAL_SPEED) && rTaskbarData.show_status_bar
-            || (type == TDI_UP || type == TDI_DOWN || type == TDI_TOTAL_SPEED) && rTaskbarData.show_netspeed_figure)
+        if ((   type != TDI_UP && type != TDI_DOWN && type != TDI_TOTAL_SPEED) && rTaskbarData.b_show_resource_figure   //显示资源占用图
+            || (type == TDI_UP || type == TDI_DOWN || type == TDI_TOTAL_SPEED) && rTaskbarData.b_show_netspeed_figure)  //显示网速占用图
         {
-            if (rTaskbarData.cm_graph_type)
+            if (0 == rTaskbarData.cm_graph_type)
             {
-                AddHisToList(type, figure_value);
-                TryDrawGraph(drawer, rect, type);
+                TryDrawHorizontalHistogram(drawer, rect, figure_value);     //显示横向柱状图
             }
             else
             {
-                TryDrawStatusBar(drawer, rect, figure_value);
+                AddHisToList(type, figure_value);
+                TryDrawHorizontalScrollChart(drawer, rect, type);           //显示横向滚动图
             }
         }
     }
@@ -418,7 +418,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     //绘制CPU或内存利用率
     else if (type == TDI_CPU || type == TDI_MEMORY || type == TDI_GPU_USAGE || type == TDI_HDD_USAGE)
     {
-        int usage{};
+        float usage{};
         switch (type)
         {
         case TDI_CPU:
@@ -597,12 +597,12 @@ HWND CTaskBarDlg::GetShellTrayWndHandleAndSaveWindows11TaskBarExistenceInfoToThe
     return result;
 }
 
-void CTaskBarDlg::TryDrawStatusBar(IDrawCommon& drawer, const CRect& rect_bar, int usage_percent)
+void CTaskBarDlg::TryDrawHorizontalHistogram(IDrawCommon& drawer, const CRect& rect_bar, int usage_percent)
 {
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
-    CSize                   fill_size       = CSize(rect_bar.Width() * usage_percent / 100, rect_bar.Height());
+    CSize                   fill_size       = CSize(rect_bar.Width() * usage_percent / 100, rect_bar.Height()); //横向的柱状图
     CRect                   rect_fill(rect_bar.TopLeft(), fill_size);
-    if (rTaskbarData.show_graph_dashed_box)
+    if (rTaskbarData.b_show_graph_dashed_box)
         drawer.DrawRectOutLine(rect_bar, rTaskbarData.status_bar_color, 1, true);
     drawer.FillRect(rect_fill, rTaskbarData.status_bar_color);
 }
@@ -847,47 +847,45 @@ CString CTaskBarDlg::GetMouseTipsInfo()
 {
     CString tip_info;
     CString temp;
-    temp.Format(_T("%s: %s\r\n (%s: %s/%s: %s)"), CCommon::LoadText(IDS_TRAFFIC_USED_TODAY),
-        CCommon::KBytesToString((theApp.m_today_up_traffic + theApp.m_today_down_traffic) / 1024u),
-        CCommon::LoadText(IDS_UPLOAD), CCommon::KBytesToString(theApp.m_today_up_traffic / 1024u),
-        CCommon::LoadText(IDS_DOWNLOAD), CCommon::KBytesToString(theApp.m_today_down_traffic / 1024u)
+    temp.Format(_T("%s: %s\r\n (%s: %s/%s: %s)"), 
+        CCommon::LoadText(IDS_TRAFFIC_USED_TODAY),  CCommon::KBytesToString((theApp.m_today_up_traffic + theApp.m_today_down_traffic) / 1024u),
+        CCommon::LoadText(IDS_UPLOAD),              CCommon::KBytesToString( theApp.m_today_up_traffic / 1024u),
+        CCommon::LoadText(IDS_DOWNLOAD),            CCommon::KBytesToString( theApp.m_today_down_traffic / 1024u)
     );
     tip_info += temp;
     if (!IsItemShow(TDI_UP))
     {
-        temp.Format(_T("\r\n%s: %s/s"), CCommon::LoadText(IDS_UPLOAD),
-            CCommon::DataSizeToString(theApp.m_out_speed, theApp.m_main_wnd_data));
+        temp.Format(_T("\r\n%s: %s/s"), 
+            CCommon::LoadText(IDS_UPLOAD),          CCommon::DataSizeToString(theApp.m_out_speed, theApp.m_main_wnd_data));
         tip_info += temp;
     }
     if (!IsItemShow(TDI_DOWN))
     {
-        temp.Format(_T("\r\n%s: %s/s"), CCommon::LoadText(IDS_DOWNLOAD),
-            CCommon::DataSizeToString(theApp.m_in_speed, theApp.m_main_wnd_data));
+        temp.Format(_T("\r\n%s: %s/s"),
+            CCommon::LoadText(IDS_DOWNLOAD),        CCommon::DataSizeToString(theApp.m_in_speed, theApp.m_main_wnd_data));
         tip_info += temp;
     }
     if (!IsItemShow(TDI_CPU))
     {
-        temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_CPU_USAGE), theApp.m_cpu_usage);
+        temp.Format(_T("\r\n%s: %d %%"),
+            CCommon::LoadText(IDS_CPU_USAGE),       theApp.m_cpu_usage);
         tip_info += temp;
     }
     if (!IsShowCpuMemory())
     {
         temp.Format(_T("\r\n%s: %s/%s"),
-            CCommon::LoadText(IDS_MEMORY_USAGE),
-            CCommon::KBytesToString(theApp.m_used_memory), CCommon::KBytesToString(theApp.m_total_memory));
+            CCommon::LoadText(IDS_MEMORY_USAGE),    CCommon::KBytesToString(theApp.m_used_memory),  CCommon::KBytesToString(theApp.m_total_memory));
     }
     if (!IsItemShow(TDI_MEMORY))
     {
-        temp.Format(_T("\r\n%s: %s/%s (%d %%)"), CCommon::LoadText(IDS_MEMORY_USAGE),
-            CCommon::KBytesToString(theApp.m_used_memory),
-            CCommon::KBytesToString(theApp.m_total_memory), theApp.m_memory_usage);
+        temp.Format(_T("\r\n%s: %s/%s (%d %%)"),
+            CCommon::LoadText(IDS_MEMORY_USAGE),    CCommon::KBytesToString(theApp.m_used_memory),  CCommon::KBytesToString(theApp.m_total_memory), theApp.m_memory_usage);
         tip_info += temp;
     }
     else
     {
-        temp.Format(_T("\r\n%s: %s/%s"), CCommon::LoadText(IDS_MEMORY_USAGE),
-            CCommon::KBytesToString(theApp.m_used_memory),
-            CCommon::KBytesToString(theApp.m_total_memory));
+        temp.Format(_T("\r\n%s: %s/%s"),
+            CCommon::LoadText(IDS_MEMORY_USAGE),    CCommon::KBytesToString(theApp.m_used_memory),  CCommon::KBytesToString(theApp.m_total_memory));
         tip_info += temp;
     }
 #ifndef WITHOUT_TEMPERATURE
@@ -897,37 +895,44 @@ CString CTaskBarDlg::GetMouseTipsInfo()
     {
         if (!IsItemShow(TDI_GPU_USAGE) && theApp.m_gpu_usage >= 0)
         {
-            temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_GPU_USAGE), theApp.m_gpu_usage);
+            temp.Format(_T("\r\n%s: %d %%"),
+                CCommon::LoadText(IDS_GPU_USAGE),           theApp.m_gpu_usage);
             tip_info += temp;
         }
         if (!IsItemShow(TDI_CPU_TEMP) && theApp.m_cpu_temperature > 0)
         {
-            temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_CPU_TEMPERATURE), CCommon::TemperatureToString(theApp.m_cpu_temperature, rTaskbarData));
+            temp.Format(_T("\r\n%s: %s"),
+                CCommon::LoadText(IDS_CPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_cpu_temperature, rTaskbarData));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_CPU_FREQ) && theApp.m_cpu_freq > 0)
         {
-            temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_CPU_FREQ), CCommon::FreqToString(theApp.m_cpu_freq, rTaskbarData));
+            temp.Format(_T("\r\n%s: %s"),
+                CCommon::LoadText(IDS_CPU_FREQ),            CCommon::FreqToString(theApp.m_cpu_freq, rTaskbarData));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_GPU_TEMP) && theApp.m_gpu_temperature > 0)
         {
-            temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_GPU_TEMPERATURE), CCommon::TemperatureToString(theApp.m_gpu_temperature, rTaskbarData));
+            temp.Format(_T("\r\n%s: %s"),
+                CCommon::LoadText(IDS_GPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_gpu_temperature, rTaskbarData));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_HDD_TEMP) && theApp.m_hdd_temperature > 0)
         {
-            temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_HDD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_hdd_temperature, rTaskbarData));
+            temp.Format(_T("\r\n%s: %s"),
+                CCommon::LoadText(IDS_HDD_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_hdd_temperature, rTaskbarData));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_MAIN_BOARD_TEMP) && theApp.m_main_board_temperature > 0)
         {
-            temp.Format(_T("\r\n%s: %s"), CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_main_board_temperature, rTaskbarData));
+            temp.Format(_T("\r\n%s: %s"),
+                CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_main_board_temperature, rTaskbarData));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_HDD_USAGE) && theApp.m_hdd_usage >= 0)
         {
-            temp.Format(_T("\r\n%s: %d %%"), CCommon::LoadText(IDS_HDD_USAGE), theApp.m_hdd_usage);
+            temp.Format(_T("\r\n%s: %d %%"),
+                CCommon::LoadText(IDS_HDD_USAGE),           theApp.m_hdd_usage);
             tip_info += temp;
         }
     }
@@ -1632,11 +1637,11 @@ bool CTaskBarDlg::CheckClickedItem(CPoint point)
     return false;
 }
 
-void CTaskBarDlg::TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type)
+void CTaskBarDlg::TryDrawHorizontalScrollChart(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type)
 {
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     std::list<int>&         list            = m_map_history_data[item_type];
-    if (rTaskbarData.show_graph_dashed_box)
+    if (rTaskbarData.b_show_graph_dashed_box)
         drawer.DrawRectOutLine(value_rect, rTaskbarData.status_bar_color, 1, true);
     int i{ -1 };
     for (const auto& item : list)

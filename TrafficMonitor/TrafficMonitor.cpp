@@ -225,43 +225,43 @@ void CTrafficMonitorApp::LoadConfig()
     default_font.size = 9;
     ini.LoadFontData(_T("task_bar"), rTaskbarData.font, default_font);
     //任务栏窗口显示文本设置
-    rTaskbarData.disp_str.Get(TDI_UP)                 = ini.GetString(L"task_bar", L"up_string", L"↑: $");
-    rTaskbarData.disp_str.Get(TDI_DOWN)               = ini.GetString(L"task_bar", L"down_string", L"↓: $");
-    rTaskbarData.disp_str.Get(TDI_TOTAL_SPEED)        = ini.GetString(L"task_bar", L"total_speed_string", L"↑↓: $");
-    rTaskbarData.disp_str.Get(TDI_CPU)                = ini.GetString(L"task_bar", L"cpu_string", L"CPU: $");
-    rTaskbarData.disp_str.Get(TDI_MEMORY)             = ini.GetString(L"task_bar", L"memory_string", CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")));
-    rTaskbarData.disp_str.Get(TDI_GPU_USAGE)          = ini.GetString(L"task_bar", L"gpu_string", CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
-    rTaskbarData.disp_str.Get(TDI_CPU_TEMP)           = ini.GetString(L"task_bar", L"cpu_temp_string", L"CPU: $");
-    rTaskbarData.disp_str.Get(TDI_GPU_TEMP)           = ini.GetString(L"task_bar", L"gpu_temp_string", CCommon::LoadText(IDS_GPU_DISP, _T(": ")));
-    rTaskbarData.disp_str.Get(TDI_HDD_TEMP)           = ini.GetString(L"task_bar", L"hdd_temp_string", CCommon::LoadText(IDS_HDD_DISP, _T(": ")));
-    rTaskbarData.disp_str.Get(TDI_MAIN_BOARD_TEMP)    = ini.GetString(L"task_bar", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": ")));
-    rTaskbarData.disp_str.Get(TDI_HDD_USAGE)          = ini.GetString(L"task_bar", L"hdd_string", CCommon::LoadText(IDS_HDD_DISP, _T(": ")));
-    rTaskbarData.disp_str.Get(TDI_CPU_FREQ)           = ini.GetString(L"task_bar", L"cpu_freq_string", CCommon::LoadText(IDS_CPU_FREQ, _T(": $")));
+    rTaskbarData.disp_str.Get(TDI_UP)                   = ini.GetString(L"task_bar", L"up_string", L"↑: $");
+    rTaskbarData.disp_str.Get(TDI_DOWN)                 = ini.GetString(L"task_bar", L"down_string", L"↓: $");
+    rTaskbarData.disp_str.Get(TDI_TOTAL_SPEED)          = ini.GetString(L"task_bar", L"total_speed_string", L"↑↓: $");
+    rTaskbarData.disp_str.Get(TDI_CPU)                  = ini.GetString(L"task_bar", L"cpu_string", L"CPU: $");
+    rTaskbarData.disp_str.Get(TDI_MEMORY)               = ini.GetString(L"task_bar", L"memory_string", CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")));
+    rTaskbarData.disp_str.Get(TDI_GPU_USAGE)            = ini.GetString(L"task_bar", L"gpu_string", CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
+    rTaskbarData.disp_str.Get(TDI_CPU_TEMP)             = ini.GetString(L"task_bar", L"cpu_temp_string", L"CPU: $");
+    rTaskbarData.disp_str.Get(TDI_GPU_TEMP)             = ini.GetString(L"task_bar", L"gpu_temp_string", CCommon::LoadText(IDS_GPU_DISP, _T(": ")));
+    rTaskbarData.disp_str.Get(TDI_HDD_TEMP)             = ini.GetString(L"task_bar", L"hdd_temp_string", CCommon::LoadText(IDS_HDD_DISP, _T(": ")));
+    rTaskbarData.disp_str.Get(TDI_MAIN_BOARD_TEMP)      = ini.GetString(L"task_bar", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": ")));
+    rTaskbarData.disp_str.Get(TDI_HDD_USAGE)            = ini.GetString(L"task_bar", L"hdd_string", CCommon::LoadText(IDS_HDD_DISP, _T(": ")));
+    rTaskbarData.disp_str.Get(TDI_CPU_FREQ)             = ini.GetString(L"task_bar", L"cpu_freq_string", CCommon::LoadText(IDS_CPU_FREQ, _T(": $")));
     //载入插件项目的显示文本设置(false表示任务栏窗口)
     ini.LoadPluginDisplayStr(false);
 
     //任务栏选项设置
-    rTaskbarData.tbar_wnd_on_left = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_on_left"), false);
-    rTaskbarData.speed_short_mode = ini.GetBool(_T("task_bar"), _T("task_bar_speed_short_mode"), false);
-    rTaskbarData.tbar_wnd_snap = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_snap"), false);
-    rTaskbarData.unit_byte = ini.GetBool(_T("task_bar"), _T("unit_byte"), true);
-    rTaskbarData.speed_unit = static_cast<SpeedUnit>(ini.GetInt(_T("task_bar"), _T("task_bar_speed_unit"), 0));
-    rTaskbarData.hide_unit = ini.GetBool(_T("task_bar"), _T("task_bar_hide_unit"), false);
-    rTaskbarData.hide_percent = ini.GetBool(_T("task_bar"), _T("task_bar_hide_percent"), false);
-    rTaskbarData.value_right_align = ini.GetBool(_T("task_bar"), _T("value_right_align"), false);
-    rTaskbarData.horizontal_arrange = ini.GetBool(_T("task_bar"), _T("horizontal_arrange"), false);
-    rTaskbarData.show_status_bar = ini.GetBool(_T("task_bar"), _T("show_status_bar"), false);
-    rTaskbarData.separate_value_unit_with_space = ini.GetBool(_T("task_bar"), _T("separate_value_unit_with_space"), true);
-    rTaskbarData.show_tool_tip = ini.GetBool(_T("task_bar"), _T("show_tool_tip"), true);
-    rTaskbarData.digits_number = ini.GetInt(_T("task_bar"), _T("digits_number"), 4);
-    rTaskbarData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"task_bar", L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
+    rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_on_left"),           false);
+    rTaskbarData.speed_short_mode                       = ini.GetBool(_T("task_bar"), _T("task_bar_speed_short_mode"),      false);
+    rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_snap"),              false);
+    rTaskbarData.unit_byte                              = ini.GetBool(_T("task_bar"), _T("unit_byte"),                      true);
+    rTaskbarData.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("task_bar"), _T("task_bar_speed_unit"),            0));
+    rTaskbarData.hide_unit                              = ini.GetBool(_T("task_bar"), _T("task_bar_hide_unit"),             false);
+    rTaskbarData.hide_percent                           = ini.GetBool(_T("task_bar"), _T("task_bar_hide_percent"),          false);
+    rTaskbarData.value_right_align                      = ini.GetBool(_T("task_bar"), _T("value_right_align"),              false);
+    rTaskbarData.horizontal_arrange                     = ini.GetBool(_T("task_bar"), _T("horizontal_arrange"),             false);
+    rTaskbarData.b_show_resource_figure                 = ini.GetBool(_T("task_bar"), _T("show_status_bar"),                false);
+    rTaskbarData.separate_value_unit_with_space         = ini.GetBool(_T("task_bar"), _T("separate_value_unit_with_space"), true);
+    rTaskbarData.show_tool_tip                          = ini.GetBool(_T("task_bar"), _T("show_tool_tip"),                  true);
+    rTaskbarData.digits_number                          = ini.GetInt (_T("task_bar"), _T("digits_number"),                  4);
+    rTaskbarData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"task_bar",    L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
     rTaskbarData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("task_bar"), _T("double_click_action"), 0));
-    rTaskbarData.double_click_exe = ini.GetString(L"task_bar", L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
-    rTaskbarData.cm_graph_type = ini.GetBool(_T("task_bar"), _T("cm_graph_type"), true);
-    rTaskbarData.show_graph_dashed_box = ini.GetBool(L"task_bar", L"show_graph_dashed_box", false);
-    rTaskbarData.item_space = ini.GetInt(L"task_bar", L"item_space", 4);
-    rTaskbarData.window_offset_top = ini.GetInt(L"task_bar", L"window_offset_top", 0);
-    rTaskbarData.vertical_margin = ini.GetInt(L"task_bar", L"vertical_margin", 0);
+    rTaskbarData.double_click_exe                       = ini.GetString(L"task_bar",    L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
+    rTaskbarData.cm_graph_type                          = ini.GetBool(_T("task_bar"), _T("cm_graph_type"),                  true);
+    rTaskbarData.b_show_graph_dashed_box                = ini.GetBool  (L"task_bar",    L"show_graph_dashed_box",           false);
+    rTaskbarData.item_space                             = ini.GetInt   (L"task_bar",    L"item_space",                      4);
+    rTaskbarData.window_offset_top                      = ini.GetInt   (L"task_bar",    L"window_offset_top",               0);
+    rTaskbarData.vertical_margin                        = ini.GetInt   (L"task_bar",    L"vertical_margin",                 0);
     rTaskbarData.ValidItemSpace();
     rTaskbarData.ValidWindowOffsetTop();
 
@@ -283,8 +283,8 @@ void CTrafficMonitorApp::LoadConfig()
     rTaskbarData.plugin_display_item.FromString(ini.GetString(L"task_bar", L"plugin_display_item", L""));
     rTaskbarData.auto_save_taskbar_color_settings_to_preset = ini.GetBool(L"task_bar", L"auto_save_taskbar_color_settings_to_preset", true);
 
-    rTaskbarData.show_netspeed_figure = ini.GetBool(L"task_bar", L"show_netspeed_figure", false);
-    rTaskbarData.netspeed_figure_max_value = ini.GetInt(L"task_bar", L"netspeed_figure_max_value", 512);
+    rTaskbarData.b_show_netspeed_figure         = ini.GetBool(L"task_bar", L"show_netspeed_figure", false);
+    rTaskbarData.netspeed_figure_max_value      = ini.GetInt(L"task_bar", L"netspeed_figure_max_value", 512);
     rTaskbarData.netspeed_figure_max_value_unit = ini.GetInt(L"task_bar", L"netspeed_figure_max_value_unit", 0);
 
     if (CTaskBarDlgDrawCommonSupport::CheckSupport())
@@ -439,7 +439,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool(L"task_bar", L"task_bar_hide_percent",                rTaskbarData.hide_percent);
     ini.WriteBool(L"task_bar", L"value_right_align",                    rTaskbarData.value_right_align);
     ini.WriteBool(L"task_bar", L"horizontal_arrange",                   rTaskbarData.horizontal_arrange);
-    ini.WriteBool(L"task_bar", L"show_status_bar",                      rTaskbarData.show_status_bar);
+    ini.WriteBool(L"task_bar", L"show_status_bar",                      rTaskbarData.b_show_resource_figure);
     ini.WriteBool(L"task_bar", L"separate_value_unit_with_space",       rTaskbarData.separate_value_unit_with_space);
     ini.WriteBool(L"task_bar", L"show_tool_tip",                        rTaskbarData.show_tool_tip);
     ini.WriteInt(L"task_bar", L"digits_number",                         rTaskbarData.digits_number);
@@ -447,7 +447,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt(L"task_bar", L"double_click_action",  static_cast<int>(rTaskbarData.double_click_action));
     ini.WriteString(L"task_bar", L"double_click_exe",                   rTaskbarData.double_click_exe);
     ini.WriteBool(L"task_bar", L"cm_graph_type",                        rTaskbarData.cm_graph_type);
-    ini.WriteBool(L"task_bar", L"show_graph_dashed_box",                rTaskbarData.show_graph_dashed_box);
+    ini.WriteBool(L"task_bar", L"show_graph_dashed_box",                rTaskbarData.b_show_graph_dashed_box);
     ini.WriteInt(L"task_bar", L"item_space",                            rTaskbarData.item_space);
     ini.WriteInt(L"task_bar", L"window_offset_top",                     rTaskbarData.window_offset_top);
     ini.WriteInt(L"task_bar", L"vertical_margin",                       rTaskbarData.vertical_margin);
@@ -462,7 +462,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteString(L"task_bar", L"plugin_display_item",                rTaskbarData.plugin_display_item.ToString());
     ini.WriteBool(L"task_bar", L"auto_save_taskbar_color_settings_to_preset", rTaskbarData.auto_save_taskbar_color_settings_to_preset);
 
-    ini.WriteBool(L"task_bar", L"show_netspeed_figure",                 rTaskbarData.show_netspeed_figure);
+    ini.WriteBool(L"task_bar", L"show_netspeed_figure",                 rTaskbarData.b_show_netspeed_figure);
     ini.WriteInt(L"task_bar", L"netspeed_figure_max_value",             rTaskbarData.netspeed_figure_max_value);
     ini.WriteInt(L"task_bar", L"netspeed_figure_max_value_unit",        rTaskbarData.netspeed_figure_max_value_unit);
 

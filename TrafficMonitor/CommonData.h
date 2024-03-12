@@ -261,49 +261,52 @@ struct TaskbarItemColor //任务栏窗口每一项的颜色
 //选项设置中“任务栏窗口设置”的数据
 struct TaskBarSettingData : public PublicSettingData
 {
-    COLORREF  back_color{ RGB(0, 0, 0) };   //背景颜色
-    COLORREF transparent_color{ RGB(0, 0, 0) };     //透明色
-    COLORREF status_bar_color{ RGB(0, 0, 0) };      // CPU/内存 状态条颜色
+    COLORREF  back_color{ RGB(0, 0, 0) };                   //背景颜色
+    COLORREF transparent_color{ RGB(0, 0, 0) };             //透明色
+    COLORREF status_bar_color{ RGB(0, 0, 0) };              // CPU/内存 状态条颜色
     std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};    //文字的颜色
-    int dft_back_color = 0;                         //默认背景颜色
-    int dft_transparent_color = 0;                  //默认透明色
-    int dft_status_bar_color = 0x005A5A5A;          //默认CPU/内存 状态条颜色
-    int dft_text_colors = 0x00ffffffU;              //默认文字颜色
+    int dft_back_color = 0;                                 //默认背景颜色
+    int dft_transparent_color = 0;                          //默认透明色
+    int dft_status_bar_color = 0x005A5A5A;                  //默认CPU/内存 状态条颜色
+    int dft_text_colors = 0x00ffffffU;                      //默认文字颜色
 
-    bool auto_adapt_light_theme{ true };            //是否自动适应浅色主题
-    int dark_default_style{ 0 };                    //深色主题时使用的预设方案
-    int light_default_style{ -1 };                  //浅色主题时使用的预设方案
-    bool auto_set_background_color{ false };        //根据任务栏颜色自动设置背景色
-    bool auto_save_taskbar_color_settings_to_preset{};    //当启用“自动适应Windows10深色/浅色主题”时，是否在颜色设置有更改时自动将当前颜色设置保存到对应的预设
+    bool auto_adapt_light_theme{ true };                    //是否自动适应浅色主题
+    int dark_default_style{ 0 };                            //深色主题时使用的预设方案
+    int light_default_style{ -1 };                          //浅色主题时使用的预设方案
+    bool auto_set_background_color{ false };                //根据任务栏颜色自动设置背景色
+    bool auto_save_taskbar_color_settings_to_preset{};      //当启用“自动适应Windows10深色/浅色主题”时，是否在颜色设置有更改时自动将当前颜色设置保存到对应的预设
     bool IsTaskbarTransparent() const;
     void SetTaskabrTransparent(bool transparent);
 
     CTaskbarItemOrderHelper item_order;
-    unsigned int m_tbar_display_item{ TDI_UP | TDI_DOWN };      //任务栏窗口显示的项目
-    StringSet plugin_display_item;                  //任务窗口显示的插件项目
+    unsigned int m_tbar_display_item{ TDI_UP | TDI_DOWN };  //任务栏窗口显示的项目
+    StringSet plugin_display_item;                          //任务窗口显示的插件项目
 
-    bool value_right_align{ false };    //数值是否右对齐
-    int digits_number{ 4 };             //数据位数
-    bool horizontal_arrange{ true };    //水平排列
-    bool show_status_bar{ true };       //显示 CPU/内存的状态条
-    bool tbar_wnd_on_left{ false };     //如果为true，则任务栏窗口显示在任务栏的左侧（或上方）
-    bool tbar_wnd_snap{ false };     	//如果为true，则在Win11中任务栏窗口贴靠中间任务栏，否则靠近边缘
-    bool cm_graph_type{ false };        //如果为false，默认原样式，柱状图显示占用率，如为true，滚动显示占用率
-    bool show_graph_dashed_box{ true }; //显示占用图虚线框
-    int item_space{};                   //项目间距
-    int window_offset_top{};            //任务栏窗口顶部边距
-    int vertical_margin{};              //项目垂直间距
+    bool value_right_align{ false };                        //数值是否右对齐
+    int digits_number{ 4 };                                 //数据位数
+    bool horizontal_arrange{ true };                        //水平排列
+    bool tbar_wnd_on_left{ false };                         //如果为true，则任务栏窗口显示在任务栏的左侧（或上方）
+    bool tbar_wnd_snap{ false };     	                    //如果为true，则在Win11中任务栏窗口贴靠中间任务栏，否则靠近边缘
+    int item_space{};                                       //项目间距
+    int window_offset_top{};                                //任务栏窗口顶部边距
+    int vertical_margin{};                                  //项目垂直间距
+
+    //任务栏窗口设置选项
+    bool b_show_resource_figure{ true };                    //是否显示资源占用图(CPU/内存)
+    bool b_show_netspeed_figure{ false };                   //是否显示网速占用图(上传、下载、上传下载总和)
+    bool b_show_graph_dashed_box{ true };                   //是否显示虚线框
+    bool cm_graph_type{ false };                            //占用图类型(如果为false，默认原样式，柱状图显示占用率; 如为true，滚动显示占用率)
+
     void ValidItemSpace();
     void ValidWindowOffsetTop();
     void ValidVerticalMargin();
 
-    bool show_netspeed_figure{ false };     //是否显示网速占用图
-    int netspeed_figure_max_value;          //网速占用图的最大值
-    int netspeed_figure_max_value_unit{};   //网速占用图最大值的单位（0: KB, 1: MB）
+    int netspeed_figure_max_value;                          //网速占用图的最大值
+    int netspeed_figure_max_value_unit{};                   //网速占用图最大值的单位（0: KB, 1: MB）
     unsigned __int64 GetNetspeedFigureMaxValueInBytes() const;  //获取网速占用图的最大值（以字节为单位）
 
-    bool disable_d2d{ false };//是否禁用d2d绘图
-    DWORD update_layered_window_error_code{0}; // 使用D2D1渲染时，UpdateLayeredWindowIndirect失败的错误代码，会在关闭任务栏窗口时被重置为0
+    bool disable_d2d{ false };                              //是否禁用d2d绘图
+    DWORD update_layered_window_error_code{0};              // 使用D2D1渲染时，UpdateLayeredWindowIndirect失败的错误代码，会在关闭任务栏窗口时被重置为0
 };
 
 //选项设置中“常规设置”的数据

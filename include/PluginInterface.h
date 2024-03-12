@@ -200,6 +200,7 @@ public:
     /** 主程序的监控信息 */
     struct MonitorInfo
     {
+        //某些变量的类型在主程序那边已经变了，因为插件接口使用了这个，所以这里先不改。
         unsigned long long up_speed{};
         unsigned long long down_speed{};
         int cpu_usage{};

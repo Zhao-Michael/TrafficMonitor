@@ -618,24 +618,24 @@ void CTrafficMonitorDlg::UpdateNotifyIconTip()
     CString in_speed = CCommon::DataSizeToString(theApp.m_in_speed);
     CString out_speed = CCommon::DataSizeToString(theApp.m_out_speed);
 
-    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%>/s"), { CCommon::LoadText(IDS_UPLOAD), out_speed });
-    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%>/s"), { CCommon::LoadText(IDS_DOWNLOAD), in_speed });
-    strTip += CCommon::StringFormat(_T("\r\nCPU: <%1%> %"), { theApp.m_cpu_usage });
-    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"), { CCommon::LoadText(IDS_MEMORY), theApp.m_memory_usage });
+    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%>/s"),   { CCommon::LoadText(IDS_UPLOAD), out_speed });
+    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%>/s"),   { CCommon::LoadText(IDS_DOWNLOAD), in_speed });
+    strTip += CCommon::StringFormat(_T("\r\nCPU: <%1%> %"),     { theApp.m_cpu_usage });
+    strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"),   { CCommon::LoadText(IDS_MEMORY), theApp.m_memory_usage });
     if (IsTemperatureNeeded())
     {
         if (theApp.m_general_data.IsHardwareEnable(HI_GPU) && theApp.m_gpu_usage >= 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"), { CCommon::LoadText(IDS_GPU_USAGE), theApp.m_gpu_usage });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"),   { CCommon::LoadText(IDS_GPU_USAGE), theApp.m_gpu_usage });
         if (theApp.m_general_data.IsHardwareEnable(HI_CPU) && theApp.m_cpu_temperature > 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"), { CCommon::LoadText(IDS_CPU_TEMPERATURE), static_cast<int>(theApp.m_cpu_temperature) });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"),  { CCommon::LoadText(IDS_CPU_TEMPERATURE),       static_cast<int>(theApp.m_cpu_temperature) });
         if (theApp.m_general_data.IsHardwareEnable(HI_GPU) && theApp.m_gpu_temperature > 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"), { CCommon::LoadText(IDS_GPU_TEMPERATURE), static_cast<int>(theApp.m_gpu_temperature) });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"),  { CCommon::LoadText(IDS_GPU_TEMPERATURE),       static_cast<int>(theApp.m_gpu_temperature) });
         if (theApp.m_general_data.IsHardwareEnable(HI_HDD) && theApp.m_hdd_temperature > 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"), { CCommon::LoadText(IDS_HDD_TEMPERATURE), static_cast<int>(theApp.m_hdd_temperature) });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"),  { CCommon::LoadText(IDS_HDD_TEMPERATURE),       static_cast<int>(theApp.m_hdd_temperature) });
         if (theApp.m_general_data.IsHardwareEnable(HI_MBD) && theApp.m_main_board_temperature > 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"), { CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), static_cast<int>(theApp.m_main_board_temperature) });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> °C"),  { CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), static_cast<int>(theApp.m_main_board_temperature) });
         if (theApp.m_general_data.IsHardwareEnable(HI_HDD) && theApp.m_hdd_usage >= 0)
-            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"), { CCommon::LoadText(IDS_HDD_USAGE), theApp.m_hdd_usage });
+            strTip += CCommon::StringFormat(_T("\r\n<%1%>: <%2%> %"),   { CCommon::LoadText(IDS_HDD_USAGE), theApp.m_hdd_usage });
     }
 
     CCommon::WStringCopy(m_ntIcon.szTip, 128, strTip);
@@ -1278,9 +1278,9 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
     MEMORYSTATUSEX statex;
     statex.dwLength = sizeof(statex);
     GlobalMemoryStatusEx(&statex);
-    theApp.m_memory_usage = statex.dwMemoryLoad;
-    theApp.m_used_memory = static_cast<int>((statex.ullTotalPhys - statex.ullAvailPhys) / 1024);
-    theApp.m_total_memory = static_cast<int>(statex.ullTotalPhys / 1024);
+    theApp.m_memory_usage   = statex.dwMemoryLoad;
+    theApp.m_used_memory    = static_cast<UINT64>((statex.ullTotalPhys - statex.ullAvailPhys) / 1024);
+    theApp.m_total_memory   = static_cast<UINT64>(statex.ullTotalPhys / 1024);
 
 #ifndef WITHOUT_TEMPERATURE
     //获取温度
@@ -1307,11 +1307,11 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
             AfxMessageBox(monitor_error_message.c_str(), MB_ICONERROR | MB_OK);
         }
         //theApp.m_cpu_temperature = theApp.m_pMonitor->CpuTemperature();
-        theApp.m_gpu_temperature = theApp.m_pMonitor->GpuTemperature();
+        theApp.m_gpu_temperature        = theApp.m_pMonitor->GpuTemperature();
         //theApp.m_hdd_temperature = theApp.m_pMonitor->HDDTemperature();
         theApp.m_main_board_temperature = theApp.m_pMonitor->MainboardTemperature();
-        theApp.m_gpu_usage = theApp.m_pMonitor->GpuUsage();
-        theApp.m_cpu_freq = theApp.m_pMonitor->CpuFreq();
+        theApp.m_gpu_usage              = theApp.m_pMonitor->GpuUsage();
+        theApp.m_cpu_freq               = theApp.m_pMonitor->CpuFreq();
         //获取CPU温度
         if (!theApp.m_pMonitor->AllCpuTemperature().empty())
         {
@@ -1548,7 +1548,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
         //last_value: 传递一个static或可以在此lambda表达式调用结束后继续存在的变量，用于保存上一次的值
         //notify_time: 传递一个static或可以在此lambda表达式调用结束后继续存在的变量，用于记录上次弹出提示的时间（定时器触发次数）
         //tip_str: 要提示的消息
-        auto checkNotifyTip = [&](GeneralSettingData::NotifyTipSettings setting_data, int value, int& last_value, int& notify_time, LPCTSTR tip_str)
+        auto checkNotifyTip = [&](GeneralSettingData::NotifyTipSettings setting_data, float value, float& last_value, int& notify_time, LPCTSTR tip_str)
         {
             if (setting_data.enable)
             {
@@ -1564,31 +1564,31 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
         //检查是否要弹出内存使用率超出提示
         CString info;
         info.Format(CCommon::LoadText(IDS_MEMORY_UDAGE_EXCEED, _T(" %d%%!")), theApp.m_memory_usage);
-        static int last_memory_usage;
+        static float last_memory_usage;
         static int memory_usage_notify_time{ -theApp.m_notify_interval };       //记录上次弹出提示时的时间
         checkNotifyTip(theApp.m_general_data.memory_usage_tip, theApp.m_memory_usage, last_memory_usage, memory_usage_notify_time, info.GetString());
 
         //检查是否要弹出CPU温度使用率超出提示
         info.Format(CCommon::LoadText(IDS_CPU_TEMPERATURE_EXCEED, _T(" %d°C!")), static_cast<int>(theApp.m_cpu_temperature));
-        static int last_cpu_temp;
+        static float last_cpu_temp;
         static int cpu_temp_notify_time{ -theApp.m_notify_interval };       //记录上次弹出提示时的时间
         checkNotifyTip(theApp.m_general_data.cpu_temp_tip, theApp.m_cpu_temperature, last_cpu_temp, cpu_temp_notify_time, info.GetString());
 
         //检查是否要弹出显卡温度使用率超出提示
         info.Format(CCommon::LoadText(IDS_GPU_TEMPERATURE_EXCEED, _T(" %d°C!")), static_cast<int>(theApp.m_gpu_temperature));
-        static int last_gpu_temp;
+        static float last_gpu_temp;
         static int gpu_temp_notify_time{ -theApp.m_notify_interval };       //记录上次弹出提示时的时间
         checkNotifyTip(theApp.m_general_data.gpu_temp_tip, theApp.m_gpu_temperature, last_gpu_temp, gpu_temp_notify_time, info.GetString());
 
         //检查是否要弹出硬盘温度使用率超出提示
         info.Format(CCommon::LoadText(IDS_HDD_TEMPERATURE_EXCEED, _T(" %d°C!")), static_cast<int>(theApp.m_hdd_temperature));
-        static int last_hdd_temp;
+        static float last_hdd_temp;
         static int hdd_temp_notify_time{ -theApp.m_notify_interval };       //记录上次弹出提示时的时间
         checkNotifyTip(theApp.m_general_data.hdd_temp_tip, theApp.m_hdd_temperature, last_hdd_temp, hdd_temp_notify_time, info.GetString());
 
         //检查是否要弹出主板温度使用率超出提示
         info.Format(CCommon::LoadText(IDS_MBD_TEMPERATURE_EXCEED, _T(" %d°C!")), static_cast<int>(theApp.m_main_board_temperature));
-        static int last_main_board_temp;
+        static float last_main_board_temp;
         static int main_board_temp_notify_time{ -theApp.m_notify_interval };        //记录上次弹出提示时的时间
         checkNotifyTip(theApp.m_general_data.mainboard_temp_tip, theApp.m_main_board_temperature, last_main_board_temp, main_board_temp_notify_time, info.GetString());
 

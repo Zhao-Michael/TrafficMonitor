@@ -515,16 +515,17 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 
     //CPU/内存/显卡利用率
-    map_str[TDI_CPU].value = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
+    map_str[TDI_CPU].value          = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
  
-    map_str[TDI_CPU_FREQ].value = CCommon::FreqToString(theApp.m_cpu_freq, rMainWndData);
+    map_str[TDI_CPU_FREQ].value     = CCommon::FreqToString(theApp.m_cpu_freq, rMainWndData);
     CString str_memory_value;
     if (rMainWndData.memory_display == MemoryDisplay::MEMORY_USED)
-        str_memory_value = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWndData.separate_value_unit_with_space);
+        str_memory_value            = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWndData.separate_value_unit_with_space);
     else if (rMainWndData.memory_display == MemoryDisplay::MEMORY_AVAILABLE)
-        str_memory_value = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, rMainWndData.separate_value_unit_with_space);
+        str_memory_value            = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, 
+                                                                    rMainWndData.separate_value_unit_with_space);
     else
-        str_memory_value = CCommon::UsageToString(theApp.m_memory_usage, rMainWndData);
+        str_memory_value            = CCommon::UsageToString(theApp.m_memory_usage, rMainWndData);
     map_str[TDI_MEMORY].value       = str_memory_value;
     map_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
     map_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
@@ -534,10 +535,10 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     {
         map_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);
     };
-    getTemperatureStr(TDI_CPU_TEMP, theApp.m_cpu_temperature);
-    getTemperatureStr(TDI_GPU_TEMP, theApp.m_gpu_temperature);
-    getTemperatureStr(TDI_HDD_TEMP, theApp.m_hdd_temperature);
-    getTemperatureStr(TDI_MAIN_BOARD_TEMP, theApp.m_main_board_temperature);
+    getTemperatureStr(TDI_CPU_TEMP,         theApp.m_cpu_temperature);
+    getTemperatureStr(TDI_GPU_TEMP,         theApp.m_gpu_temperature);
+    getTemperatureStr(TDI_HDD_TEMP,         theApp.m_hdd_temperature);
+    getTemperatureStr(TDI_MAIN_BOARD_TEMP,  theApp.m_main_board_temperature);
 
     //获取文本颜色
     std::map<CommonDisplayItem, COLORREF> text_colors{};

@@ -43,27 +43,27 @@ public:
     wstring m_config_dir;
 
     //以下数据定义为App类中的公共成员，以便于在主对话框和任务栏窗口中都能访问
-    unsigned __int64 m_in_speed{};      //下载速度
-    unsigned __int64 m_out_speed{};     //上传速度
-    int m_cpu_usage{ -1 };      //CPU利用率
-    int m_memory_usage{ -1 };   //内存利用率
-    int m_used_memory{};    //可用物理内存（单位为KB）
-    int m_total_memory{};   //物理内存总量（单位为KB）
-    float m_cpu_temperature{ -1 };  //CPU温度
-    float m_cpu_freq{ -1 };  //CPU 频率
-    float m_gpu_temperature{ -1 };  //显卡温度
-    float m_hdd_temperature{ -1 };  //硬盘温度
-    float m_main_board_temperature{ -1 };    //主板温度
-    int m_gpu_usage{ -1 };      //显卡利用率
-    int m_hdd_usage{ -1 };      //硬盘利用率
+    unsigned __int64    m_in_speed{};                                   //下载速度
+    unsigned __int64    m_out_speed{};                                  //上传速度
+    unsigned __int64    m_today_up_traffic{};                           //今天已使用的上传流量
+    unsigned __int64    m_today_down_traffic{};                         //今天已使用的下载流量
+    //4个利用率、4个温度、1个频率都是float类型      //内存大小使用UINT64
+    float               m_cpu_usage{ 0 };                               //CPU利用率
+    float               m_memory_usage{ -1 };                           //内存利用率
+    UINT64              m_used_memory{};                                //可用物理内存（单位为KB）
+    UINT64              m_total_memory{};                               //物理内存总量（单位为KB）
+    float               m_gpu_usage{ -1 };                              //显卡利用率
+    float               m_hdd_usage{ -1 };                              //硬盘利用率
+    float               m_cpu_temperature{ -1 };                        //CPU温度
+    float               m_gpu_temperature{ -1 };                        //显卡温度
+    float               m_hdd_temperature{ -1 };                        //硬盘温度
+    float               m_main_board_temperature{ -1 };                 //主板温度
+    float               m_cpu_freq{ -1 };                               //CPU 频率
 
-    unsigned __int64 m_today_up_traffic{};  //今天已使用的上传流量
-    unsigned __int64 m_today_down_traffic{};    //今天已使用的下载流量
+    bool                m_cannot_save_config_warning{ true };           //指示是否会在无法保存设置时弹出提示框
+    bool                m_cannot_save_global_config_warning{ true };    //指示是否会在无法保存设置时弹出提示框
 
-    bool m_cannot_save_config_warning{ true };  //指示是否会在无法保存设置时弹出提示框
-    bool m_cannot_save_global_config_warning{ true };   //指示是否会在无法保存设置时弹出提示框
-
-    bool m_module_dir_writable{ true };         //指示程序所在目录是否可写
+    bool                m_module_dir_writable{ true };                  //指示程序所在目录是否可写
 
     //选项设置数据
     GeneralSettingData      m_general_data;

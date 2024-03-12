@@ -12,7 +12,7 @@ void CCPUUsage::SetUseCPUTimes(bool use_get_system_times)
 	}
 }
 
-int CCPUUsage::GetCPUUsage()
+float CCPUUsage::GetCPUUsage()
 {
 	if (m_use_get_system_times)
 		return GetCPUUsageByGetSystemTimes();
@@ -20,9 +20,9 @@ int CCPUUsage::GetCPUUsage()
 		return GetCPUUsageByPdh();
 }
 
-int CCPUUsage::GetCPUUsageByGetSystemTimes()
+float CCPUUsage::GetCPUUsageByGetSystemTimes()
 {
-	int cpu_usage{};
+	float cpu_usage{};
 	FILETIME idleTime;
 	FILETIME kernelTime;
 	FILETIME userTime;
@@ -39,7 +39,7 @@ int CCPUUsage::GetCPUUsageByGetSystemTimes()
 	else
 	{
 		//（总的时间-空闲时间）/总的时间=占用cpu的时间就是使用率
-		cpu_usage = static_cast<int>(abs((kernel + user - idle) * 100 / (kernel + user)));
+		cpu_usage = static_cast<UCHAR>(abs((kernel + user - idle) * 100 / (kernel + user)));
 	}
 	m_preidleTime = idleTime;
 	m_prekernelTime = kernelTime;
@@ -48,9 +48,9 @@ int CCPUUsage::GetCPUUsageByGetSystemTimes()
 	return cpu_usage;
 }
 
-int CCPUUsage::GetCPUUsageByPdh()
+float CCPUUsage::GetCPUUsageByPdh()
 {
-	int cpu_usage{};
+	float cpu_usage{};
 	HQUERY hQuery;
 	HCOUNTER hCounter;
 	DWORD counterType;
@@ -73,7 +73,7 @@ int CCPUUsage::GetCPUUsageByPdh()
 	else {
 		PDH_FMT_COUNTERVALUE fmtValue;
 		PdhCalculateCounterFromRawValue(hCounter, PDH_FMT_DOUBLE, &rawData, &m_last_rawData, &fmtValue);//计算使用率
-		cpu_usage = fmtValue.doubleValue;//传出数据
+		cpu_usage = static_cast<float>(fmtValue.doubleValue);//传出数据
 		if (cpu_usage > 100)
 			cpu_usage = 100;
 	}

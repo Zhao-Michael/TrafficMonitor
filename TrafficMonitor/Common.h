@@ -19,15 +19,15 @@ public:
     {
         if (str.empty()) return;
 
-        int size = str.size();  //字符串的长度
+        size_t size = str.size();   //字符串的长度
         if (size < 0) return;
-        int index1 = 0;     //字符串中第1个不是空格或控制字符的位置
-        int index2 = size - 1;  //字符串中最后一个不是空格或控制字符的位置
+        size_t index1 = 0;          //字符串中第1个不是空格或控制字符的位置
+        size_t index2 = size - 1;   //字符串中最后一个不是空格或控制字符的位置
         while (index1 < size && str[index1] >= 0 && str[index1] <= 32)
             index1++;
         while (index2 >= 0 && str[index2] >= 0 && str[index2] <= 32)
             index2--;
-        if (index1 > index2)    //如果index1 > index2，说明字符串全是空格或控制字符
+        if (index1 > index2)        //如果index1 > index2，说明字符串全是空格或控制字符
             str.clear();
         else if (index1 == 0 && index2 == size - 1) //如果index1和index2的值分别为0和size - 1，说明字符串前后没有空格或控制字符，直接返回
             return;
@@ -132,7 +132,7 @@ public:
     static CString TemperatureToString(float temperature, const PublicSettingData& cfg);
 
     //将使用率转换成字符串
-    static CString UsageToString(int usage, const PublicSettingData& cfg);
+    static CString UsageToString(float usage, const PublicSettingData& cfg);
     static CString FreqToString(float usage, const PublicSettingData& cfg);
     //static CString KBytesToString(unsigned int kb_size);
     static CString KBytesToString(unsigned __int64 kb_size);
@@ -242,7 +242,7 @@ public:
     static void NormalizeFont(LOGFONT& font);
 
     //安全的字符串复制函数
-    static void WStringCopy(wchar_t* str_dest, int dest_size, const wchar_t* str_source, int source_size = INT_MAX);
+    static void WStringCopy(wchar_t* str_dest, size_t dest_size, const wchar_t* str_source, size_t source_size = INT_MAX);
 
     /// <summary>
     /// 字符串相似度算法-编辑距离法

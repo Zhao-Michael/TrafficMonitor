@@ -27,9 +27,8 @@ public:
     CToolTipCtrl m_tool_tips;
 
     void ShowInfo(CDC* pDC); 	//将信息绘制到控件上
-    void TryDrawStatusBar(IDrawCommon& drawer, const CRect& rect_bar, int usage_percent); //绘制CPU/内存状态条
-
-    void TryDrawGraph(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type);		// 绘制CPU/内存动态图
+    void TryDrawHorizontalHistogram  (IDrawCommon& drawer, const CRect& rect_bar,   int usage_percent);             //绘制CPU/内存的横向柱状图
+    void TryDrawHorizontalScrollChart(IDrawCommon& drawer, const CRect& value_rect, EBuiltinDisplayItem item_type);	//绘制CPU/内存的横向滚动图
 
     bool AdjustWindowPos();	//设置窗口在任务栏中的位置
     void ApplyWindowTransparentColor();

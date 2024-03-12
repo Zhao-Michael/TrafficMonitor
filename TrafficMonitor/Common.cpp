@@ -184,7 +184,7 @@ CString CCommon::DataSizeToString(unsigned long long size, const PublicSettingDa
     return str;
 }
 
-CString CCommon::DataSizeToString(unsigned long long size, bool with_space)
+CString CCommon::DataSizeToString(unsigned long long size, bool with_space)     //参数size的单位为byte
 {
     CString str;
     if (size < 1024 * 10)                   //10KB以下以KB为单位，保留2位小数
@@ -215,7 +215,7 @@ CString CCommon::TemperatureToString(float temperature, const PublicSettingData&
     return str_val;
 }
 
-CString CCommon::UsageToString(int usage, const PublicSettingData& cfg)
+CString CCommon::UsageToString(float usage, const PublicSettingData& cfg)
 {
     CString str_val;
     if (usage < 0)
@@ -383,7 +383,7 @@ BOOL CCommon::CreateFileShortcut(LPCTSTR lpszLnkFileDir, LPCTSTR lpszFileName, L
         }
         //注意后缀名要从.exe改为.lnk
         swprintf_s(szBuffer, L"%s\\%s", lpszLnkFileDir, pstr);
-        int nLen = wcslen(szBuffer);
+        size_t nLen = wcslen(szBuffer);
         szBuffer[nLen - 3] = L'l';
         szBuffer[nLen - 2] = L'n';
         szBuffer[nLen - 1] = L'k';
@@ -854,7 +854,7 @@ void CCommon::NormalizeFont(LOGFONT& font)
     WStringCopy(font.lfFaceName, 32, name.c_str(), name.size());
 }
 
-void CCommon::WStringCopy(wchar_t* str_dest, int dest_size, const wchar_t* str_source, int source_size)
+void CCommon::WStringCopy(wchar_t* str_dest, size_t dest_size, const wchar_t* str_source, size_t source_size)
 {
     if (dest_size <= 0)
         return;

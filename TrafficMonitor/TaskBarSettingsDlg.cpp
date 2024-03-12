@@ -104,13 +104,13 @@ void CTaskBarSettingsDlg::EnableControl()
     ShowDlgCtrl(IDC_EXE_PATH_STATIC, exe_path_enable);
     ShowDlgCtrl(IDC_EXE_PATH_EDIT, exe_path_enable);
     ShowDlgCtrl(IDC_BROWSE_BUTTON, exe_path_enable);
-    EnableDlgCtrl(IDC_AUTO_ADAPT_SETTINGS_BUTTON, m_data.auto_adapt_light_theme);
-    EnableDlgCtrl(IDC_SHOW_DASHED_BOX, m_data.show_status_bar || m_data.show_netspeed_figure);
-    m_status_bar_color_static.EnableWindow(m_data.show_status_bar || m_data.show_netspeed_figure);
-    EnableDlgCtrl(IDC_CM_GRAPH_BAR_RADIO, m_data.show_status_bar || m_data.show_netspeed_figure);
-    EnableDlgCtrl(IDC_CM_GRAPH_PLOT_RADIO, m_data.show_status_bar || m_data.show_netspeed_figure);
-    EnableDlgCtrl(IDC_NET_SPEED_FIGURE_MAX_VALUE_EDIT, m_data.show_netspeed_figure);
-    EnableDlgCtrl(IDC_NET_SPEED_FIGURE_MAX_VALUE_UNIT_COMBO, m_data.show_netspeed_figure);
+    EnableDlgCtrl(IDC_AUTO_ADAPT_SETTINGS_BUTTON,               m_data.auto_adapt_light_theme);
+    EnableDlgCtrl(IDC_SHOW_DASHED_BOX,                          m_data.b_show_resource_figure || m_data.b_show_netspeed_figure);     //显示虚线框checkbox
+    m_status_bar_color_static.EnableWindow(                     m_data.b_show_resource_figure || m_data.b_show_netspeed_figure);
+    EnableDlgCtrl(IDC_CM_GRAPH_BAR_RADIO,                       m_data.b_show_resource_figure || m_data.b_show_netspeed_figure);     //横向柱状图radio
+    EnableDlgCtrl(IDC_CM_GRAPH_PLOT_RADIO,                      m_data.b_show_resource_figure || m_data.b_show_netspeed_figure);     //横向滚动图radio
+    EnableDlgCtrl(IDC_NET_SPEED_FIGURE_MAX_VALUE_EDIT,          m_data.b_show_netspeed_figure);
+    EnableDlgCtrl(IDC_NET_SPEED_FIGURE_MAX_VALUE_UNIT_COMBO,    m_data.b_show_netspeed_figure);
     //EnableDlgCtrl(IDC_TASKBAR_WND_SNAP_CHECK, theApp.m_win_version.IsWindows11OrLater() && !m_data.tbar_wnd_on_left);
 }
 
@@ -224,7 +224,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->SetCheck(m_data.speed_short_mode);
     ((CButton*)GetDlgItem(IDC_VALUE_RIGHT_ALIGN_CHECK))->SetCheck(m_data.value_right_align);
     ((CButton*)GetDlgItem(IDC_HORIZONTAL_ARRANGE_CHECK))->SetCheck(m_data.horizontal_arrange);
-    ((CButton*)GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK))->SetCheck(m_data.show_status_bar);
+    ((CButton*)GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK))->SetCheck(m_data.b_show_resource_figure);
     ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(m_data.separate_value_unit_with_space);
     ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(m_data.show_tool_tip);
 
@@ -304,7 +304,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
         CheckDlgButton(IDC_CM_GRAPH_PLOT_RADIO, TRUE);
     else
         CheckDlgButton(IDC_CM_GRAPH_BAR_RADIO, TRUE);
-    CheckDlgButton(IDC_SHOW_DASHED_BOX, m_data.show_graph_dashed_box);
+    CheckDlgButton(IDC_SHOW_DASHED_BOX, m_data.b_show_graph_dashed_box);
     m_item_space_edit.SetRange(0, 32);
     m_item_space_edit.SetValue(m_data.item_space);
     CTaskBarDlg* taskbar_dlg{ CTrafficMonitorDlg::Instance()->GetTaskbarWindow() };
@@ -323,7 +323,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_AVAILABLE));
     m_memory_display_combo.SetCurSel(static_cast<int>(m_data.memory_display));
 
-    CheckDlgButton(IDC_SHOW_NET_SPEED_FIGURE_CHECK, m_data.show_netspeed_figure);
+    CheckDlgButton(IDC_SHOW_NET_SPEED_FIGURE_CHECK, m_data.b_show_netspeed_figure);
     m_net_speed_figure_max_val_edit.SetRange(1, 1024);
     m_net_speed_figure_max_val_edit.SetValue(m_data.netspeed_figure_max_value);
     m_net_speed_figure_max_val_unit_combo.AddString(_T("KB"));
@@ -605,7 +605,7 @@ void CTaskBarSettingsDlg::OnBnClickedHorizontalArrangeCheck()
 void CTaskBarSettingsDlg::OnBnClickedShowStatusBarCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.show_status_bar = (((CButton*)GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK))->GetCheck() != 0);
+    m_data.b_show_resource_figure = (((CButton*)GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK))->GetCheck() != 0);
     EnableControl();
 }
 
@@ -738,7 +738,7 @@ void CTaskBarSettingsDlg::OnCbnSelchangeMemoryDisplayCombo()
 void CTaskBarSettingsDlg::OnBnClickedShowDashedBox()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.show_graph_dashed_box = (IsDlgButtonChecked(IDC_SHOW_DASHED_BOX) != 0);
+    m_data.b_show_graph_dashed_box = (IsDlgButtonChecked(IDC_SHOW_DASHED_BOX) != 0);
 }
 
 
@@ -814,7 +814,7 @@ BOOL CTaskBarSettingsDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CTaskBarSettingsDlg::OnBnClickedShowNetSpeedFigureCheck()
 {
-    m_data.show_netspeed_figure = (IsDlgButtonChecked(IDC_SHOW_NET_SPEED_FIGURE_CHECK) != 0);
+    m_data.b_show_netspeed_figure = (IsDlgButtonChecked(IDC_SHOW_NET_SPEED_FIGURE_CHECK) != 0);
     EnableControl();
 }
 

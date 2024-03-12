@@ -13,11 +13,11 @@ public:
 	{}
 
 	void SetUseCPUTimes(bool use_get_system_times);		//设置获取CPU利用率的方式，是通过GetSystemTimes还是Pdh
-	int GetCPUUsage();
+	float GetCPUUsage();
 
 private:
-	int GetCPUUsageByGetSystemTimes();
-	int GetCPUUsageByPdh();
+	float GetCPUUsageByGetSystemTimes();
+	float GetCPUUsageByPdh();
 
 private:
 	bool m_use_get_system_times{ true };		//是否使用GetSysTime这个API来获取CPU利用率
