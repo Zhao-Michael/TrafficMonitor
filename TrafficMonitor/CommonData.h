@@ -64,31 +64,24 @@ private:
     std::map<CommonDisplayItem, wstring> map_str;
 
 public:
-    //获取一个显示的文本
-    wstring& Get(CommonDisplayItem item);
-
+    wstring&                                    Get(CommonDisplayItem item);    //获取一个显示的文本
     const std::map<CommonDisplayItem, wstring>& GetAllItems() const;
-
-    void operator=(const DispStrings& disp_str);     //重载赋值运算符
-
-    //载入一个插件项目的显示文本
-    void Load(const std::wstring& plugin_id, const std::wstring& disp_str);
-
-    //是否无效
-    bool IsInvalid() const;
+    void operator=(const DispStrings& disp_str);                                //重载赋值运算符
+    void Load(const std::wstring& plugin_id, const std::wstring& disp_str);     //载入一个插件项目的显示文本
+    bool IsInvalid() const;                                                     //是否无效
 };
 
 //鼠标双击窗口的动作
 enum class DoubleClickAction
 {
-    CONNECTION_INFO,    //连接详情
-    HISTORY_TRAFFIC,    //历史流量统计
-    SHOW_MORE_INFO,     //显示更多信息
-    OPTIONS,            //选项设置
-    TASK_MANAGER,       //任务管理器
-    SEPCIFIC_APP,       //指定应用程序
-    CHANGE_SKIN,        //更换皮肤
-    NONE                //不执行任何动作
+    CONNECTION_INFO,        //连接详情
+    HISTORY_TRAFFIC,        //历史流量统计
+    SHOW_MORE_INFO,         //显示更多信息
+    OPTIONS,                //选项设置
+    TASK_MANAGER,           //任务管理器
+    SEPCIFIC_APP,           //指定应用程序
+    CHANGE_SKIN,            //更换皮肤
+    NONE                    //不执行任何动作
 };
 
 //语言
@@ -103,8 +96,8 @@ enum class Language
 //颜色模式
 enum class ColorMode
 {
-    Default, //默认颜色
-    Light   //浅色
+    Default,                //默认颜色
+    Light                   //浅色
 };
 
 //将字号转成LOGFONT结构中的lfHeight
@@ -123,19 +116,19 @@ inline int FontSizeToLfHeight(int font_size, int dpi = 0)
 //字体
 struct FontInfo
 {
-    CString name;   //字体名称
-    int size;       //字体大小
-    bool bold;          //粗体
-    bool italic;        //斜体
-    bool underline;     //下划线
-    bool strike_out;    //删除线
+    CString name;           //字体名称
+    int size;               //字体大小
+    bool bold;              //粗体
+    bool italic;            //斜体
+    bool underline;         //下划线
+    bool strike_out;        //删除线
 
     //创建一个CFont对象
     void Create(CFont& font, int dpi = 0)
     {
         font.CreateFont(
-            FontSizeToLfHeight(size, dpi), // nHeight
-            0, // nWidth
+            FontSizeToLfHeight(size, dpi),  // nHeight
+            0,                              // nWidth
             0, // nEscapement
             0, // nOrientation
             (bold ? FW_BOLD : FW_NORMAL), // nWeight
@@ -156,21 +149,21 @@ enum class HistoryTrafficViewType
 {
     HV_DAY,         //日视图
     HV_WEEK,        //周视图
-    HV_MONTH,          //月视图
+    HV_MONTH,       //月视图
     HV_QUARTER,     //季视图
-    HV_YEAR            //年视图
+    HV_YEAR         //年视图
 };
 
 struct StringSet
 {
 public:
-    bool Contains(const std::wstring& str) const;
-    void SetStrContained(const std::wstring& str, bool contained);
-    void FromString(const std::wstring& str);
-    std::wstring ToString() const;
-    void FromVector(const std::vector<std::wstring>& vec);
-    std::vector<std::wstring> ToVector() const;
-    std::set<std::wstring>& data();
+    bool                        Contains(const std::wstring& str) const;
+    void                        SetStrContained(const std::wstring& str, bool contained);
+    void                        FromString(const std::wstring& str);
+    std::wstring                ToString() const;
+    void                        FromVector(const std::vector<std::wstring>& vec);
+    std::vector<std::wstring>   ToVector() const;
+    std::set<std::wstring>&     data();
 private:
     std::set<std::wstring> string_set;
 };
@@ -178,31 +171,34 @@ private:
 //选项设置数据
 struct MainConfigData
 {
-    int m_transparency{ 100 };          //窗口透明度
-    bool m_show_more_info{ false };     //显示更多信息
-    bool m_show_task_bar_wnd{ false };  //显示任务栏窗口
-    bool m_hide_main_window;            //隐藏主窗口
-    //bool m_tbar_show_cpu_memory;      //任务栏窗口显示CPU和内存利用率
+    int  m_transparency     { 100   };          //窗口透明度
+    bool m_show_more_info   { false };          //显示更多信息
+    bool m_show_task_bar_wnd{ false };          //显示任务栏窗口
+    bool m_hide_main_window;                    //隐藏主窗口
+    //bool m_tbar_show_cpu_memory;              //任务栏窗口显示CPU和内存利用率
 
-    int m_position_x;   //窗口位置的x坐标
-    int m_position_y;   //窗口位置的y坐标
+    int  m_position_x;                          //窗口位置的x坐标
+    int  m_position_y;                          //窗口位置的y坐标
 
-    bool m_auto_select{ false };    //自动选择连接
-    bool m_select_all{ false };     //统计所有连接的网速
-    string m_connection_name;      //当前选择网络的名称
+    //网络连接设置
+    bool m_auto_select{ false };                //自动选择连接
+    bool m_select_all{ false };                 //统计所有连接的网速
+    string m_connection_name;                   //当前选择网络的名称
+    //bool m_show_internet_ip{ false };         //是否在“连接详情”对话框中显示外网IP地址
 
-    wstring m_skin_name;            //选择的皮肤的名称
-    int m_dft_notify_icon = 0;      //默认的通知图标(用于区分win10的深色和浅色模式)
-    int m_notify_icon_selected{};   //要显示的通知区图标
-    bool m_notify_icon_auto_adapt{ false }; //通知区图标是否自动适应Win10深浅色模式
+    wstring m_skin_name;                        //选择的皮肤的名称
 
-    //bool m_show_internet_ip{ false };     //是否在“连接详情”对话框中显示外网IP地址
-    bool m_use_log_scale{ false };          //“历史流量统计”对话框中绘制表示历史流量数值的矩形时是否使用对数比例
+    //通知图标设置
+    int  m_dft_notify_icon = 0;                 //默认的通知图标(用于区分win10的深色和浅色模式)
+    int  m_notify_icon_selected{};              //要显示的通知区图标
+    bool m_notify_icon_auto_adapt{ false };     //通知区图标是否自动适应Win10深浅色模式
+
+    bool m_use_log_scale{ false };              //“历史流量统计”对话框中绘制表示历史流量数值的矩形时是否使用对数比例
     HistoryTrafficViewType m_view_type{};
-    bool m_sunday_first{ true };            //是否将周日作为一周的第一天
-    StringSet plugin_disabled;      //已禁用的插件
+    bool m_sunday_first{ true };                //是否将周日作为一周的第一天
+    StringSet plugin_disabled;                  //已禁用的插件
 
-    int taskbar_left_space_win11{};         //Windows11下，任务栏窗口显示在左侧时的边距
+    int  taskbar_left_space_win11{};            //Windows11下，任务栏窗口显示在左侧时的边距
 };
 
 //内存显示方式
@@ -213,36 +209,42 @@ enum class MemoryDisplay
     MEMORY_AVAILABLE        //内存可用
 };
 
-//选项设置中“主窗口设置”和“任务栏窗口设置”中公共的数据（不使用此结构体创建对象）
+//选项设置中“主窗口设置”和“任务栏窗口设置”中公共的数据(不使用此结构体创建对象)
 struct PublicSettingData
 {
-    bool specify_each_item_color{ false };      //是否指定每个项目的颜色
-    FontInfo font;          //字体
-    DispStrings disp_str;   //显示的文本
-    bool speed_short_mode{ false };     //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
-    bool separate_value_unit_with_space{ true };    //网速数值和单位用空格分隔
-    bool show_tool_tip{ true };         //显示鼠标提示
+    FontInfo font;                                  //字体
+    DispStrings disp_str;                           //显示的文本
+    bool specify_each_item_color{ false };          //是否指定每个项目的颜色
+    bool show_tool_tip{ true };                     //显示鼠标提示
+
+    //数值属性设置
+    bool hide_unit;                                 //隐藏单位
+    bool hide_percent;                              //隐藏百分号
+//    bool hide_degree;                             //隐藏温度度数                                            //暂不支持，以后会支持。
+    bool separate_value_unit_with_space{ true };    //网速数值和单位用空格分隔                                //以后改名为：数值和单位用空格分隔(不再只限于网速)
+    bool speed_short_mode{ false };                 //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
+    SpeedUnit speed_unit;                           //网速的单位
+    bool unit_byte{ true };                         //使用字节(B)而不是比特(b)为单位                        //以后某天要取消对bit的支持，因此到时将删除此项。
     MemoryDisplay memory_display{ MemoryDisplay::USAGE_PERCENTAGE };    //内存显示方式
 
-    bool unit_byte{ true };             //使用字节(B)而不是比特(b)为单位
-    SpeedUnit speed_unit;       //网速的单位
-    bool hide_unit;         //隐藏单位
-    bool hide_percent;      //隐藏百分号
-    DoubleClickAction double_click_action;      //鼠标双击动作
-    wstring double_click_exe;   //鼠标双击动作为打开指定应用程序时，打开的程序路径
+    //鼠标双击设置
+    DoubleClickAction   double_click_action;    //鼠标双击动作
+    wstring             double_click_exe;       //鼠标双击动作为打开指定应用程序时，打开的程序路径
 };
 
 //#define MAIN_WND_COLOR_NUM 9      //主窗口颜色数量
 //选项设置中“主窗口设置”的数据
 struct MainWndSettingData : public PublicSettingData
 {
-    std::map<CommonDisplayItem, COLORREF> text_colors{};    //方字的颜色
-    bool swap_up_down{ false };     //交换上传和下载显示的位置
-    bool hide_main_wnd_when_fullscreen;     //有程序全屏运行时隐藏悬浮窗
-    bool m_always_on_top{ false };      //窗口置顶
-    bool m_lock_window_pos{ false };    //锁定窗口位置
-    bool m_mouse_penetrate{ false };    //鼠标穿透
-    bool m_alow_out_of_border{ false };     //是否允许悬浮窗超出屏幕边界
+    std::map<CommonDisplayItem, COLORREF> text_colors{};    //方字的颜色                 //以后要像任务栏一样，可以设置标签颜色。
+
+    bool m_always_on_top        { false };      //窗口置顶
+    bool m_lock_window_pos      { false };      //锁定窗口位置
+    bool m_mouse_penetrate      { false };      //鼠标穿透
+    bool m_alow_out_of_border   { false };      //是否允许悬浮窗超出屏幕边界
+    bool hide_main_wnd_when_fullscreen;         //有程序全屏运行时隐藏悬浮窗
+
+    bool swap_up_down           { false };      //交换上传和下载显示的位置
 };
 
 //#define TASKBAR_COLOR_NUM 18      //任务栏窗口颜色数量
@@ -261,15 +263,17 @@ struct TaskbarItemColor //任务栏窗口每一项的颜色
 //选项设置中“任务栏窗口设置”的数据
 struct TaskBarSettingData : public PublicSettingData
 {
-    COLORREF  back_color{ RGB(0, 0, 0) };                   //背景颜色
-    COLORREF transparent_color{ RGB(0, 0, 0) };             //透明色
-    COLORREF status_bar_color{ RGB(0, 0, 0) };              // CPU/内存 状态条颜色
+    //颜色相关
+    COLORREF    back_color          { RGB(0, 0, 0) };       //背景颜色
+    COLORREF    transparent_color   { RGB(0, 0, 0) };       //透明色
+    COLORREF    status_bar_color    { RGB(0, 0, 0) };       // CPU/内存 状态条颜色
     std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};    //文字的颜色
+    //缺省颜色
     int dft_back_color = 0;                                 //默认背景颜色
     int dft_transparent_color = 0;                          //默认透明色
     int dft_status_bar_color = 0x005A5A5A;                  //默认CPU/内存 状态条颜色
     int dft_text_colors = 0x00ffffffU;                      //默认文字颜色
-
+    //颜色主题
     bool auto_adapt_light_theme{ true };                    //是否自动适应浅色主题
     int dark_default_style{ 0 };                            //深色主题时使用的预设方案
     int light_default_style{ -1 };                          //浅色主题时使用的预设方案
@@ -278,32 +282,31 @@ struct TaskBarSettingData : public PublicSettingData
     bool IsTaskbarTransparent() const;
     void SetTaskabrTransparent(bool transparent);
 
-    CTaskbarItemOrderHelper item_order;
+    CTaskbarItemOrderHelper     item_order;
     unsigned int m_tbar_display_item{ TDI_UP | TDI_DOWN };  //任务栏窗口显示的项目
     StringSet plugin_display_item;                          //任务窗口显示的插件项目
 
-    bool value_right_align{ false };                        //数值是否右对齐
-    int digits_number{ 4 };                                 //数据位数
-    bool horizontal_arrange{ true };                        //水平排列
-    bool tbar_wnd_on_left{ false };                         //如果为true，则任务栏窗口显示在任务栏的左侧（或上方）
-    bool tbar_wnd_snap{ false };     	                    //如果为true，则在Win11中任务栏窗口贴靠中间任务栏，否则靠近边缘
-    int item_space{};                                       //项目间距
-    int window_offset_top{};                                //任务栏窗口顶部边距
-    int vertical_margin{};                                  //项目垂直间距
+    bool        value_right_align{ false };                 //数值是否右对齐
+    int         digits_number{ 4 };                         //数据位数
+    bool        horizontal_arrange{ true };                 //水平排列
+    bool        tbar_wnd_on_left{ false };                  //如果为true，则任务栏窗口显示在任务栏的左侧（或上方）
+    bool        tbar_wnd_snap{ false };     	            //如果为true，则在Win11中任务栏窗口贴靠中间任务栏，否则靠近边缘
+    int         item_space{};                               //项目间距
+    int         window_offset_top{};                        //任务栏窗口顶部边距
+    int         vertical_margin{};                          //项目垂直间距
 
-    //任务栏窗口设置选项
+    //任务栏窗口独有设置选项
     bool b_show_resource_figure{ true };                    //是否显示资源占用图(CPU/内存)
     bool b_show_netspeed_figure{ false };                   //是否显示网速占用图(上传、下载、上传下载总和)
     bool b_show_graph_dashed_box{ true };                   //是否显示虚线框
     bool cm_graph_type{ false };                            //占用图类型(如果为false，默认原样式，柱状图显示占用率; 如为true，滚动显示占用率)
+    int netspeed_figure_max_value;                          //网速占用图的最大值
+    int netspeed_figure_max_value_unit{};                   //网速占用图最大值的单位（0: KB, 1: MB）
+    unsigned __int64 GetNetspeedFigureMaxValueInBytes() const;  //获取网速占用图的最大值（以字节为单位）
 
     void ValidItemSpace();
     void ValidWindowOffsetTop();
     void ValidVerticalMargin();
-
-    int netspeed_figure_max_value;                          //网速占用图的最大值
-    int netspeed_figure_max_value_unit{};                   //网速占用图最大值的单位（0: KB, 1: MB）
-    unsigned __int64 GetNetspeedFigureMaxValueInBytes() const;  //获取网速占用图的最大值（以字节为单位）
 
     bool disable_d2d{ false };                              //是否禁用d2d绘图
     DWORD update_layered_window_error_code{0};              // 使用D2D1渲染时，UpdateLayeredWindowIndirect失败的错误代码，会在关闭任务栏窗口时被重置为0

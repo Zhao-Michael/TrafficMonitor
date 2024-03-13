@@ -141,6 +141,70 @@ public:
 class ITMPlugin
 {
 public:
+    /** 插件信息的索引 */
+    enum PluginInfoIndex
+    {
+        TMI_NAME,           /**< 名称 */
+        TMI_DESCRIPTION,    /**< 描述 */
+        TMI_AUTHOR,         /**< 作者 */
+        TMI_COPYRIGHT,      /**< 版权 */
+        TMI_VERSION,        /**< 版本 */
+        TMI_URL,            /**< 主页 */
+        TMI_MAX             /**< 插件信息的最大值 */
+    };
+
+    /** 选项设置对话框的返回值 */
+    enum OptionReturn
+    {
+        OR_OPTION_CHANGED,          /**< 选项设置对话框中更改了选项设置 */
+        OR_OPTION_UNCHANGED,        /**< 选项设置对话框中未更改选项设置 */
+        OR_OPTION_NOT_PROVIDED      /**< 未提供选项设置对话框 */
+    };
+
+    /** 主程序的监控信息 */
+    struct MonitorInfo
+    {
+        //某些变量的类型在主程序那边已经变了，因为插件接口使用了这个，所以这里先不改。
+        unsigned long long up_speed{};
+        unsigned long long down_speed{};
+        int cpu_usage{};
+        int memory_usage{};
+        int gpu_usage{};
+        int hdd_usage{};
+        int cpu_temperature{};
+        int gpu_temperature{};
+        int hdd_temperature{};
+        int main_board_temperature{};
+        int cpu_freq{};
+    };
+
+    enum ExtendedInfoIndex
+    {
+        EI_LABEL_TEXT_COLOR,                    //绘图的标签文本颜色
+        EI_VALUE_TEXT_COLOR,                    //绘图的数值文本颜色
+        EI_DRAW_TASKBAR_WND,                    //是否绘制任务栏窗口
+
+        //主窗口选项设置
+        EI_NAIN_WND_NET_SPEED_SHORT_MODE,       //网速显示简洁模式
+        EI_MAIN_WND_SPERATE_WITH_SPACE,         //数值和单位使用空格分隔
+        EI_MAIN_WND_UNIT_BYTE,                  //网速单位是否使用B（字节）
+        EI_MAIN_WND_UNIT_SELECT,                //网速单位选择（0：自动，1：固定为KB/s，2：固定为MB/s）
+        EI_MAIN_WND_NOT_SHOW_UNIT,              //不显示网速单位
+        EI_MAIN_WND_NOT_SHOW_PERCENT,           //不显示百分号
+
+        //任务栏窗口设置
+        EI_TASKBAR_WND_NET_SPEED_SHORT_MODE,    //网速显示简洁模式
+        EI_TASKBAR_WND_SPERATE_WITH_SPACE,      //数值和单位使用空格分隔
+        EI_TASKBAR_WND_VALUE_RIGHT_ALIGN,       //数值右对齐
+        EI_TASKBAR_WND_NET_SPEED_WIDTH,         //网速数据宽度
+        EI_TASKBAR_WND_UNIT_BYTE,               //网速单位是否使用B（字节）
+        EI_TASKBAR_WND_UNIT_SELECT,             //网速单位选择（0：自动，1：固定为KB/s，2：固定为MB/s）
+        EI_TASKBAR_WND_NOT_SHOW_UNIT,           //不显示网速单位
+        EI_TASKBAR_WND_NOT_SHOW_PERCENT,        //不显示百分号
+
+        EI_CONFIG_DIR,                          //配置文件的目录
+    };
+
     /**
      * @brief   插件接口的版本，仅当修改了插件接口时才会修改这里的返回值。
      * @attention 插件开发者不应该修改这里的返回值，也不应该重写此虚函数。
@@ -163,14 +227,6 @@ public:
      */
     virtual void DataRequired() = 0;
 
-    /** 选项设置对话框的返回值 */
-    enum OptionReturn
-    {
-        OR_OPTION_CHANGED,          /**< 选项设置对话框中更改了选项设置 */
-        OR_OPTION_UNCHANGED,        /**< 选项设置对话框中未更改选项设置 */
-        OR_OPTION_NOT_PROVIDED      /**< 未提供选项设置对话框 */
-    };
-
     /**
      * @brief   主程序调用此函数以打开插件的选项设置对话框
      * @detail  此函数不一定要重写。如果插件提供了选项设置界面，则应该重写此函数，并在最后返回OR_OPTION_CHANGED或OR_OPTION_UNCHANGED。
@@ -180,39 +236,10 @@ public:
      */
     virtual OptionReturn ShowOptionsDialog(void* hParent) { return OR_OPTION_NOT_PROVIDED; }
 
-    /** 插件信息的索引 */
-    enum PluginInfoIndex
-    {
-        TMI_NAME,           /**< 名称 */
-        TMI_DESCRIPTION,    /**< 描述 */
-        TMI_AUTHOR,         /**< 作者 */
-        TMI_COPYRIGHT,      /**< 版权 */
-        TMI_VERSION,        /**< 版本 */
-        TMI_URL,            /**< 主页 */
-        TMI_MAX             /**< 插件信息的最大值 */
-    };
-
     /**
      * @brief   获取此插件的信息，根据index的值返回对应的信息
      */
     virtual const wchar_t* GetInfo(PluginInfoIndex index) = 0;
-
-    /** 主程序的监控信息 */
-    struct MonitorInfo
-    {
-        //某些变量的类型在主程序那边已经变了，因为插件接口使用了这个，所以这里先不改。
-        unsigned long long up_speed{};
-        unsigned long long down_speed{};
-        int cpu_usage{};
-        int memory_usage{};
-        int gpu_usage{};
-        int hdd_usage{};
-        int cpu_temperature{};
-        int gpu_temperature{};
-        int hdd_temperature{};
-        int main_board_temperature{};
-        int cpu_freq{};
-    };
 
     /**
      * @brief   主程序调用此函数以向插件传递所有获取到的监控信息
@@ -223,33 +250,6 @@ public:
      * @brief   获取插件要在鼠标提示中显示的文本
      */
     virtual const wchar_t* GetTooltipInfo() { return L""; }
-
-    enum ExtendedInfoIndex
-    {
-        EI_LABEL_TEXT_COLOR,    //绘图的标签文本颜色
-        EI_VALUE_TEXT_COLOR,    //绘图的数值文本颜色
-        EI_DRAW_TASKBAR_WND,    //是否绘制任务栏窗口
-
-        //主窗口选项设置
-        EI_NAIN_WND_NET_SPEED_SHORT_MODE,   //网速显示简洁模式
-        EI_MAIN_WND_SPERATE_WITH_SPACE,     //数值和单位使用空格分隔
-        EI_MAIN_WND_UNIT_BYTE,              //网速单位是否使用B（字节）
-        EI_MAIN_WND_UNIT_SELECT,            //网速单位选择（0：自动，1：固定为KB/s，2：固定为MB/s）
-        EI_MAIN_WND_NOT_SHOW_UNIT,          //不显示网速单位
-        EI_MAIN_WND_NOT_SHOW_PERCENT,       //不显示百分号
-
-        //任务栏窗口设置
-        EI_TASKBAR_WND_NET_SPEED_SHORT_MODE,    //网速显示简洁模式
-        EI_TASKBAR_WND_SPERATE_WITH_SPACE,      //数值和单位使用空格分隔
-        EI_TASKBAR_WND_VALUE_RIGHT_ALIGN,       //数值右对齐
-        EI_TASKBAR_WND_NET_SPEED_WIDTH,         //网速数据宽度
-        EI_TASKBAR_WND_UNIT_BYTE,               //网速单位是否使用B（字节）
-        EI_TASKBAR_WND_UNIT_SELECT,             //网速单位选择（0：自动，1：固定为KB/s，2：固定为MB/s）
-        EI_TASKBAR_WND_NOT_SHOW_UNIT,           //不显示网速单位
-        EI_TASKBAR_WND_NOT_SHOW_PERCENT,        //不显示百分号
-
-        EI_CONFIG_DIR,                      //配置文件的目录
-    };
 
     /**
      * @brief   主程序调用此函数以向插件传递更多信息

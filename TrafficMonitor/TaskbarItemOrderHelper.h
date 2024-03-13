@@ -19,7 +19,7 @@ enum EBuiltinDisplayItem
 };
 
 //所有内置显示项目的集合
-const std::set<EBuiltinDisplayItem> sAllDisplayItems
+const std::set<EBuiltinDisplayItem> gS_AllBuiltinDisplayItems
 {
     TDI_UP, TDI_DOWN, TDI_CPU, TDI_MEMORY
 #ifndef WITHOUT_TEMPERATURE

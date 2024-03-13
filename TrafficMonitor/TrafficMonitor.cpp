@@ -333,59 +333,59 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteStringList(L"general", L"connections_hide",                rGeneralData.connections_hide.ToVector());
 
     //主窗口设置
-    ini.WriteInt         (L"config",    L"transparency",                rCfgData.m_transparency);
-    ini.WriteBool        (L"config",    L"always_on_top",               rMainWndData.m_always_on_top);
-    ini.WriteBool        (L"config",    L"lock_window_pos",             rMainWndData.m_lock_window_pos);
-    ini.WriteBool        (L"config",    L"show_notify_icon",            rGeneralData.show_notify_icon);
-    ini.WriteBool        (L"config",    L"show_cpu_memory",             rCfgData.m_show_more_info);
-    ini.WriteBool        (L"config",    L"mouse_penetrate",             rMainWndData.m_mouse_penetrate);
-    ini.WriteBool        (L"config",    L"show_task_bar_wnd",           rCfgData.m_show_task_bar_wnd);
-    ini.WriteInt         (L"config",    L"position_x",                  rCfgData.m_position_x);
-    ini.WriteInt         (L"config",    L"position_y",                  rCfgData.m_position_y);
-    ini.SaveMainWndColors(L"config",    L"text_color",                  rMainWndData.text_colors);
-    ini.WriteBool      (_T("config"), _T("specify_each_item_color"),    rMainWndData.specify_each_item_color);
-    ini.WriteInt         (L"config",    L"hide_main_window",            rCfgData.m_hide_main_window);
-    ini.WriteString    (_T("config"), _T("skin_selected"),              rCfgData.m_skin_name.c_str());
-    ini.WriteInt         (L"config",    L"notify_icon_selected",        rCfgData.m_notify_icon_selected);
-    ini.WriteBool        (L"config",    L"notify_icon_auto_adapt",      rCfgData.m_notify_icon_auto_adapt);
+    ini.WriteInt            (L"config",     L"transparency",                    rCfgData.m_transparency);
+    ini.WriteBool           (L"config",     L"always_on_top",                   rMainWndData.m_always_on_top);
+    ini.WriteBool           (L"config",     L"lock_window_pos",                 rMainWndData.m_lock_window_pos);
+    ini.WriteBool           (L"config",     L"show_notify_icon",                rGeneralData.show_notify_icon);
+    ini.WriteBool           (L"config",     L"show_cpu_memory",                 rCfgData.m_show_more_info);
+    ini.WriteBool           (L"config",     L"mouse_penetrate",                 rMainWndData.m_mouse_penetrate);
+    ini.WriteBool           (L"config",     L"show_task_bar_wnd",               rCfgData.m_show_task_bar_wnd);
+    ini.WriteInt            (L"config",     L"position_x",                      rCfgData.m_position_x);
+    ini.WriteInt            (L"config",     L"position_y",                      rCfgData.m_position_y);
+    ini.SaveMainWndColors   (L"config",     L"text_color",                      rMainWndData.text_colors);
+    ini.WriteBool         (_T("config"),  _T("specify_each_item_color"),        rMainWndData.specify_each_item_color);
+    ini.WriteInt            (L"config",     L"hide_main_window",                rCfgData.m_hide_main_window);
+    ini.WriteString       (_T("config"),  _T("skin_selected"),                  rCfgData.m_skin_name.c_str());
+    ini.WriteInt            (L"config",     L"notify_icon_selected",            rCfgData.m_notify_icon_selected);
+    ini.WriteBool           (L"config",     L"notify_icon_auto_adapt",          rCfgData.m_notify_icon_auto_adapt);
     //网络连接设置
-    ini.WriteBool  (L"connection", L"auto_select",  rCfgData.m_auto_select);
-    ini.WriteBool  (L"connection", L"select_all",   rCfgData.m_select_all);
-    ini.WriteString(L"connection", L"connection_name", CCommon::StrToUnicode(rCfgData.m_connection_name.c_str()));
+    ini.WriteBool           (L"connection", L"auto_select",                     rCfgData.m_auto_select);
+    ini.WriteBool           (L"connection", L"select_all",                      rCfgData.m_select_all);
+    ini.WriteString         (L"connection", L"connection_name", CCommon::StrToUnicode(rCfgData.m_connection_name.c_str()));
 
     //主窗口全局字体设置
-    ini.SaveFontData(L"config", rMainWndData.font);
+    ini.SaveFontData        (L"config",                                         rMainWndData.font);
 
-    ini.WriteBool(L"config", L"swap_up_down",                   rMainWndData.swap_up_down);
-    ini.WriteBool(L"config", L"hide_main_wnd_when_fullscreen",  rMainWndData.hide_main_wnd_when_fullscreen);
+    ini.WriteBool           (L"config",     L"swap_up_down",                    rMainWndData.swap_up_down);
+    ini.WriteBool           (L"config",     L"hide_main_wnd_when_fullscreen",   rMainWndData.hide_main_wnd_when_fullscreen);
 
     //主窗口显示文本设置
-    ini.WriteString(_T("config"), _T("up_string"),              rMainWndData.disp_str.Get(TDI_UP));
-    ini.WriteString(_T("config"), _T("down_string"),            rMainWndData.disp_str.Get(TDI_DOWN));
-    ini.WriteString(_T("config"), _T("total_speed_string"),     rMainWndData.disp_str.Get(TDI_TOTAL_SPEED));
-    ini.WriteString(_T("config"), _T("cpu_string"),             rMainWndData.disp_str.Get(TDI_CPU));
-    ini.WriteString(_T("config"), _T("memory_string"),          rMainWndData.disp_str.Get(TDI_MEMORY));
-    ini.WriteString(_T("config"), _T("gpu_string"),             rMainWndData.disp_str.Get(TDI_GPU_USAGE));
-    ini.WriteString(_T("config"), _T("cpu_temp_string"),        rMainWndData.disp_str.Get(TDI_CPU_TEMP));
-    ini.WriteString(_T("config"), _T("cpu_freq_string"),        rMainWndData.disp_str.Get(TDI_CPU_FREQ));
-    ini.WriteString(_T("config"), _T("gpu_temp_string"),        rMainWndData.disp_str.Get(TDI_GPU_TEMP));
-    ini.WriteString(_T("config"), _T("hdd_temp_string"),        rMainWndData.disp_str.Get(TDI_HDD_TEMP));
-    ini.WriteString(_T("config"), _T("main_board_temp_string"), rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP));
-    ini.WriteString(_T("config"), _T("hdd_string"),             rMainWndData.disp_str.Get(TDI_HDD_USAGE));
+    ini.WriteString       (_T("config"),  _T("up_string"),                      rMainWndData.disp_str.Get(TDI_UP));
+    ini.WriteString       (_T("config"),  _T("down_string"),                    rMainWndData.disp_str.Get(TDI_DOWN));
+    ini.WriteString       (_T("config"),  _T("total_speed_string"),             rMainWndData.disp_str.Get(TDI_TOTAL_SPEED));
+    ini.WriteString       (_T("config"),  _T("cpu_string"),                     rMainWndData.disp_str.Get(TDI_CPU));
+    ini.WriteString       (_T("config"),  _T("memory_string"),                  rMainWndData.disp_str.Get(TDI_MEMORY));
+    ini.WriteString       (_T("config"),  _T("gpu_string"),                     rMainWndData.disp_str.Get(TDI_GPU_USAGE));
+    ini.WriteString       (_T("config"),  _T("cpu_temp_string"),                rMainWndData.disp_str.Get(TDI_CPU_TEMP));
+    ini.WriteString       (_T("config"),  _T("cpu_freq_string"),                rMainWndData.disp_str.Get(TDI_CPU_FREQ));
+    ini.WriteString       (_T("config"),  _T("gpu_temp_string"),                rMainWndData.disp_str.Get(TDI_GPU_TEMP));
+    ini.WriteString       (_T("config"),  _T("hdd_temp_string"),                rMainWndData.disp_str.Get(TDI_HDD_TEMP));
+    ini.WriteString       (_T("config"),  _T("main_board_temp_string"),         rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP));
+    ini.WriteString       (_T("config"),  _T("hdd_string"),                     rMainWndData.disp_str.Get(TDI_HDD_USAGE));
     ini.SavePluginDisplayStr(true);
 
-    ini.WriteBool  (L"config", L"speed_short_mode",                     rMainWndData.speed_short_mode);
-    ini.WriteBool  (L"config", L"separate_value_unit_with_space",       rMainWndData.separate_value_unit_with_space);
-    ini.WriteBool  (L"config", L"show_tool_tip",                        rMainWndData.show_tool_tip);
-    ini.WriteInt   (L"config", L"memory_display",      static_cast<int>(rMainWndData.memory_display));
-    ini.WriteBool  (L"config", L"unit_byte",                            rMainWndData.unit_byte);
-    ini.WriteInt   (L"config", L"speed_unit",          static_cast<int>(rMainWndData.speed_unit));
-    ini.WriteBool  (L"config", L"hide_unit",                            rMainWndData.hide_unit);
-    ini.WriteBool  (L"config", L"hide_percent",                         rMainWndData.hide_percent);
-    ini.WriteInt   (L"config", L"double_click_action", static_cast<int>(rMainWndData.double_click_action));
-    ini.WriteString(L"config", L"double_click_exe",                     rMainWndData.double_click_exe);
+    ini.WriteBool           (L"config",     L"speed_short_mode",                rMainWndData.speed_short_mode);
+    ini.WriteBool           (L"config",     L"separate_value_unit_with_space",  rMainWndData.separate_value_unit_with_space);
+    ini.WriteBool           (L"config",     L"show_tool_tip",                   rMainWndData.show_tool_tip);
+    ini.WriteInt            (L"config",     L"memory_display", static_cast<int>(rMainWndData.memory_display));
+    ini.WriteBool           (L"config",     L"unit_byte",                       rMainWndData.unit_byte);
+    ini.WriteInt            (L"config",     L"speed_unit",     static_cast<int>(rMainWndData.speed_unit));
+    ini.WriteBool           (L"config",     L"hide_unit",                       rMainWndData.hide_unit);
+    ini.WriteBool           (L"config",     L"hide_percent",                    rMainWndData.hide_percent);
+    ini.WriteInt            (L"config",     L"double_click_action",static_cast<int>(rMainWndData.double_click_action));
+    ini.WriteString         (L"config",     L"double_click_exe",                rMainWndData.double_click_exe);
 
-    ini.WriteInt   (L"config", L"alow_out_of_border",                   rMainWndData.m_alow_out_of_border);
+    ini.WriteInt            (L"config", L"alow_out_of_border",                  rMainWndData.m_alow_out_of_border);
 
     //提示信息选项
     ini.WriteBool(L"notify_tip", L"traffic_tip_enable",                 rGeneralData.traffic_tip_enable);
@@ -926,7 +926,7 @@ void CTrafficMonitorApp::AutoSelectNotifyIcon()
             if (rCfgData.m_notify_icon_selected == 1)
                 rCfgData.m_notify_icon_selected = 5;
         }
-        else     //深色模式下，如果图标是黑色，则改成白色
+        else                //深色模式下，如果图标是黑色，则改成白色
         {
             if (rCfgData.m_notify_icon_selected == 4)
                 rCfgData.m_notify_icon_selected = 0;

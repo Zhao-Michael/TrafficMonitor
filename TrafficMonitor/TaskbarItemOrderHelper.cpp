@@ -25,7 +25,7 @@ bool CommonDisplayItem::operator<(const CommonDisplayItem& item) const
     else if (!is_plugin)
         return item_type < item.item_type;
     else
-        return theApp.m_plugin_manager.GetItemIndex(plugin_item) < theApp.m_plugin_manager.GetItemIndex(item.plugin_item);
+        return theApp.m_plugin_manager.GetIPlguinItemIndex(plugin_item) < theApp.m_plugin_manager.GetIPlguinItemIndex(item.plugin_item);
 }
 
 CString CommonDisplayItem::GetItemName() const

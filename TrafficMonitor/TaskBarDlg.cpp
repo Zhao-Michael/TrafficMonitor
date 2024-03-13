@@ -1079,7 +1079,7 @@ void CTaskBarDlg::CalculateWindowSize()
     item_widths[TDI_MAIN_BOARD_TEMP].value_width = value_width;
 
     //计算插件项目的宽度
-    for (const auto& plugin : theApp.m_plugin_manager.GetPluginItems())
+    for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
     {
         int& value_width{ item_widths[plugin].value_width };
         if (plugin != nullptr && rTaskbarData.plugin_display_item.Contains(plugin->GetItemId()))
@@ -1504,7 +1504,7 @@ BOOL CTaskBarDlg::OnCommand(WPARAM wParam, LPARAM lParam)
     //选择了“显示项目”中的插件项目
     if (uMsg >= ID_SHOW_PLUGIN_ITEM_START && uMsg <= ID_SHOW_PLUGIN_ITEM_MAX)
     {
-        IPluginItem* item = theApp.m_plugin_manager.GetItemByIndex(uMsg - ID_SHOW_PLUGIN_ITEM_START);
+        IPluginItem* item = theApp.m_plugin_manager.GetIPluginItemByIndex(uMsg - ID_SHOW_PLUGIN_ITEM_START);
         if (item != nullptr)
         {
             bool displayed = rTaskbarData.plugin_display_item.Contains(item->GetItemId());

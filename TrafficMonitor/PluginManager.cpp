@@ -118,7 +118,7 @@ void CPluginManager::LoadPlugins()
     ReplaceMfcDrawTextFunction();
 
     //初始化所有任务栏显示项目
-    for (const auto& display_item : sAllDisplayItems)
+    for (const auto& display_item : gS_AllBuiltinDisplayItems)
     {
         S_all_display_items_with_plugins.insert(display_item);
     }
@@ -128,7 +128,7 @@ void CPluginManager::LoadPlugins()
     }
 }
 
-const std::vector<IPluginItem*>& CPluginManager::GetPluginItems() const
+const std::vector<IPluginItem*>& CPluginManager::GetAllIPluginItems() const
 {
     return V_PI_PluginItem;
 }
@@ -138,7 +138,7 @@ const std::vector<CPluginManager::PluginManageUnit>& CPluginManager::GetAllPlugi
     return V_PluginManageUnit;
 }
 
-IPluginItem* CPluginManager::GetItemById(const std::wstring& item_id)
+IPluginItem* CPluginManager::GetIPluginItemById(const std::wstring& item_id)
 {
     for (const auto& item : V_PI_PluginItem)
     {
@@ -148,14 +148,14 @@ IPluginItem* CPluginManager::GetItemById(const std::wstring& item_id)
     return nullptr;
 }
 
-IPluginItem* CPluginManager::GetItemByIndex(int index)
+IPluginItem* CPluginManager::GetIPluginItemByIndex(size_t index)
 {
-    if (index >= 0 && index < static_cast<int>(V_PI_PluginItem.size()))
+    if (index < V_PI_PluginItem.size())
         return V_PI_PluginItem[index];
     return nullptr;
 }
 
-int CPluginManager::GetItemIndex(IPluginItem* item) const
+int CPluginManager::GetIPlguinItemIndex(IPluginItem* item) const
 {
     for (auto iter = V_PI_PluginItem.begin(); iter != V_PI_PluginItem.end(); ++iter)
     {
@@ -208,7 +208,6 @@ const std::set<CommonDisplayItem>& CPluginManager::AllDisplayItemsWithPlugins()
 {
     return S_all_display_items_with_plugins;
 }
-
 
 int CPluginManager::GetItemWidth(IPluginItem* pItem, CDC* pDC)
 {

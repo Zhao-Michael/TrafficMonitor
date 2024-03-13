@@ -40,12 +40,12 @@ public:
     ~CPluginManager();
     void LoadPlugins();
 
-    const std::vector<IPluginItem*>&        GetPluginItems() const;
     const std::vector<PluginManageUnit>&    GetAllPluginManageUnit() const;
-    IPluginItem*                            GetItemById(const std::wstring& item_id);
-    IPluginItem*                            GetItemByIndex(int index);
-    int                                     GetItemIndex(IPluginItem* item) const;
+    const std::vector<IPluginItem*>&        GetAllIPluginItems() const;
     ITMPlugin*                              GetITMPluginByIPlguinItem(IPluginItem* pItem);
+    IPluginItem*                            GetIPluginItemById(const std::wstring& item_id);
+    IPluginItem*                            GetIPluginItemByIndex(size_t index);
+    int                                     GetIPlguinItemIndex(IPluginItem* item) const;
     int                                     GetIPluginIndex(ITMPlugin* plugin) const;
 
     //遍历所有插件
@@ -65,7 +65,9 @@ private:
     static void ReplaceMfcDrawTextFunction() noexcept;
 
 private:
-    //V: vector; S: set; M: map; I: interface; P: pointer
+    //用于描述函数成员变量类型(class和struct不标识)
+    //V: vector; S: set; M: map;                            //用于描述成员变量是V_S_M这三种类型之一
+    //I: interface; E: enum; B: bool; R: refer; P: pointer; //用于描述成员变量本身类型或是V_S_M中的成员类型
     std::vector<PluginManageUnit>       V_PluginManageUnit;
     std::vector<IPluginItem*>           V_PI_PluginItem;                    //将所有ITMPlugin的所有ITMPlugin都存入一个vector
     std::set<CommonDisplayItem>         S_all_display_items_with_plugins;   //包含插件在内的所有任务栏显示项目

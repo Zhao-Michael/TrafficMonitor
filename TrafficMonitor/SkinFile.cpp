@@ -35,7 +35,7 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
             string layout_item_cfg_name = CTinyXml2Helper::ElementName(ele_layout_item);
-            for (auto builtin_item : sAllDisplayItems)
+            for (auto builtin_item : gS_AllBuiltinDisplayItems)
             {
                 if (layout_item_cfg_name == CSkinFile::GetDisplayItemXmlNodeName(builtin_item))
                 {
@@ -48,7 +48,7 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
             wstring plugin_id = CCommon::StrToUnicode(m_plugin_map[layout_item_cfg_name].c_str(), true);
             if (!plugin_id.empty())
             {
-                for (const auto& iplugin_item : theApp.m_plugin_manager.GetPluginItems())
+                for (const auto& iplugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
                 {
                     if (plugin_id == iplugin_item->GetItemId())
                     {
@@ -165,7 +165,7 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                     {
                                         string item_name = CTinyXml2Helper::ElementName(display_text_item);
                                         wstring item_text = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(display_text_item), true);
-                                        for (auto display_item : sAllDisplayItems)
+                                        for (auto display_item : gS_AllBuiltinDisplayItems)
                                         {
                                             if (item_name == CSkinFile::GetDisplayItemXmlNodeName(display_item))
                                             {
@@ -336,7 +336,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 
     //获取每个项目显示的文本
     std::map<EBuiltinDisplayItem, DrawStr> map_str;
-    for (auto iter = sAllDisplayItems.begin(); iter != sAllDisplayItems.end(); ++iter)
+    for (auto iter = gS_AllBuiltinDisplayItems.begin(); iter != gS_AllBuiltinDisplayItems.end(); ++iter)
     {
         MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
         //wstring disp_text = m_skin_info.display_text.Get(*iter);
@@ -416,7 +416,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         }
 
         //绘制插件项目
-        for (const auto& plugin_item : theApp.m_plugin_manager.GetPluginItems())
+        for (const auto& plugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
         {
             LayoutItem layout_item = layout.GetItem(plugin_item);
             if (layout_item.show)
@@ -465,7 +465,6 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 
 void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
 {
-    MainWndSettingData&     rMainWndData = theApp.m_main_wnd_data;
     //绘制背景图
     CImage& background_image{ show_more_info ? m_background_l : m_background_s };
     Layout& layout{ show_more_info ? m_layout_info.layout_l : m_layout_info.layout_s };
@@ -474,8 +473,9 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     CDrawDoubleBuffer draw_double_buffer(pDC, rect);
     CDrawCommon draw;
     draw.Create(draw_double_buffer.GetMemDC(), nullptr);
-
     draw.DrawBitmap(background_image, CPoint(0, 0), CSize(layout.width, layout.height));
+
+    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
 
     //获取每个项目显示的文本
     std::map<EBuiltinDisplayItem, DrawStr> map_str;
@@ -577,7 +577,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 
     //绘制插件项目
-    for (const auto& plugin_item : theApp.m_plugin_manager.GetPluginItems())
+    for (const auto& plugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
     {
         const auto& layout_item = layout.GetItem(plugin_item);
         if (layout_item.show)
