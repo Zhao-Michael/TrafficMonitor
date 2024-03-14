@@ -235,22 +235,17 @@ struct MainWndSettingData : public PublicSettingData
     int  m_position_x;                          //窗口位置的x坐标
     int  m_position_y;                          //窗口位置的y坐标
 
-    //GUI设置项
+    //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
+    bool swap_up_down           { false };      //交换上传和下载显示的位置
     bool m_always_on_top        { false };      //窗口置顶
-    bool m_mouse_penetrate      { false };      //鼠标穿透
     bool m_lock_window_pos      { false };      //锁定窗口位置
-    bool m_show_more_info       { false };      //显示更多信息
+    bool m_mouse_penetrate      { false };      //鼠标穿透
     bool m_alow_out_of_border   { false };      //是否允许悬浮窗超出屏幕边界
     bool hide_main_wnd_when_fullscreen;         //有程序全屏运行时隐藏悬浮窗
-
-
+    //(2)鼠标右键中的部分设置
+    bool m_show_more_info{ false };             //显示更多信息
     int  m_transparency         { 100 };        //窗口透明度
-
     wstring m_skin_name;                        //选择的皮肤的名称
-
-
-
-    bool swap_up_down           { false };      //交换上传和下载显示的位置
 };
 
 //#define TASKBAR_COLOR_NUM 18      //任务栏窗口颜色数量
@@ -322,20 +317,20 @@ struct TaskBarSettingData : public PublicSettingData
 struct GeneralSettingData
 {
     bool check_update_when_start{ true };
-    int update_source{};                    //更新源。0: GitHub; 1: Gitee
+    int  update_source{};                   //更新源。0: GitHub; 1: Gitee
     bool auto_run{ false };
     bool allow_skin_cover_font{ true };
     bool allow_skin_cover_text{ true };
-    bool show_notify_icon{ true };    //显示通知区域图标
+    bool show_notify_icon{ true };          //显示通知区域图标
 //通知消息
     bool traffic_tip_enable{ false };       //是否启用流量超出时提示
     int traffic_tip_value;                  //要提示的流量临界值
     int traffic_tip_unit{};                 //要提示的流量值的单位（0: MB, 1: GB）
 
-    struct NotifyTipSettings        //超过某个值时弹出提示的设置
+    struct NotifyTipSettings                //超过某个值时弹出提示的设置
     {
-        bool enable;                //是否启用提示
-        int tip_value;              //要弹出提示的临界值
+        bool enable;                        //是否启用提示
+        int tip_value;                      //要弹出提示的临界值
     };
     NotifyTipSettings memory_usage_tip;     //用内存使用率超出提示
     NotifyTipSettings cpu_temp_tip;         //CPU温度超出提示

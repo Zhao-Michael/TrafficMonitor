@@ -54,31 +54,59 @@ void CTrafficMonitorApp::LoadConfig()
     AppSettingData&     rAppData        = m_cfg_data;
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //              (1)载入APP全局性设置
+    //      (一)载入APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
-    //常规设置(全局性唯一性设置)
-    rGeneralData.check_update_when_start        = ini.GetBool(_T("general"), _T("check_update_when_start"), true);
-    rGeneralData.allow_skin_cover_font          = ini.GetBool(_T("general"), _T("allow_skin_cover_font"),   true);
-    rGeneralData.allow_skin_cover_text          = ini.GetBool(_T("general"), _T("allow_skin_cover_text"),   true);
-    rGeneralData.language  = static_cast<Language>(ini.GetInt(_T("general"), _T("language"),                0));
-    rGeneralData.show_all_interface             = ini.GetBool  (L"general",    L"show_all_interface",       false);
+    //(1)选项对话框中的常规设置(全局性唯一性设置)
+    rGeneralData.check_update_when_start        = ini.GetBool(_T("general"),  _T("check_update_when_start"), true);
+    rGeneralData.language = static_cast<Language>(ini.GetInt( _T("general"),  _T("language"),               0));
     bool is_chinese_language{};     //当前语言是否为简体中文
     if (rGeneralData.language == Language::FOLLOWING_SYSTEM)
         is_chinese_language = CCommon::LoadText(IDS_LANGUAGE_CODE) == _T("2");
     else
         is_chinese_language = (rGeneralData.language == Language::SIMPLIFIED_CHINESE);
-    rGeneralData.update_source                  = ini.GetInt   (L"general", L"update_source", is_chinese_language ? 1 : 0);   //如果当前语言为简体，则默认更新源为Gitee，否则为GitHub
+    rGeneralData.update_source                  = ini.GetInt   (L"general",     L"update_source", is_chinese_language ? 1 : 0);   //如果当前语言为简体，则默认更新源为Gitee，否则为GitHub   
+    //提示信息选项
+    rGeneralData.traffic_tip_enable             = ini.GetBool  (L"notify_tip", L"traffic_tip_enable",               false);
+    rGeneralData.traffic_tip_value              = ini.GetInt   (L"notify_tip", L"traffic_tip_value",                200);
+    rGeneralData.traffic_tip_unit               = ini.GetInt   (L"notify_tip", L"traffic_tip_unit",                 0);
+    rGeneralData.memory_usage_tip.enable        = ini.GetBool  (L"notify_tip", L"memory_usage_tip_enable",          false);
+    rGeneralData.memory_usage_tip.tip_value     = ini.GetInt   (L"notify_tip", L"memory_tip_value",                 80);
+    rGeneralData.cpu_temp_tip.enable            = ini.GetBool  (L"notify_tip", L"cpu_temperature_tip_enable",       false);
+    rGeneralData.cpu_temp_tip.tip_value         = ini.GetInt   (L"notify_tip", L"cpu_temperature_tip_value",        80);
+    rGeneralData.gpu_temp_tip.enable            = ini.GetBool  (L"notify_tip", L"gpu_temperature_tip_enable",       false);
+    rGeneralData.gpu_temp_tip.tip_value         = ini.GetInt   (L"notify_tip", L"gpu_temperature_tip_value",        80);
+    rGeneralData.hdd_temp_tip.enable            = ini.GetBool  (L"notify_tip", L"hdd_temperature_tip_enable",       false);
+    rGeneralData.hdd_temp_tip.tip_value         = ini.GetInt   (L"notify_tip", L"hdd_temperature_tip_value",        80);
+    rGeneralData.mainboard_temp_tip.enable      = ini.GetBool  (L"notify_tip", L"mainboard_temperature_tip_enable", false);
+    rGeneralData.mainboard_temp_tip.tip_value   = ini.GetInt   (L"notify_tip", L"mainboard_temperature_tip_value",  80);
+    //硬件监控
+    rGeneralData.hardware_monitor_item          = ini.GetInt   (L"general",     L"hardware_monitor_item",   0);
+    rGeneralData.hard_disk_name                 = ini.GetString(L"general",     L"hard_disk_name",          L"");
+    rGeneralData.cpu_core_name                  = ini.GetString(L"general",     L"cpu_core_name",           L"Core Average");
+    rGeneralData.show_all_interface             = ini.GetBool  (L"general",     L"show_all_interface",      false);
     //载入获取CPU利用率的方式，默认使用GetSystemTimes获取
-    rGeneralData.m_get_cpu_usage_by_cpu_times   = ini.GetBool  (L"general", L"get_cpu_usage_by_cpu_times", /*m_win_version.GetMajorVersion() < 10*/ true);
-    rGeneralData.monitor_time_span              = ini.GetInt   (L"general", L"monitor_time_span", 1000);
+    rGeneralData.m_get_cpu_usage_by_cpu_times   = ini.GetBool  (L"general",     L"get_cpu_usage_by_cpu_times", /*m_win_version.GetMajorVersion() < 10*/ true);
+    rGeneralData.monitor_time_span              = ini.GetInt   (L"general",     L"monitor_time_span", 1000);
     if (rGeneralData.monitor_time_span < MONITOR_TIME_SPAN_MIN || rGeneralData.monitor_time_span > MONITOR_TIME_SPAN_MAX)
         rGeneralData.monitor_time_span = 1000;
-    rGeneralData.hard_disk_name                 = ini.GetString(L"general", L"hard_disk_name", L"");
-    rGeneralData.cpu_core_name                  = ini.GetString(L"general", L"cpu_core_name", L"Core Average");
-    rGeneralData.hardware_monitor_item          = ini.GetInt   (L"general", L"hardware_monitor_item", 0);
+    rGeneralData.show_notify_icon               = ini.GetBool(_T("config"),   _T("show_notify_icon"),       true);
+    rGeneralData.allow_skin_cover_font          = ini.GetBool(_T("general"),  _T("allow_skin_cover_font"),  true);
+    rGeneralData.allow_skin_cover_text          = ini.GetBool(_T("general"),  _T("allow_skin_cover_text"),  true);
+    //(2)鼠标右键中的部分设置
+    rAppData.m_show_task_bar_wnd                = ini.GetBool(_T("config"),   _T("show_task_bar_wnd"),      false);
+    rAppData.m_hide_main_window                 = ini.GetBool(_T("config"),   _T("hide_main_window"),       false);
+    //网络连接设置
+    rAppData.m_auto_select                      = ini.GetBool(_T("connection"), _T("auto_select"),          true);
+    rAppData.m_select_all                       = ini.GetBool(_T("connection"), _T("select_all"),           false);
+    rAppData.m_connection_name =CCommon::UnicodeToStr(ini.GetString(L"connection",    L"connection_name", L"").c_str());
     std::vector<std::wstring> connections_hide;
     ini.GetStringList(L"general", L"connections_hide", connections_hide, std::vector<std::wstring>{});
     rGeneralData.connections_hide.FromVector(connections_hide);
+    //通知图标设置
+    rAppData.m_notify_icon_selected = ini.GetInt(_T("config"), _T("notify_icon_selected"), (m_win_version.IsWindows7() || m_win_version.IsWindows8Or8point1() ? 2 : rAppData.m_dft_notify_icon));       //Win7/8/8.1默认使用蓝色通知区图标，因为隐藏通知区图标后白色图标会看不清，其他系统默认使用白色图标
+    rAppData.m_notify_icon_auto_adapt = ini.GetBool(_T("config"), _T("notify_icon_auto_adapt"), true);
+    if (rAppData.m_notify_icon_auto_adapt)
+        AutoSelectNotifyIcon();
 
     //Windows10颜色模式设置
     bool is_windows10_light_theme = CWindowsSettingHelper::IsWindows10LightTheme();
@@ -87,37 +115,10 @@ void CTrafficMonitorApp::LoadConfig()
     else
         CCommon::SetColorMode(ColorMode::Default);
 
-    //主窗口设置(当前版本情况：只支持全局性设置)
-    rMainWndData.m_transparency         = ini.GetInt (_T("config"), _T("transparency"),     80);
-    rMainWndData.m_always_on_top        = ini.GetBool(_T("config"), _T("always_on_top"),    true);
-    rMainWndData.m_lock_window_pos      = ini.GetBool(_T("config"), _T("lock_window_pos"),  false);
-    rGeneralData.show_notify_icon       = ini.GetBool(_T("config"), _T("show_notify_icon"), true);
-    rMainWndData.m_show_more_info       = ini.GetBool(_T("config"), _T("show_cpu_memory"),  false);
-    rMainWndData.m_mouse_penetrate      = ini.GetBool(_T("config"), _T("mouse_penetrate"),  false);
-    rAppData.m_show_task_bar_wnd        = ini.GetBool(_T("config"), _T("show_task_bar_wnd"),false);
-    rMainWndData.m_position_x           = ini.GetInt (_T("config"), _T("position_x"),       -1);
-    rMainWndData.m_position_y           = ini.GetInt (_T("config"), _T("position_y"),       -1);
-    //网络连接设置
-    rAppData.m_auto_select                           = ini.GetBool(_T("connection"), _T("auto_select"),         true);
-    rAppData.m_select_all                            = ini.GetBool(_T("connection"), _T("select_all"),          false);
-    rAppData.m_connection_name = CCommon::UnicodeToStr(ini.GetString(L"connection",    L"connection_name",      L"").c_str());
-    //判断皮肤是否存在
-    std::vector<wstring> skin_files;
-    CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
-    bool is_skin_exist = (!skin_files.empty());
-    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, (is_skin_exist ? 16384 : 16777215)); //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-    rMainWndData.specify_each_item_color        = ini.GetBool  (_T("config"), _T("specify_each_item_color"), false);
-    rAppData.m_hide_main_window                 = ini.GetBool  (_T("config"), _T("hide_main_window"), false);
-    rMainWndData.m_skin_name                    = ini.GetString(_T("config"), _T("skin_selected"), _T(""));
-    if (rMainWndData.m_skin_name.substr(0, 8) == L".\\skins\\")       //如果读取到的皮肤名称前面有".\\skins\\"，则把它删除。（用于和前一个版本保持兼容性）
-        rMainWndData.m_skin_name = rMainWndData.m_skin_name.substr(7);
-    rAppData.m_notify_icon_selected             = ini.GetInt   (_T("config"), _T("notify_icon_selected"), (m_win_version.IsWindows7() || m_win_version.IsWindows8Or8point1() ? 2 : rAppData.m_dft_notify_icon));       //Win7/8/8.1默认使用蓝色通知区图标，因为隐藏通知区图标后白色图标会看不清，其他系统默认使用白色图标
-    rAppData.m_notify_icon_auto_adapt           = ini.GetBool  (_T("config"), _T("notify_icon_auto_adapt"), true);
-    if (rAppData.m_notify_icon_auto_adapt)
-        AutoSelectNotifyIcon();
-    rMainWndData.swap_up_down                   = ini.GetBool  (_T("config"), _T("swap_up_down"), false);
-    rMainWndData.hide_main_wnd_when_fullscreen  = ini.GetBool  (_T("config"), _T("hide_main_wnd_when_fullscreen"), true);
-
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //      (二)载入主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
     //载入主窗口全局字体设置
     FontInfo default_font{};
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
@@ -126,56 +127,58 @@ void CTrafficMonitorApp::LoadConfig()
     //rMainWndData.font.name = ini.GetString(_T("config"), _T("font_name"), CCommon::LoadText(IDS_MICROSOFT_YAHEI)).c_str();
     //rMainWndData.font.size = ini.GetInt(_T("config"), _T("font_size"), 10);
 
-    ////////////////////////////////////////////////////////////////////////////////////////
-    //              (2)载入主窗口设置
-    ////////////////////////////////////////////////////////////////////////////////////////
+    //判断皮肤是否存在
+    std::vector<wstring> skin_files;
+    CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
+    bool is_skin_exist = (!skin_files.empty());
+    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, (is_skin_exist ? 16384 : 16777215)); //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
+    rMainWndData.specify_each_item_color = ini.GetBool(_T("config"), _T("specify_each_item_color"), false);
+
+    rMainWndData.swap_up_down                   = ini.GetBool(_T("config"), _T("swap_up_down"),         false);
+    rMainWndData.speed_short_mode               = ini.GetBool(_T("config"), _T("speed_short_mode"),     false);
+    rMainWndData.separate_value_unit_with_space = ini.GetBool(_T("config"), _T("separate_value_unit_with_space"), true);
+    rMainWndData.show_tool_tip                  = ini.GetBool(_T("config"), _T("show_tool_tip"),        true);
+    rMainWndData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"config", L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
+    rMainWndData.unit_byte                      = ini.GetBool(_T("config"), _T("unit_byte"),            true);
+    rMainWndData.speed_unit = static_cast<SpeedUnit>(ini.GetInt(_T("config"), _T("speed_unit"),         0));
+    rMainWndData.hide_unit                      = ini.GetBool(_T("config"), _T("hide_unit"),            false);
+    rMainWndData.hide_percent                   = ini.GetBool(_T("config"), _T("hide_percent"),         false);
+    rMainWndData.m_always_on_top                = ini.GetBool(_T("config"), _T("always_on_top"),        true);
+    rMainWndData.m_lock_window_pos              = ini.GetBool(_T("config"), _T("lock_window_pos"),      false);
+    rMainWndData.m_mouse_penetrate              = ini.GetBool(_T("config"), _T("mouse_penetrate"),      false);
+    rMainWndData.m_alow_out_of_border           = ini.GetBool(_T("config"), _T("alow_out_of_border"),   false);
+    rMainWndData.hide_main_wnd_when_fullscreen  = ini.GetBool(_T("config"), _T("hide_main_wnd_when_fullscreen"), true);
+    rMainWndData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("config"), _T("double_click_action"), 0));
+    rMainWndData.double_click_exe               = ini.GetString(L"config", L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
+    //(2)鼠标右键中的部分设置
+    rMainWndData.m_show_more_info               = ini.GetBool(_T("config"), _T("show_cpu_memory"),      false);
+    rMainWndData.m_transparency                 = ini.GetInt (_T("config"), _T("transparency"),     80);
+    rMainWndData.m_skin_name                    = ini.GetString(_T("config"), _T("skin_selected"), _T(""));
+    if (rMainWndData.m_skin_name.substr(0, 8) == L".\\skins\\")       //如果读取到的皮肤名称前面有".\\skins\\"，则把它删除。（用于和前一个版本保持兼容性）
+        rMainWndData.m_skin_name = rMainWndData.m_skin_name.substr(7);
+    //(3)其它设置
+    rMainWndData.m_position_x                   = ini.GetInt (_T("config"), _T("position_x"),       -1);
+    rMainWndData.m_position_y                   = ini.GetInt (_T("config"), _T("position_y"),       -1);
+
     //载入用于主窗口的内置显示项文本标签(当前版本情况：只支持全局性设置)
-    rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"), L"up_string", CCommon::LoadText(IDS_UPLOAD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_DOWN)             = ini.GetString(L"config", L"down_string", CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_TOTAL_SPEED)      = ini.GetString(L"config", L"total_speed_string", _T("↑↓: $"));
-    rMainWndData.disp_str.Get(TDI_CPU)              = ini.GetString(L"config", L"cpu_string", L"CPU: $");
-    rMainWndData.disp_str.Get(TDI_CPU_FREQ)         = ini.GetString(L"config", L"cpu_freq_string", CCommon::LoadText(IDS_CPU_FREQ, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_MEMORY)           = ini.GetString(L"config", L"memory_string", CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_GPU_USAGE)        = ini.GetString(L"config", L"gpu_string", CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_CPU_TEMP)         = ini.GetString(L"config", L"cpu_temp_string", L"CPU: $");
-    rMainWndData.disp_str.Get(TDI_GPU_TEMP)         = ini.GetString(L"config", L"gpu_temp_string", CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_HDD_TEMP)         = ini.GetString(L"config", L"hdd_temp_string", CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP)  = ini.GetString(L"config", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_HDD_USAGE)        = ini.GetString(L"config", L"hdd_string", CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"),L"up_string",              CCommon::LoadText(IDS_UPLOAD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_DOWN)             = ini.GetString(  L"config", L"down_string",            CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_TOTAL_SPEED)      = ini.GetString(  L"config", L"total_speed_string",   _T("↑↓: $"));
+    rMainWndData.disp_str.Get(TDI_CPU)              = ini.GetString(  L"config", L"cpu_string",             L"CPU: $");
+    rMainWndData.disp_str.Get(TDI_CPU_FREQ)         = ini.GetString(  L"config", L"cpu_freq_string",        CCommon::LoadText(IDS_CPU_FREQ, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_MEMORY)           = ini.GetString(  L"config", L"memory_string",          CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_GPU_USAGE)        = ini.GetString(  L"config", L"gpu_string",             CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_CPU_TEMP)         = ini.GetString(  L"config", L"cpu_temp_string",        L"CPU: $");
+    rMainWndData.disp_str.Get(TDI_GPU_TEMP)         = ini.GetString(  L"config", L"gpu_temp_string",        CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_HDD_TEMP)         = ini.GetString(  L"config", L"hdd_temp_string",        CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP)  = ini.GetString(  L"config", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_HDD_USAGE)        = ini.GetString(  L"config", L"hdd_string",             CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
 
     //载入用于主窗口的插件显示项文本标签设置(true表示主窗口)
     ini.LoadPluginDisplayStr(true);
 
-    //主窗口选项设置
-    rMainWndData.speed_short_mode                   = ini.GetBool(_T("config"), _T("speed_short_mode"), false);
-    rMainWndData.separate_value_unit_with_space     = ini.GetBool(_T("config"), _T("separate_value_unit_with_space"), true);
-    rMainWndData.show_tool_tip                      = ini.GetBool(_T("config"), _T("show_tool_tip"), true);
-    rMainWndData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"config", L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
-    rMainWndData.unit_byte                          = ini.GetBool(_T("config"), _T("unit_byte"), true);
-    rMainWndData.speed_unit   = static_cast<SpeedUnit>(ini.GetInt(_T("config"), _T("speed_unit"), 0));
-    rMainWndData.hide_unit                          = ini.GetBool(_T("config"), _T("hide_unit"), false);
-    rMainWndData.hide_percent                       = ini.GetBool(_T("config"), _T("hide_percent"), false);
-    rMainWndData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("config"), _T("double_click_action"), 0));
-    rMainWndData.double_click_exe                   = ini.GetString(L"config", L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
-    rMainWndData.m_alow_out_of_border               = ini.GetBool(_T("config"), _T("alow_out_of_border"), false);
-
-    //提示信息选项
-    rGeneralData.traffic_tip_enable                 = ini.GetBool(L"notify_tip", L"traffic_tip_enable",                 false);
-    rGeneralData.traffic_tip_value                  = ini.GetInt (L"notify_tip", L"traffic_tip_value",                  200);
-    rGeneralData.traffic_tip_unit                   = ini.GetInt (L"notify_tip", L"traffic_tip_unit",                   0);
-    rGeneralData.memory_usage_tip.enable            = ini.GetBool(L"notify_tip", L"memory_usage_tip_enable",            false);
-    rGeneralData.memory_usage_tip.tip_value         = ini.GetInt (L"notify_tip", L"memory_tip_value",                   80);
-    rGeneralData.cpu_temp_tip.enable                = ini.GetBool(L"notify_tip", L"cpu_temperature_tip_enable",         false);
-    rGeneralData.cpu_temp_tip.tip_value             = ini.GetInt (L"notify_tip", L"cpu_temperature_tip_value",          80);
-    rGeneralData.gpu_temp_tip.enable                = ini.GetBool(L"notify_tip", L"gpu_temperature_tip_enable",         false);
-    rGeneralData.gpu_temp_tip.tip_value             = ini.GetInt (L"notify_tip", L"gpu_temperature_tip_value",          80);
-    rGeneralData.hdd_temp_tip.enable                = ini.GetBool(L"notify_tip", L"hdd_temperature_tip_enable",         false);
-    rGeneralData.hdd_temp_tip.tip_value             = ini.GetInt (L"notify_tip", L"hdd_temperature_tip_value",          80);
-    rGeneralData.mainboard_temp_tip.enable          = ini.GetBool(L"notify_tip", L"mainboard_temperature_tip_enable",   false);
-    rGeneralData.mainboard_temp_tip.tip_value       = ini.GetInt (L"notify_tip", L"mainboard_temperature_tip_value",    80);
-
     ////////////////////////////////////////////////////////////////////////////////////////
-    //              (3)载入任务栏窗口设置
+    //      (三)载入任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
     rTaskbarData.back_color                         = ini.GetInt(_T("task_bar"), _T("task_bar_back_color"), rTaskbarData.dft_back_color, 16);
@@ -394,7 +397,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt            (L"config",     L"double_click_action",static_cast<int>(rMainWndData.double_click_action));
     ini.WriteString         (L"config",     L"double_click_exe",                rMainWndData.double_click_exe);
 
-    ini.WriteInt            (L"config", L"alow_out_of_border",                  rMainWndData.m_alow_out_of_border);
+    ini.WriteInt            (L"config",     L"alow_out_of_border",              rMainWndData.m_alow_out_of_border);
 
     //提示信息选项
     ini.WriteBool(L"notify_tip", L"traffic_tip_enable",                 rGeneralData.traffic_tip_enable);
