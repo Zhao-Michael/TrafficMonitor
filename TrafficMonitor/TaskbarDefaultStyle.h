@@ -9,11 +9,11 @@ class CTaskbarDefaultStyle
 public:
 	struct TaskBarStyleData
 	{
-        std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};
+		bool specify_each_item_color{};
+		std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};
 		COLORREF back_color{};
 		COLORREF transparent_color{};
 		COLORREF status_bar_color{};
-		bool specify_each_item_color{};
 	};
 
 	CTaskbarDefaultStyle();

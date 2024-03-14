@@ -55,12 +55,12 @@ public:
     };
 
     //皮肤布局信息
-    struct LayoutInfo
+    struct LayoutManager
     {
-        int text_height{};  //皮肤文本的高度
-        bool no_label{};    //是否不显示标签
-        Layout layout_l;    //“显示更多信息”时的布局
-        Layout layout_s;    //不“显示更多信息”时的布局
+        int     text_height{};      //皮肤文本的高度
+        bool    no_label{};         //是否不显示标签
+        Layout  layout_l;           //“显示更多信息”时的布局
+        Layout  layout_s;           //不“显示更多信息”时的布局
     };
 
     //皮肤预览图信息
@@ -77,11 +77,11 @@ public:
         Pos s_pos;      //不“显示更多信息”时的窗口在预览图中的位置
     };
 
-    const CImage&       GetBackgroundL()    const { return m_background_l;  }
-    const CImage&       GetBackgroundS()    const { return m_background_s;  }
-    const SkinInfo&     GetSkinInfo()       const { return m_skin_info;     }
-    const LayoutInfo&   GetLayoutInfo()     const { return m_layout_info;   }
-    const PreviewInfo&  GetPreviewInfo()    const { return m_preview_info;  }
+    const CImage&           GetBackgroundL()    const { return m_background_l;      }
+    const CImage&           GetBackgroundS()    const { return m_background_s;      }
+    const SkinInfo&         GetSkinInfo()       const { return m_skin_info;         }
+    const LayoutManager&    GetLayoutManager()  const { return m_layout_manager;    }
+    const PreviewInfo&      GetPreviewInfo()    const { return m_preview_info;      }
 
     static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
     //从文件载入皮肤信息
@@ -112,9 +112,9 @@ private:
     static void DrawSkinText(CDrawCommon drawer, DrawStr draw_str, CRect rect, COLORREF color, Alignment align);
 
 private:
-    SkinInfo m_skin_info;
-    LayoutInfo m_layout_info;
-    PreviewInfo m_preview_info;
+    SkinInfo        m_skin_info;
+    LayoutManager   m_layout_manager;
+    PreviewInfo     m_preview_info;
     std::map<std::string, std::string> m_plugin_map;  //插件名称与xml节点名称的映射关系。key是xml节点名称，value是插件ID
 
     CFont m_font;

@@ -69,8 +69,8 @@ public:
     GeneralSettingData      m_general_data;
     MainWndSettingData      m_main_wnd_data;
     TaskBarSettingData      m_taskbar_data;
-    //其他设置数据
-    MainConfigData          m_cfg_data;
+    //APP全局性设置数据
+    AppSettingData          m_cfg_data;
     int                     m_notify_interval;                      //弹出通知消息的时间间隔
     bool                    m_debug_log{};
     bool                    m_taksbar_transparent_color_enable{};

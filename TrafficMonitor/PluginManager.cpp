@@ -108,9 +108,9 @@ void CPluginManager::LoadPlugins()
             IPluginItem* item = plugin_manage_unit.plugin->GetItem(index);
             if (item == nullptr)
                 break;
-            plugin_manage_unit.V_PI_PluginItem.push_back(item);                //将所有ITMPlugin的所有ITMPlugin都存入一个vector
-            V_PI_PluginItem.push_back(item);
-            M_IPlguinItem_to_ITMPlugin[item] = plugin_manage_unit.plugin;       //记录每个IPlguinItem属于哪个ITMPlugin
+            plugin_manage_unit.V_PI_PluginItems.push_back(item);
+            V_PI_PluginItems.push_back(item);                               //将所有ITMPlugin的所有IPluginItem都存入一个vector
+            M_IPlguinItem_to_ITMPlugin[item] = plugin_manage_unit.plugin;   //记录每个IPlguinItem属于哪个ITMPlugin
             index++;
         }
     }
@@ -122,7 +122,7 @@ void CPluginManager::LoadPlugins()
     {
         S_all_display_items_with_plugins.insert(display_item);
     }
-    for (const auto& display_item : V_PI_PluginItem)
+    for (const auto& display_item : V_PI_PluginItems)
     {
         S_all_display_items_with_plugins.insert(display_item);
     }
@@ -130,7 +130,7 @@ void CPluginManager::LoadPlugins()
 
 const std::vector<IPluginItem*>& CPluginManager::GetAllIPluginItems() const
 {
-    return V_PI_PluginItem;
+    return V_PI_PluginItems;
 }
 
 const std::vector<CPluginManager::PluginManageUnit>& CPluginManager::GetAllPluginManageUnit() const
@@ -140,7 +140,7 @@ const std::vector<CPluginManager::PluginManageUnit>& CPluginManager::GetAllPlugi
 
 IPluginItem* CPluginManager::GetIPluginItemById(const std::wstring& item_id)
 {
-    for (const auto& item : V_PI_PluginItem)
+    for (const auto& item : V_PI_PluginItems)
     {
         if (item->GetItemId() == item_id)
             return item;
@@ -150,17 +150,17 @@ IPluginItem* CPluginManager::GetIPluginItemById(const std::wstring& item_id)
 
 IPluginItem* CPluginManager::GetIPluginItemByIndex(size_t index)
 {
-    if (index < V_PI_PluginItem.size())
-        return V_PI_PluginItem[index];
+    if (index < V_PI_PluginItems.size())
+        return V_PI_PluginItems[index];
     return nullptr;
 }
 
 int CPluginManager::GetIPlguinItemIndex(IPluginItem* item) const
 {
-    for (auto iter = V_PI_PluginItem.begin(); iter != V_PI_PluginItem.end(); ++iter)
+    for (auto iter = V_PI_PluginItems.begin(); iter != V_PI_PluginItems.end(); ++iter)
     {
         if (*iter == item)
-            return iter - V_PI_PluginItem.begin();
+            return iter - V_PI_PluginItems.begin();
     }
     return -1;
 }
@@ -195,7 +195,7 @@ void CPluginManager::EnumPlugin(std::function<void(ITMPlugin*)> func) const
 
 void CPluginManager::EnumPluginItem(std::function<void(IPluginItem*)> func) const
 {
-    for (const auto& item : V_PI_PluginItem)
+    for (const auto& item : V_PI_PluginItems)
     {
         if (item != nullptr)
         {

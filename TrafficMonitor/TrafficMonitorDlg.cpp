@@ -133,7 +133,7 @@ CString CTrafficMonitorDlg::GetMouseTipsInfo()
         CCommon::LoadText(IDS_DOWNLOAD), CCommon::KBytesToString(theApp.m_today_down_traffic / 1024u)
     );
     tip_info += temp;
-    const CSkinFile::Layout& skin_layout{ theApp.m_cfg_data.m_show_more_info ? m_skin.GetLayoutInfo().layout_l : m_skin.GetLayoutInfo().layout_s }; //当前的皮肤布局
+    const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     if (!skin_layout.GetItem(TDI_UP).show)      //如果主窗口中没有显示上传速度，则在提示信息中显示上传速度
     {
         temp.Format(_T("\r\n%s: %s/s"), CCommon::LoadText(IDS_UPLOAD),
@@ -216,7 +216,7 @@ CString CTrafficMonitorDlg::GetMouseTipsInfo()
 void CTrafficMonitorDlg::SetTransparency()
 {
     SetWindowLong(m_hWnd, GWL_EXSTYLE, GetWindowLong(m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-    SetLayeredWindowAttributes(0, theApp.m_cfg_data.m_transparency * 255 / 100, LWA_ALPHA);  //透明度取值范围为0~255
+    SetLayeredWindowAttributes(0, theApp.m_main_wnd_data.m_transparency * 255 / 100, LWA_ALPHA);  //透明度取值范围为0~255
 }
 
 void CTrafficMonitorDlg::SetTransparency(int transparency)
@@ -685,10 +685,10 @@ void CTrafficMonitorDlg::_OnOptions(int tab)
     //将选项设置数据传递给选项设置对话框
     if (COptionsDlg::GetUniqueHandel(OPTION_DLG_NAME) == NULL)     //确保此时选项设置对话框已经关闭
     {
-        optionsDlg.m_tab1_dlg.m_data = theApp.m_main_wnd_data;
-        optionsDlg.m_tab2_dlg.m_data = theApp.m_taskbar_data;
-        optionsDlg.m_tab3_dlg.m_data = theApp.m_general_data;
-        optionsDlg.m_tab1_dlg.m_text_disable = m_skin.GetLayoutInfo().no_label;
+        optionsDlg.m_tab1_dlg.m_data            = theApp.m_main_wnd_data;
+        optionsDlg.m_tab2_dlg.m_data            = theApp.m_taskbar_data;
+        optionsDlg.m_tab3_dlg.m_data            = theApp.m_general_data;
+        optionsDlg.m_tab1_dlg.m_text_disable    = m_skin.GetLayoutManager().no_label;
     }
 
     if (optionsDlg.DoModal() == IDOK)
@@ -811,13 +811,13 @@ void CTrafficMonitorDlg::ApplySettings(COptionsDlg& optionsDlg)
 
 void CTrafficMonitorDlg::SetItemPosition()
 {
-    if (theApp.m_cfg_data.m_show_more_info)
+    if (theApp.m_main_wnd_data.m_show_more_info)
     {
-        SetWindowPos(nullptr, 0, 0, m_skin.GetLayoutInfo().layout_l.width, m_skin.GetLayoutInfo().layout_l.height, SWP_NOMOVE | SWP_NOZORDER);
+        SetWindowPos(nullptr, 0, 0, m_skin.GetLayoutManager().layout_l.width, m_skin.GetLayoutManager().layout_l.height, SWP_NOMOVE | SWP_NOZORDER);
     }
     else
     {
-        SetWindowPos(nullptr, 0, 0, m_skin.GetLayoutInfo().layout_s.width, m_skin.GetLayoutInfo().layout_s.height, SWP_NOMOVE | SWP_NOZORDER);
+        SetWindowPos(nullptr, 0, 0, m_skin.GetLayoutManager().layout_s.width, m_skin.GetLayoutManager().layout_s.height, SWP_NOMOVE | SWP_NOZORDER);
     }
 }
 
@@ -827,27 +827,28 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     if (!CCommon::FileExist(skin_cfg_path.c_str()))
         skin_cfg_path = theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.ini";
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
-    if (m_skin.GetLayoutInfo().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
+    if (m_skin.GetLayoutManager().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
         theApp.m_main_wnd_data.swap_up_down = false;
 }
 
 void CTrafficMonitorDlg::LoadBackGroundImage()
 {
-    CImage img_tmp;
-    CSize image_size;
-    if (theApp.m_cfg_data.m_show_more_info)
+    CImage              img_tmp;
+    CSize               image_size;
+    MainWndSettingData& rMainWndData    = theApp.m_main_wnd_data;
+    if (rMainWndData.m_show_more_info)
     {
-        image_size.SetSize(m_skin.GetLayoutInfo().layout_l.width, m_skin.GetLayoutInfo().layout_l.height);
+        image_size.SetSize(m_skin.GetLayoutManager().layout_l.width, m_skin.GetLayoutManager().layout_l.height);
     }
     else
     {
-        image_size.SetSize(m_skin.GetLayoutInfo().layout_s.width, m_skin.GetLayoutInfo().layout_s.height);
+        image_size.SetSize(m_skin.GetLayoutManager().layout_s.width, m_skin.GetLayoutManager().layout_s.height);
     }
 
     //创建窗口区域
     CImage img_mask;
     //载入掩码图片
-    if (theApp.m_cfg_data.m_show_more_info)
+    if (rMainWndData.m_show_more_info)
         img_tmp.Load((theApp.m_skin_path + m_skins[m_skin_selected] + BACKGROUND_MASK_L).c_str());
     else
         img_tmp.Load((theApp.m_skin_path + m_skins[m_skin_selected] + BACKGROUND_MASK_S).c_str());
@@ -906,10 +907,10 @@ void CTrafficMonitorDlg::TaskbarShowHideItem(EBuiltinDisplayItem type)
 
 void CTrafficMonitorDlg::CheckClickedItem(CPoint point)
 {
-    const CSkinFile::Layout& skin_layout{ theApp.m_cfg_data.m_show_more_info ? m_skin.GetLayoutInfo().layout_l : m_skin.GetLayoutInfo().layout_s }; //当前的皮肤布局
+    const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     for (const auto& layout_item : skin_layout.layout_items)
     {
-        CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, m_skin.GetLayoutInfo().text_height));
+        CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, m_skin.GetLayoutManager().text_height));
         if (rect.PtInRect(point))
         {
             m_clicked_item = layout_item.first;
@@ -1033,7 +1034,7 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
     m_skin_selected = 0;
     for (unsigned int i{}; i < m_skins.size(); i++)
     {
-        if (m_skins[i] == theApp.m_cfg_data.m_skin_name)
+        if (m_skins[i] == theApp.m_main_wnd_data.m_skin_name)
             m_skin_selected = i;
     }
 
@@ -1042,8 +1043,8 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
 
     //初始化窗口位置
     SetItemPosition();
-    if (theApp.m_cfg_data.m_position_x != -1 && theApp.m_cfg_data.m_position_y != -1)
-        SetWindowPos(nullptr, theApp.m_cfg_data.m_position_x, theApp.m_cfg_data.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    if (theApp.m_main_wnd_data.m_position_x != -1 && theApp.m_main_wnd_data.m_position_y != -1)
+        SetWindowPos(nullptr, theApp.m_main_wnd_data.m_position_x, theApp.m_main_wnd_data.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
     CheckWindowPos();
 
     //载入背景图片
@@ -1064,7 +1065,7 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
     m_cpu_usage.SetUseCPUTimes(theApp.m_general_data.m_get_cpu_usage_by_cpu_times);
 
     //如果程序启动时设置了隐藏主窗口，或窗口的位置在左上角，则先将其不透明度设为0
-    if (theApp.m_cfg_data.m_hide_main_window || (theApp.m_cfg_data.m_position_x == 0 && theApp.m_cfg_data.m_position_y == 0))
+    if (theApp.m_cfg_data.m_hide_main_window || (theApp.m_main_wnd_data.m_position_x == 0 && theApp.m_main_wnd_data.m_position_y == 0))
         SetTransparency(0);
 
     SetTimer(TASKBAR_TIMER, 100, NULL);
@@ -1419,6 +1420,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
     if (nIDEvent == MAIN_TIMER)
     {
+        MainWndSettingData&     rMainWndData = theApp.m_main_wnd_data;
         m_timer_cnt++;
         if (m_first_start)      //这个if语句在程序启动后1秒执行
         {
@@ -1434,20 +1436,20 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                 OpenTaskBarWnd();
 
             //如果窗口的位置为(0, 0)，则在初始化时MoveWindow函数无效，此时再移动一次窗口
-            if (theApp.m_cfg_data.m_position_x == 0 && theApp.m_cfg_data.m_position_y == 0)
+            if (rMainWndData.m_position_x == 0 && rMainWndData.m_position_y == 0)
             {
-                SetWindowPos(nullptr, theApp.m_cfg_data.m_position_x, theApp.m_cfg_data.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+                SetWindowPos(nullptr, rMainWndData.m_position_x, rMainWndData.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
             }
             SetTransparency();              //重新设置窗口不透明度
 
             m_first_start = false;
         }
 
-        if (theApp.m_main_wnd_data.m_always_on_top && !theApp.m_cfg_data.m_hide_main_window)
+        if (rMainWndData.m_always_on_top && !theApp.m_cfg_data.m_hide_main_window)
         {
             //每隔1秒钟就判断一下前台窗口是否全屏
             m_is_foreground_fullscreen = CCommon::IsForegroundFullscreen();
-            if (theApp.m_main_wnd_data.hide_main_wnd_when_fullscreen)       //当设置了全屏时隐藏悬浮窗时
+            if (rMainWndData.hide_main_wnd_when_fullscreen)       //当设置了全屏时隐藏悬浮窗时
             {
                 if (m_is_foreground_fullscreen || theApp.m_cfg_data.m_hide_main_window)
                     ShowWindow(SW_HIDE);
@@ -1481,7 +1483,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                 }
             }
 
-            if (m_timer_cnt % 300 == 299 && !theApp.m_cfg_data.m_hide_main_window && theApp.m_main_wnd_data.m_always_on_top)
+            if (m_timer_cnt % 300 == 299 && !theApp.m_cfg_data.m_hide_main_window && rMainWndData.m_always_on_top)
             {
                 SetAlwaysOnTop();       //每5分钟执行一次设置窗口置顶
             }
@@ -1494,11 +1496,11 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
         if (m_timer_cnt % 30 == 26)     //每隔30秒钟检测一次窗口位置，当窗口位置发生变化时保存设置
         {
             static int last_pos_x{ -1 }, last_pos_y{ -1 };
-            if (last_pos_x != theApp.m_cfg_data.m_position_x || last_pos_y != theApp.m_cfg_data.m_position_y)
+            if (last_pos_x != rMainWndData.m_position_x || last_pos_y != rMainWndData.m_position_y)
             {
                 theApp.SaveConfig();
-                last_pos_x = theApp.m_cfg_data.m_position_x;
-                last_pos_y = theApp.m_cfg_data.m_position_y;
+                last_pos_x = rMainWndData.m_position_x;
+                last_pos_y = rMainWndData.m_position_y;
             }
         }
 
@@ -1890,7 +1892,7 @@ void CTrafficMonitorDlg::OnAlwaysOnTop()
 void CTrafficMonitorDlg::OnTransparency100()
 {
     // TODO: 在此添加命令处理程序代码
-    theApp.m_cfg_data.m_transparency = 100;
+    theApp.m_main_wnd_data.m_transparency = 100;
     SetTransparency();
     theApp.SaveConfig();
 }
@@ -1899,7 +1901,7 @@ void CTrafficMonitorDlg::OnTransparency100()
 void CTrafficMonitorDlg::OnTransparency80()
 {
     // TODO: 在此添加命令处理程序代码
-    theApp.m_cfg_data.m_transparency = 80;
+    theApp.m_main_wnd_data.m_transparency = 80;
     SetTransparency();
     theApp.SaveConfig();
 }
@@ -1908,7 +1910,7 @@ void CTrafficMonitorDlg::OnTransparency80()
 void CTrafficMonitorDlg::OnTransparency60()
 {
     // TODO: 在此添加命令处理程序代码
-    theApp.m_cfg_data.m_transparency = 60;
+    theApp.m_main_wnd_data.m_transparency = 60;
     SetTransparency();
     theApp.SaveConfig();
 }
@@ -1917,7 +1919,7 @@ void CTrafficMonitorDlg::OnTransparency60()
 void CTrafficMonitorDlg::OnTransparency40()
 {
     // TODO: 在此添加命令处理程序代码
-    theApp.m_cfg_data.m_transparency = 40;
+    theApp.m_main_wnd_data.m_transparency = 40;
     SetTransparency();
     theApp.SaveConfig();
 }
@@ -2007,20 +2009,20 @@ void CTrafficMonitorDlg::OnInitMenu(CMenu* pMenu)
     // TODO: 在此处添加消息处理程序代码
     m_menu_popuped = true;
 
-    pMenu->CheckMenuItem(ID_ALWAYS_ON_TOP, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_always_on_top ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_LOCK_WINDOW_POS, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_lock_window_pos ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_SHOW_CPU_MEMORY, MF_BYCOMMAND | (theApp.m_cfg_data.m_show_more_info ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_MOUSE_PENETRATE, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_mouse_penetrate ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_SHOW_TASK_BAR_WND, MF_BYCOMMAND | (theApp.m_cfg_data.m_show_task_bar_wnd ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_SHOW_MAIN_WND, MF_BYCOMMAND | (!theApp.m_cfg_data.m_hide_main_window ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_ALOW_OUT_OF_BORDER, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_alow_out_of_border ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_ALWAYS_ON_TOP, MF_BYCOMMAND         | (theApp.m_main_wnd_data.m_always_on_top       ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_LOCK_WINDOW_POS, MF_BYCOMMAND       | (theApp.m_main_wnd_data.m_lock_window_pos     ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_SHOW_CPU_MEMORY, MF_BYCOMMAND       | (theApp.m_main_wnd_data.m_show_more_info      ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_MOUSE_PENETRATE, MF_BYCOMMAND       | (theApp.m_main_wnd_data.m_mouse_penetrate     ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_SHOW_TASK_BAR_WND, MF_BYCOMMAND     | (theApp.m_cfg_data.m_show_task_bar_wnd        ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_SHOW_MAIN_WND, MF_BYCOMMAND         | (!theApp.m_cfg_data.m_hide_main_window        ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_ALOW_OUT_OF_BORDER, MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_alow_out_of_border  ? MF_CHECKED : MF_UNCHECKED));
 
     //设置“选择连接”子菜单项中各单选项的选择状态
     SetConnectionMenuState(theApp.m_main_menu.GetSubMenu(0)->GetSubMenu(0));
     SetConnectionMenuState(theApp.m_main_menu_plugin.GetSubMenu(0)->GetSubMenu(0));
 
     //设置“窗口不透明度”子菜单下各单选项的选择状态
-    switch (theApp.m_cfg_data.m_transparency)
+    switch (theApp.m_main_wnd_data.m_transparency)
     {
     case 100: pMenu->CheckMenuRadioItem(ID_TRANSPARENCY_100, ID_TRANSPARENCY_40, ID_TRANSPARENCY_100, MF_BYCOMMAND | MF_CHECKED); break;
     case 80: pMenu->CheckMenuRadioItem(ID_TRANSPARENCY_100, ID_TRANSPARENCY_40, ID_TRANSPARENCY_80, MF_BYCOMMAND | MF_CHECKED); break;
@@ -2098,8 +2100,8 @@ void CTrafficMonitorDlg::OnMove(int x, int y)
 
     if (!m_first_start)
     {
-        theApp.m_cfg_data.m_position_x = x;
-        theApp.m_cfg_data.m_position_y = y;
+        theApp.m_main_wnd_data.m_position_x = x;
+        theApp.m_main_wnd_data.m_position_y = y;
     }
 
     ////确保窗口不会超出屏幕范围
@@ -2217,18 +2219,18 @@ void CTrafficMonitorDlg::OnShowCpuMemory()
     // TODO: 在此添加命令处理程序代码
     CRect rect;
     GetWindowRect(rect);
-    theApp.m_cfg_data.m_show_more_info = !theApp.m_cfg_data.m_show_more_info;
-    if (theApp.m_cfg_data.m_show_more_info)
+    theApp.m_main_wnd_data.m_show_more_info = !theApp.m_main_wnd_data.m_show_more_info;
+    if (theApp.m_main_wnd_data.m_show_more_info)
     {
-        rect.right = rect.left + m_skin.GetLayoutInfo().layout_l.width;
-        rect.bottom = rect.top + m_skin.GetLayoutInfo().layout_l.width;
+        rect.right = rect.left + m_skin.GetLayoutManager().layout_l.width;
+        rect.bottom = rect.top + m_skin.GetLayoutManager().layout_l.width;
         MoveWindow(rect);
         CheckWindowPos();
     }
     else
     {
-        rect.right = rect.left + m_skin.GetLayoutInfo().layout_s.width;
-        rect.bottom = rect.top + m_skin.GetLayoutInfo().layout_s.height;
+        rect.right = rect.left + m_skin.GetLayoutManager().layout_s.width;
+        rect.bottom = rect.top + m_skin.GetLayoutManager().layout_s.height;
         MoveWindow(rect);
         CheckWindowPos();
     }
@@ -2379,8 +2381,8 @@ void CTrafficMonitorDlg::OnChangeSkin()
     skinDlg.m_pFont = &m_font;
     if (skinDlg.DoModal() == IDOK)
     {
-        m_skin_selected = skinDlg.m_skin_selected;
-        theApp.m_cfg_data.m_skin_name = m_skins[m_skin_selected];
+        m_skin_selected                     = skinDlg.m_skin_selected;
+        theApp.m_main_wnd_data.m_skin_name   = m_skins[m_skin_selected];
         //获取皮肤布局
         LoadSkinLayout();
         //载入背景图片
@@ -2410,7 +2412,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
             SetTextFont();
         }
         //获取项目的显示文本
-        if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutInfo().no_label)
+        if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
         {
             theApp.m_main_wnd_data.disp_str = skinDlg.GetSkinData().GetSkinInfo().display_text;
         }
@@ -2596,7 +2598,7 @@ void CTrafficMonitorDlg::OnPaint()
     CPaintDC dc(this); // device context for painting
                        // TODO: 在此处添加消息处理程序代码
                        // 不为绘图消息调用 CDialog::OnPaint()
-    m_skin.DrawInfo(&dc, theApp.m_cfg_data.m_show_more_info, m_font);
+    m_skin.DrawInfo(&dc, theApp.m_main_wnd_data.m_show_more_info, m_font);
 }
 
 

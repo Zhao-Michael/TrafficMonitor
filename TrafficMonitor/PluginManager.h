@@ -30,7 +30,7 @@ public:
         DWORD                                               error_code{};       //错误代码（GetLastError的返回值）
         std::map<ITMPlugin::PluginInfoIndex, std::wstring>  M_properties;       //插件属性
         ITMPlugin*                                          plugin{};           //插件接口ITMPlugin指针
-        std::vector<IPluginItem*>                           V_PI_PluginItem;    //插件接口ITMPlugin提供的所有显示项目
+        std::vector<IPluginItem*>                           V_PI_PluginItems;   //插件接口ITMPlugin提供的所有显示项目
 
         //成员函数
         std::wstring Property(ITMPlugin::PluginInfoIndex) const;
@@ -69,7 +69,7 @@ private:
     //V: vector; S: set; M: map;                            //用于描述成员变量是V_S_M这三种类型之一
     //I: interface; E: enum; B: bool; R: refer; P: pointer; //用于描述成员变量本身类型或是V_S_M中的成员类型
     std::vector<PluginManageUnit>       V_PluginManageUnit;
-    std::vector<IPluginItem*>           V_PI_PluginItem;                    //将所有ITMPlugin的所有ITMPlugin都存入一个vector
+    std::vector<IPluginItem*>           V_PI_PluginItems;                   //包含所有ITMPlugin的所有IPluginItem
     std::set<CommonDisplayItem>         S_all_display_items_with_plugins;   //包含插件在内的所有任务栏显示项目
     std::map<IPluginItem*, ITMPlugin*>  M_IPlguinItem_to_ITMPlugin;         //用于根据插件项目查找对应插件的map
 };

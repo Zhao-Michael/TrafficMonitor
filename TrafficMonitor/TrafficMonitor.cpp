@@ -51,8 +51,11 @@ void CTrafficMonitorApp::LoadConfig()
     GeneralSettingData& rGeneralData    = m_general_data;
     MainWndSettingData& rMainWndData    = m_main_wnd_data;
     TaskBarSettingData& rTaskbarData    = m_taskbar_data;
-    MainConfigData&     rCfgData        = m_cfg_data;
+    AppSettingData&     rAppData        = m_cfg_data;
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //              (1)载入APP全局性设置
+    ////////////////////////////////////////////////////////////////////////////////////////
     //常规设置(全局性唯一性设置)
     rGeneralData.check_update_when_start        = ini.GetBool(_T("general"), _T("check_update_when_start"), true);
     rGeneralData.allow_skin_cover_font          = ini.GetBool(_T("general"), _T("allow_skin_cover_font"),   true);
@@ -85,37 +88,37 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::SetColorMode(ColorMode::Default);
 
     //主窗口设置(当前版本情况：只支持全局性设置)
-    rCfgData.m_transparency             = ini.GetInt (_T("config"), _T("transparency"),     80);
+    rMainWndData.m_transparency         = ini.GetInt (_T("config"), _T("transparency"),     80);
     rMainWndData.m_always_on_top        = ini.GetBool(_T("config"), _T("always_on_top"),    true);
     rMainWndData.m_lock_window_pos      = ini.GetBool(_T("config"), _T("lock_window_pos"),  false);
     rGeneralData.show_notify_icon       = ini.GetBool(_T("config"), _T("show_notify_icon"), true);
-    rCfgData.m_show_more_info           = ini.GetBool(_T("config"), _T("show_cpu_memory"),  false);
+    rMainWndData.m_show_more_info       = ini.GetBool(_T("config"), _T("show_cpu_memory"),  false);
     rMainWndData.m_mouse_penetrate      = ini.GetBool(_T("config"), _T("mouse_penetrate"),  false);
-    rCfgData.m_show_task_bar_wnd        = ini.GetBool(_T("config"), _T("show_task_bar_wnd"),false);
-    rCfgData.m_position_x               = ini.GetInt (_T("config"), _T("position_x"),       -1);
-    rCfgData.m_position_y               = ini.GetInt (_T("config"), _T("position_y"),       -1);
+    rAppData.m_show_task_bar_wnd        = ini.GetBool(_T("config"), _T("show_task_bar_wnd"),false);
+    rMainWndData.m_position_x           = ini.GetInt (_T("config"), _T("position_x"),       -1);
+    rMainWndData.m_position_y           = ini.GetInt (_T("config"), _T("position_y"),       -1);
     //网络连接设置
-    rCfgData.m_auto_select                           = ini.GetBool(_T("connection"), _T("auto_select"),         true);
-    rCfgData.m_select_all                            = ini.GetBool(_T("connection"), _T("select_all"),          false);
-    rCfgData.m_connection_name = CCommon::UnicodeToStr(ini.GetString(L"connection",    L"connection_name",      L"").c_str());
+    rAppData.m_auto_select                           = ini.GetBool(_T("connection"), _T("auto_select"),         true);
+    rAppData.m_select_all                            = ini.GetBool(_T("connection"), _T("select_all"),          false);
+    rAppData.m_connection_name = CCommon::UnicodeToStr(ini.GetString(L"connection",    L"connection_name",      L"").c_str());
     //判断皮肤是否存在
     std::vector<wstring> skin_files;
     CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
     bool is_skin_exist = (!skin_files.empty());
     ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, (is_skin_exist ? 16384 : 16777215)); //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
     rMainWndData.specify_each_item_color        = ini.GetBool  (_T("config"), _T("specify_each_item_color"), false);
-    rCfgData.m_hide_main_window                 = ini.GetBool  (_T("config"), _T("hide_main_window"), false);
-    rCfgData.m_skin_name                        = ini.GetString(_T("config"), _T("skin_selected"), _T(""));
-    if (rCfgData.m_skin_name.substr(0, 8) == L".\\skins\\")       //如果读取到的皮肤名称前面有".\\skins\\"，则把它删除。（用于和前一个版本保持兼容性）
-        rCfgData.m_skin_name = rCfgData.m_skin_name.substr(7);
-    rCfgData.m_notify_icon_selected             = ini.GetInt   (_T("config"), _T("notify_icon_selected"), (m_win_version.IsWindows7() || m_win_version.IsWindows8Or8point1() ? 2 : rCfgData.m_dft_notify_icon));       //Win7/8/8.1默认使用蓝色通知区图标，因为隐藏通知区图标后白色图标会看不清，其他系统默认使用白色图标
-    rCfgData.m_notify_icon_auto_adapt           = ini.GetBool  (_T("config"), _T("notify_icon_auto_adapt"), true);
-    if (rCfgData.m_notify_icon_auto_adapt)
+    rAppData.m_hide_main_window                 = ini.GetBool  (_T("config"), _T("hide_main_window"), false);
+    rMainWndData.m_skin_name                    = ini.GetString(_T("config"), _T("skin_selected"), _T(""));
+    if (rMainWndData.m_skin_name.substr(0, 8) == L".\\skins\\")       //如果读取到的皮肤名称前面有".\\skins\\"，则把它删除。（用于和前一个版本保持兼容性）
+        rMainWndData.m_skin_name = rMainWndData.m_skin_name.substr(7);
+    rAppData.m_notify_icon_selected             = ini.GetInt   (_T("config"), _T("notify_icon_selected"), (m_win_version.IsWindows7() || m_win_version.IsWindows8Or8point1() ? 2 : rAppData.m_dft_notify_icon));       //Win7/8/8.1默认使用蓝色通知区图标，因为隐藏通知区图标后白色图标会看不清，其他系统默认使用白色图标
+    rAppData.m_notify_icon_auto_adapt           = ini.GetBool  (_T("config"), _T("notify_icon_auto_adapt"), true);
+    if (rAppData.m_notify_icon_auto_adapt)
         AutoSelectNotifyIcon();
     rMainWndData.swap_up_down                   = ini.GetBool  (_T("config"), _T("swap_up_down"), false);
     rMainWndData.hide_main_wnd_when_fullscreen  = ini.GetBool  (_T("config"), _T("hide_main_wnd_when_fullscreen"), true);
 
-    //主窗口全局字体设置
+    //载入主窗口全局字体设置
     FontInfo default_font{};
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
     default_font.size = 10;
@@ -123,7 +126,10 @@ void CTrafficMonitorApp::LoadConfig()
     //rMainWndData.font.name = ini.GetString(_T("config"), _T("font_name"), CCommon::LoadText(IDS_MICROSOFT_YAHEI)).c_str();
     //rMainWndData.font.size = ini.GetInt(_T("config"), _T("font_size"), 10);
 
-    //载入主窗口显示文本设置(当前版本情况：只支持全局性设置)
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //              (2)载入主窗口设置
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //载入用于主窗口的内置显示项文本标签(当前版本情况：只支持全局性设置)
     rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"), L"up_string", CCommon::LoadText(IDS_UPLOAD_DISP, _T(": $")));
     rMainWndData.disp_str.Get(TDI_DOWN)             = ini.GetString(L"config", L"down_string", CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": $")));
     rMainWndData.disp_str.Get(TDI_TOTAL_SPEED)      = ini.GetString(L"config", L"total_speed_string", _T("↑↓: $"));
@@ -137,7 +143,7 @@ void CTrafficMonitorApp::LoadConfig()
     rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP)  = ini.GetString(L"config", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": $")));
     rMainWndData.disp_str.Get(TDI_HDD_USAGE)        = ini.GetString(L"config", L"hdd_string", CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
 
-    //载入插件项目的显示文本设置(true表示主窗口)
+    //载入用于主窗口的插件显示项文本标签设置(true表示主窗口)
     ini.LoadPluginDisplayStr(true);
 
     //主窗口选项设置
@@ -168,6 +174,9 @@ void CTrafficMonitorApp::LoadConfig()
     rGeneralData.mainboard_temp_tip.enable          = ini.GetBool(L"notify_tip", L"mainboard_temperature_tip_enable",   false);
     rGeneralData.mainboard_temp_tip.tip_value       = ini.GetInt (L"notify_tip", L"mainboard_temperature_tip_value",    80);
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //              (3)载入任务栏窗口设置
+    ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
     rTaskbarData.back_color                         = ini.GetInt(_T("task_bar"), _T("task_bar_back_color"), rTaskbarData.dft_back_color, 16);
     rTaskbarData.transparent_color                  = ini.GetInt(_T("task_bar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
@@ -180,7 +189,7 @@ void CTrafficMonitorApp::LoadConfig()
     ini.LoadTaskbarWndColors                                    (_T("task_bar"), _T("task_bar_text_color"), rTaskbarData.text_colors, rTaskbarData.dft_text_colors);
     rTaskbarData.status_bar_color                 = ini.GetInt(_T("task_bar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
     rTaskbarData.specify_each_item_color          = ini.GetBool (L"task_bar",    L"specify_each_item_color", false);
-    //rCfgData.m_tbar_show_cpu_memory               = ini.GetBool(_T("task_bar"), _T("task_bar_show_cpu_memory"), false);
+    //rAppData.m_tbar_show_cpu_memory               = ini.GetBool(_T("task_bar"), _T("task_bar_show_cpu_memory"), false);
     rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"task_bar",    L"tbar_display_item", TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
@@ -293,10 +302,10 @@ void CTrafficMonitorApp::LoadConfig()
         rTaskbarData.disable_d2d = true;
 
     //其他设置
-    //rCfgData.m_show_internet_ip = ini.GetBool(L"connection_details", L"show_internet_ip", false);
-    rCfgData.m_use_log_scale = ini.GetBool(_T("histroy_traffic"), _T("use_log_scale"), true);
-    rCfgData.m_sunday_first = ini.GetBool(_T("histroy_traffic"), _T("sunday_first"), true);
-    rCfgData.m_view_type = static_cast<HistoryTrafficViewType>(ini.GetInt(_T("histroy_traffic"), _T("view_type"), static_cast<int>(HistoryTrafficViewType::HV_DAY)));
+    //rAppData.m_show_internet_ip = ini.GetBool(L"connection_details", L"show_internet_ip", false);
+    rAppData.m_use_log_scale = ini.GetBool(_T("histroy_traffic"), _T("use_log_scale"), true);
+    rAppData.m_sunday_first = ini.GetBool(_T("histroy_traffic"), _T("sunday_first"), true);
+    rAppData.m_view_type = static_cast<HistoryTrafficViewType>(ini.GetInt(_T("histroy_traffic"), _T("view_type"), static_cast<int>(HistoryTrafficViewType::HV_DAY)));
 
     m_no_multistart_warning = ini.GetBool(_T("other"), _T("no_multistart_warning"), false);
     m_notify_interval = ini.GetInt(_T("other"), _T("notify_interval"), 60);
@@ -308,7 +317,7 @@ void CTrafficMonitorApp::LoadConfig()
     m_show_mouse_panetrate_tip = ini.GetBool(L"other", L"show_mouse_panetrate_tip", true);
     m_show_dot_net_notinstalled_tip = ini.GetBool(L"other", L"show_dot_net_notinstalled_tip", true);
 
-    rCfgData.taskbar_left_space_win11 = ini.GetInt(L"task_bar", L"taskbar_left_space_win11", 160);
+    rAppData.taskbar_left_space_win11 = ini.GetInt(L"task_bar", L"taskbar_left_space_win11", 160);
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -317,7 +326,7 @@ void CTrafficMonitorApp::SaveConfig()
     GeneralSettingData& rGeneralData    = m_general_data;
     MainWndSettingData& rMainWndData    = m_main_wnd_data;
     TaskBarSettingData& rTaskbarData    = m_taskbar_data;
-    MainConfigData&     rCfgData        = m_cfg_data;
+    AppSettingData&     rAppData        = m_cfg_data;
 
     //常规设置
     ini.WriteBool    (_T("general"), _T("check_update_when_start"),     rGeneralData.check_update_when_start);
@@ -333,25 +342,25 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteStringList(L"general", L"connections_hide",                rGeneralData.connections_hide.ToVector());
 
     //主窗口设置
-    ini.WriteInt            (L"config",     L"transparency",                    rCfgData.m_transparency);
+    ini.WriteInt            (L"config",     L"transparency",                    rMainWndData.m_transparency);
     ini.WriteBool           (L"config",     L"always_on_top",                   rMainWndData.m_always_on_top);
     ini.WriteBool           (L"config",     L"lock_window_pos",                 rMainWndData.m_lock_window_pos);
     ini.WriteBool           (L"config",     L"show_notify_icon",                rGeneralData.show_notify_icon);
-    ini.WriteBool           (L"config",     L"show_cpu_memory",                 rCfgData.m_show_more_info);
+    ini.WriteBool           (L"config",     L"show_cpu_memory",                 rMainWndData.m_show_more_info);
     ini.WriteBool           (L"config",     L"mouse_penetrate",                 rMainWndData.m_mouse_penetrate);
-    ini.WriteBool           (L"config",     L"show_task_bar_wnd",               rCfgData.m_show_task_bar_wnd);
-    ini.WriteInt            (L"config",     L"position_x",                      rCfgData.m_position_x);
-    ini.WriteInt            (L"config",     L"position_y",                      rCfgData.m_position_y);
+    ini.WriteBool           (L"config",     L"show_task_bar_wnd",               rAppData.m_show_task_bar_wnd);
+    ini.WriteInt            (L"config",     L"position_x",                      rMainWndData.m_position_x);
+    ini.WriteInt            (L"config",     L"position_y",                      rMainWndData.m_position_y);
     ini.SaveMainWndColors   (L"config",     L"text_color",                      rMainWndData.text_colors);
     ini.WriteBool         (_T("config"),  _T("specify_each_item_color"),        rMainWndData.specify_each_item_color);
-    ini.WriteInt            (L"config",     L"hide_main_window",                rCfgData.m_hide_main_window);
-    ini.WriteString       (_T("config"),  _T("skin_selected"),                  rCfgData.m_skin_name.c_str());
-    ini.WriteInt            (L"config",     L"notify_icon_selected",            rCfgData.m_notify_icon_selected);
-    ini.WriteBool           (L"config",     L"notify_icon_auto_adapt",          rCfgData.m_notify_icon_auto_adapt);
+    ini.WriteInt            (L"config",     L"hide_main_window",                rAppData.m_hide_main_window);
+    ini.WriteString       (_T("config"),  _T("skin_selected"),                  rMainWndData.m_skin_name.c_str());
+    ini.WriteInt            (L"config",     L"notify_icon_selected",            rAppData.m_notify_icon_selected);
+    ini.WriteBool           (L"config",     L"notify_icon_auto_adapt",          rAppData.m_notify_icon_auto_adapt);
     //网络连接设置
-    ini.WriteBool           (L"connection", L"auto_select",                     rCfgData.m_auto_select);
-    ini.WriteBool           (L"connection", L"select_all",                      rCfgData.m_select_all);
-    ini.WriteString         (L"connection", L"connection_name", CCommon::StrToUnicode(rCfgData.m_connection_name.c_str()));
+    ini.WriteBool           (L"connection", L"auto_select",                     rAppData.m_auto_select);
+    ini.WriteBool           (L"connection", L"select_all",                      rAppData.m_select_all);
+    ini.WriteString         (L"connection", L"connection_name", CCommon::StrToUnicode(rAppData.m_connection_name.c_str()));
 
     //主窗口全局字体设置
     ini.SaveFontData        (L"config",                                         rMainWndData.font);
@@ -408,7 +417,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt (L"task_bar", L"transparent_color",                    rTaskbarData.transparent_color, 16);
     ini.WriteInt (L"task_bar", L"status_bar_color",                     rTaskbarData.status_bar_color, 16);
     ini.WriteBool(L"task_bar", L"specify_each_item_color",              rTaskbarData.specify_each_item_color);
-    //ini.WriteBool(L"task_bar", L"task_bar_show_cpu_memory",           rCfgData.m_tbar_show_cpu_memory);
+    //ini.WriteBool(L"task_bar", L"task_bar_show_cpu_memory",           rAppData.m_tbar_show_cpu_memory);
     ini.WriteInt (L"task_bar", L"tbar_display_item",                    rTaskbarData.m_tbar_display_item);
     //任务栏窗口字体设置
     ini.SaveFontData(L"task_bar", rTaskbarData.font);
@@ -469,10 +478,10 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool(L"task_bar", L"disable_d2d",                          rTaskbarData.disable_d2d);
 
     //其他设置
-    //ini.WriteBool(L"connection_details", L"show_internet_ip", rCfgData.m_show_internet_ip);
-    ini.WriteBool(L"histroy_traffic", L"use_log_scale",                 rCfgData.m_use_log_scale);
-    ini.WriteBool(L"histroy_traffic", L"sunday_first",                  rCfgData.m_sunday_first);
-    ini.WriteInt(L"histroy_traffic", L"view_type",     static_cast<int>(rCfgData.m_view_type));
+    //ini.WriteBool(L"connection_details", L"show_internet_ip",         rAppData.m_show_internet_ip);
+    ini.WriteBool(L"histroy_traffic", L"use_log_scale",                 rAppData.m_use_log_scale);
+    ini.WriteBool(L"histroy_traffic", L"sunday_first",                  rAppData.m_sunday_first);
+    ini.WriteInt(L"histroy_traffic", L"view_type",     static_cast<int>(rAppData.m_view_type));
 
     ini.WriteBool(_T("other"), _T("no_multistart_warning"), m_no_multistart_warning);
     ini.WriteBool(_T("other"), _T("exit_when_start_by_restart_manager"), m_exit_when_start_by_restart_manager);
@@ -483,9 +492,9 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool(_T("other"), _T("show_mouse_panetrate_tip"), m_show_mouse_panetrate_tip);
     ini.WriteBool(_T("other"), _T("show_dot_net_notinstalled_tip"), m_show_dot_net_notinstalled_tip);
 
-    ini.WriteString(L"config", L"plugin_disabled", rCfgData.plugin_disabled.ToString());
+    ini.WriteString(L"config", L"plugin_disabled", rAppData.plugin_disabled.ToString());
 
-    ini.WriteInt(L"task_bar", L"taskbar_left_space_win11", rCfgData.taskbar_left_space_win11);
+    ini.WriteInt(L"task_bar", L"taskbar_left_space_win11", rAppData.taskbar_left_space_win11);
 
     ini.WriteString(L"app", L"version", VERSION);
 
@@ -917,21 +926,21 @@ void CTrafficMonitorApp::AutoSelectNotifyIcon()
 {
     if (m_win_version.GetMajorVersion() >= 10)
     {
-        MainConfigData& rCfgData = m_cfg_data;
+        AppSettingData& rAppData = m_cfg_data;
         bool light_mode = CWindowsSettingHelper::IsWindows10LightTheme();
         if (light_mode)     //浅色模式下，如果图标是白色，则改成黑色
         {
-            if (rCfgData.m_notify_icon_selected == 0)
-                rCfgData.m_notify_icon_selected = 4;
-            if (rCfgData.m_notify_icon_selected == 1)
-                rCfgData.m_notify_icon_selected = 5;
+            if (rAppData.m_notify_icon_selected == 0)
+                rAppData.m_notify_icon_selected = 4;
+            if (rAppData.m_notify_icon_selected == 1)
+                rAppData.m_notify_icon_selected = 5;
         }
         else                //深色模式下，如果图标是黑色，则改成白色
         {
-            if (rCfgData.m_notify_icon_selected == 4)
-                rCfgData.m_notify_icon_selected = 0;
-            if (rCfgData.m_notify_icon_selected == 5)
-                rCfgData.m_notify_icon_selected = 1;
+            if (rAppData.m_notify_icon_selected == 4)
+                rAppData.m_notify_icon_selected = 0;
+            if (rAppData.m_notify_icon_selected == 5)
+                rAppData.m_notify_icon_selected = 1;
         }
     }
 }
@@ -1230,9 +1239,9 @@ void CTrafficMonitorApp::UpdateOpenHardwareMonitorEnableState()
 
 bool CTrafficMonitorApp::IsForceShowNotifyIcon()
 {
-    MainConfigData& rCfgData = m_cfg_data;
-    return ((!rCfgData.m_show_task_bar_wnd /*|| m_win_version.IsWindows11OrLater()*/)
-        && (rCfgData.m_hide_main_window || m_main_wnd_data.m_mouse_penetrate));    //如果没有显示任务栏窗口，且隐藏了主窗口或设置了鼠标穿透，则禁用“显示通知区图标”菜单项
+    AppSettingData& rAppData = m_cfg_data;
+    return ((!rAppData.m_show_task_bar_wnd /*|| m_win_version.IsWindows11OrLater()*/)
+        && (rAppData.m_hide_main_window || m_main_wnd_data.m_mouse_penetrate));    //如果没有显示任务栏窗口，且隐藏了主窗口或设置了鼠标穿透，则禁用“显示通知区图标”菜单项
 }
 
 std::wstring CTrafficMonitorApp::GetPlauginTooltipInfo() const

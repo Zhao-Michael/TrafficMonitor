@@ -37,17 +37,17 @@ void CPluginInfoDlg::ShowInfo()
         m_info_list.SetItemText(RI_DESCRIPTION, 1, pluginManageUnit.Property(ITMPlugin::TMI_DESCRIPTION).c_str());
         m_info_list.SetItemText(RI_FILE_NAME,   1, CFilePathHelper(pluginManageUnit.m_file_path).GetFileName().c_str());
         m_info_list.SetItemText(RI_FILE_PATH,   1, pluginManageUnit.m_file_path.c_str());
-        m_info_list.SetItemText(RI_ITEM_NUM,    1, std::to_wstring(pluginManageUnit.V_PI_PluginItem.size()).c_str());
+        m_info_list.SetItemText(RI_ITEM_NUM,    1, std::to_wstring(pluginManageUnit.V_PI_PluginItems.size()).c_str());
         wstring item_names;
         wstring item_id;
-        for (const auto& item : pluginManageUnit.V_PI_PluginItem)
+        for (const auto& item : pluginManageUnit.V_PI_PluginItems)
         {
             item_names  += item->GetItemName();
             item_names  += L";";
             item_id     += item->GetItemId();
             item_id     += L";";
         }
-        if (!pluginManageUnit.V_PI_PluginItem.empty())
+        if (!pluginManageUnit.V_PI_PluginItems.empty())
         {
             item_names.pop_back();
             item_id.pop_back();

@@ -72,11 +72,11 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
         if (!IsTaskBarStyleDataValid(m_default_style[index]))
             return;
 
-        data.text_colors = m_default_style[index].text_colors;
-		data.back_color = m_default_style[index].back_color;
-		data.transparent_color = m_default_style[index].transparent_color;
-		data.status_bar_color = m_default_style[index].status_bar_color;
-		data.specify_each_item_color = m_default_style[index].specify_each_item_color;
+        data.specify_each_item_color    = m_default_style[index].specify_each_item_color;
+        data.text_colors                = m_default_style[index].text_colors;
+		data.back_color                 = m_default_style[index].back_color;
+		data.transparent_color          = m_default_style[index].transparent_color;
+		data.status_bar_color           = m_default_style[index].status_bar_color;
 		if (data.transparent_color == data.back_color)
 		{
 			CCommon::TransparentColorConvert(data.back_color);

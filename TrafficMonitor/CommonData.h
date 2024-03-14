@@ -168,25 +168,18 @@ private:
     std::set<std::wstring> string_set;
 };
 
-//选项设置数据
-struct MainConfigData
+//APP全局性设置数据
+struct AppSettingData
 {
-    int  m_transparency     { 100   };          //窗口透明度
-    bool m_show_more_info   { false };          //显示更多信息
     bool m_show_task_bar_wnd{ false };          //显示任务栏窗口
     bool m_hide_main_window;                    //隐藏主窗口
     //bool m_tbar_show_cpu_memory;              //任务栏窗口显示CPU和内存利用率
-
-    int  m_position_x;                          //窗口位置的x坐标
-    int  m_position_y;                          //窗口位置的y坐标
 
     //网络连接设置
     bool m_auto_select{ false };                //自动选择连接
     bool m_select_all{ false };                 //统计所有连接的网速
     string m_connection_name;                   //当前选择网络的名称
     //bool m_show_internet_ip{ false };         //是否在“连接详情”对话框中显示外网IP地址
-
-    wstring m_skin_name;                        //选择的皮肤的名称
 
     //通知图标设置
     int  m_dft_notify_icon = 0;                 //默认的通知图标(用于区分win10的深色和浅色模式)
@@ -213,9 +206,10 @@ enum class MemoryDisplay
 struct PublicSettingData
 {
     FontInfo font;                                  //字体
-    DispStrings disp_str;                           //显示的文本
-    bool specify_each_item_color{ false };          //是否指定每个项目的颜色
     bool show_tool_tip{ true };                     //显示鼠标提示
+
+    DispStrings disp_str;                           //标签    //里面存放了所有标签的map
+    bool specify_each_item_color{ false };          //是否指定每个项目的颜色
 
     //数值属性设置
     bool hide_unit;                                 //隐藏单位
@@ -238,11 +232,23 @@ struct MainWndSettingData : public PublicSettingData
 {
     std::map<CommonDisplayItem, COLORREF> text_colors{};    //方字的颜色                 //以后要像任务栏一样，可以设置标签颜色。
 
+    int  m_position_x;                          //窗口位置的x坐标
+    int  m_position_y;                          //窗口位置的y坐标
+
+    //GUI设置项
     bool m_always_on_top        { false };      //窗口置顶
-    bool m_lock_window_pos      { false };      //锁定窗口位置
     bool m_mouse_penetrate      { false };      //鼠标穿透
+    bool m_lock_window_pos      { false };      //锁定窗口位置
+    bool m_show_more_info       { false };      //显示更多信息
     bool m_alow_out_of_border   { false };      //是否允许悬浮窗超出屏幕边界
     bool hide_main_wnd_when_fullscreen;         //有程序全屏运行时隐藏悬浮窗
+
+
+    int  m_transparency         { 100 };        //窗口透明度
+
+    wstring m_skin_name;                        //选择的皮肤的名称
+
+
 
     bool swap_up_down           { false };      //交换上传和下载显示的位置
 };

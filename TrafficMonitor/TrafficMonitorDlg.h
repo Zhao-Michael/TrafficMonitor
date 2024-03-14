@@ -46,20 +46,21 @@ protected:
 
 // 实现
 protected:
-    HICON m_hIcon;
-    NOTIFYICONDATA m_ntIcon;    //通知区域图标
-    CTaskBarDlg* m_tBarDlg{};     //任务栏窗口的指针
+    HICON                       m_hIcon;
+    NOTIFYICONDATA              m_ntIcon;                   //通知区域图标
+    CTaskBarDlg*                m_tBarDlg{};                //任务栏窗口的指针
 
-    vector<NetWorkConection> m_connections; //保存获取到的要显示到“选择网卡”菜单项中的所有网络连接
-    MIB_IFTABLE* m_pIfTable;
-    DWORD m_dwSize{};	//m_pIfTable的大小
-    size_t m_connection_selected{ 0 }; //要显示流量的连接的序号
-    unsigned __int64 m_in_bytes{};        //当前已接收的字节数
-    unsigned __int64 m_out_bytes{};   //当前已发送的字节数
-    unsigned __int64 m_last_in_bytes{}; //上次已接收的字节数
-    unsigned __int64 m_last_out_bytes{};    //上次已发送的字节数
+    //网络连接
+    vector<NetWorkConection>    m_connections;              //保存获取到的要显示到“选择网卡”菜单项中的所有网络连接
+    size_t                      m_connection_selected{ 0 }; //要显示流量的连接的序号
+    MIB_IFTABLE*                m_pIfTable;
+    DWORD                       m_dwSize{};	                //m_pIfTable的大小
+    unsigned __int64            m_in_bytes{};               //当前已接收的字节数
+    unsigned __int64            m_out_bytes{};              //当前已发送的字节数
+    unsigned __int64            m_last_in_bytes{};          //上次已接收的字节数
+    unsigned __int64            m_last_out_bytes{};         //上次已发送的字节数
 
-    CCPUUsage m_cpu_usage;
+    CCPUUsage                   m_cpu_usage;
 
     bool m_first_start{ true };     //初始时为true，在定时器第一次启动后置为flase
 
@@ -85,12 +86,12 @@ protected:
         }
     };
 
-    //CRect m_screen_rect;        //屏幕的范围（不包含任务栏）
-    vector<CRect> m_screen_rects;       //所有屏幕的范围（不包含任务栏）
-    vector<CRect> m_last_screen_rects;       //上一次所有屏幕的范围（不包含任务栏）
-    CSize m_screen_size;        //屏幕的大小（包含任务栏）
-    CSkinFile m_skin;
-    CommonDisplayItem m_clicked_item;           //鼠标点击的项目
+    //CRect m_screen_rect;                      //屏幕的范围（不包含任务栏）
+    vector<CRect>       m_screen_rects;         //所有屏幕的范围（不包含任务栏）
+    vector<CRect>       m_last_screen_rects;    //上一次所有屏幕的范围（不包含任务栏）
+    CSize               m_screen_size;          //屏幕的大小（包含任务栏）
+    CSkinFile           m_skin;
+    CommonDisplayItem   m_clicked_item;         //鼠标点击的项目
 
     CFont m_font;           //字体
 
