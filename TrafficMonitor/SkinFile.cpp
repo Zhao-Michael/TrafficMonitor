@@ -18,12 +18,12 @@ CSkinFile::~CSkinFile()
 
 static CSkinFile::LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
 {
-    CSkinFile::LayoutItem layout_item;
-    layout_item.x = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
-    layout_item.y = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
-    layout_item.width = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout_item.align = static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
-    layout_item.show = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
+    CSkinFile::LayoutItem   layout_item;
+    layout_item.x       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
+    layout_item.y       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
+    layout_item.width   =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout_item.align   =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
+    layout_item.show    = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     return layout_item;
 }
 
@@ -334,11 +334,16 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         draw.FillRect(rect_l, RGB(230, 230, 230));
     draw.DrawBitmap(m_background_l, rect_l.TopLeft(), rect_l.Size());
 
-    //获取每个项目显示的文本
-    std::map<EBuiltinDisplayItem, DrawStr> map_str;
+    MainWndSettingData&                     rMainWndData    = theApp.m_main_wnd_data;
+    CPluginManager&                         rPluginManager  = theApp.m_plugin_manager;
+    std::map<EBuiltinDisplayItem, DrawStr>  map_str;            //存放所有内置项目的显示标签和数值
+    std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //              (1)所有内置项目的显示标签数值
+    ////////////////////////////////////////////////////////////////////////////////////////    
     for (auto iter = gS_AllBuiltinDisplayItems.begin(); iter != gS_AllBuiltinDisplayItems.end(); ++iter)
     {
-        MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
         //wstring disp_text = m_skin_info.display_text.Get(*iter);
         //if (disp_text == NONE_STR)
         //    disp_text = rMainWndData.disp_str.Get(*iter);
@@ -377,12 +382,13 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         map_str[*iter] = draw_str;
     }
 
-    //获取文本颜色
-    std::map<CommonDisplayItem, COLORREF> text_colors{};
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //              (2)所有项目的显示数值的颜色
+    ////////////////////////////////////////////////////////////////////////////////////////
     if (m_skin_info.specify_each_item_color)
     {
         int i{};
-        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
             if (i < static_cast<int>(m_skin_info.text_color.size()))
                 text_colors[item] = m_skin_info.text_color[i];
@@ -391,7 +397,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     }
     else if (!m_skin_info.text_color.empty())
     {
-        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
             if (!m_skin_info.text_color.empty())
                 text_colors[item] = m_skin_info.text_color[0];
@@ -416,45 +422,44 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         }
 
         //绘制插件项目
-        for (const auto& plugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
+        for (const auto& iplugin_item : rPluginManager.GetAllIPluginItems())
         {
-            LayoutItem layout_item = layout.GetItem(plugin_item);
+            LayoutItem layout_item = layout.GetItem(iplugin_item);
             if (layout_item.show)
             {
-                COLORREF cl{};
-                auto iter = text_colors.find(plugin_item);
+                COLORREF color{};
+                auto iter = text_colors.find(iplugin_item);
                 if (iter != text_colors.end())
-                    cl = iter->second;
+                    color = iter->second;
                 else if (!text_colors.empty())
-                    cl = text_colors.begin()->second;
+                    color = text_colors.begin()->second;
                 //矩形区域
                 CPoint point;
                 point.SetPoint(layout_item.x, layout_item.y);
                 point.Offset(pos.x, pos.y);
                 CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
-                if (plugin_item->IsCustomDraw())
-                {
-                    int brightness{ (GetRValue(cl) + GetGValue(cl) + GetBValue(cl)) / 2 };
-                    ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(plugin_item);
-                    if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
-                    {
-                        plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(cl).c_str());
-                        plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
-                    }
-                    draw.GetDC()->SetTextColor(cl);
-                    plugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), point.x, point.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
-                }
-                else
+                if (!iplugin_item->IsCustomDraw())
                 {
                     //绘制文本
                     DrawStr draw_str;
-                    draw_str.label = plugin_item->GetItemLableText();
-                    draw_str.value = plugin_item->GetItemValueSampleText();
-                    DrawSkinText(draw, draw_str, rect, cl, layout_item.align);
+                    draw_str.label = iplugin_item->GetItemLableText();
+                    draw_str.value = iplugin_item->GetItemValueSampleText();
+                    DrawSkinText(draw, draw_str, rect, color, layout_item.align);
+                }
+                else
+                {
+                    int brightness{ (GetRValue(color) + GetGValue(color) + GetBValue(color)) / 2 };
+                    ITMPlugin* plugin = rPluginManager.GetITMPluginByIPlguinItem(iplugin_item);
+                    if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
+                    {
+                        plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(color).c_str());
+                        plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
+                    }
+                    draw.GetDC()->SetTextColor(color);
+                    iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), point.x, point.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
                 }
             }
         }
-
     };
 
     //绘制小预览图文本
@@ -475,12 +480,14 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     draw.Create(draw_double_buffer.GetMemDC(), nullptr);
     draw.DrawBitmap(background_image, CPoint(0, 0), CSize(layout.width, layout.height));
 
-    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
+    MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
+    CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
+    std::map<EBuiltinDisplayItem, DrawStr>  map_str;            //存放所有内置项目的显示标签和数值
+    std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (1)获取所有内置项目的显示标签
     ////////////////////////////////////////////////////////////////////////////////////////
-    std::map<EBuiltinDisplayItem, DrawStr> map_str;
     if (!m_layout_manager.no_label)
     {
         map_str[TDI_UP].label               = rMainWndData.disp_str.Get(TDI_UP).c_str();
@@ -543,22 +550,20 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (3)获取所有项目的显示数值的颜色
     ////////////////////////////////////////////////////////////////////////////////////////
-    std::map<CommonDisplayItem, COLORREF> text_colors{};
     if (rMainWndData.specify_each_item_color)
     {
         text_colors = rMainWndData.text_colors;
     }
     else if (!rMainWndData.text_colors.empty())
     {
-        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
             text_colors[item] = rMainWndData.text_colors.begin()->second;
         }
     }
 
-    //绘制文本
+    //设置字体。目前不支持每个显示项单独设置字体。
     draw.SetFont(&font);
-
     //绘制文本
     int index{};
     for (auto iter = map_str.begin(); iter != map_str.end(); ++iter)
@@ -568,10 +573,8 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         {
             //矩形区域
             CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
-
             //文本颜色
             COLORREF text_color = text_colors[iter->first];
-
             //绘制文本
             DrawSkinText(draw, map_str[iter->first], rect, text_color, layout_item.align);
         }
@@ -579,40 +582,39 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 
     //绘制插件项目
-    for (const auto& plugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
+    for (const auto& iplugin_item : rPluginManager.GetAllIPluginItems())
     {
-        const auto& layout_item = layout.GetItem(plugin_item);
+        const auto& layout_item = layout.GetItem(iplugin_item);
         if (layout_item.show)
         {
             //插件项目自绘
-            COLORREF cl{};
-            auto iter = text_colors.find(plugin_item);
+            COLORREF color{};
+            auto iter = text_colors.find(iplugin_item);
             if (iter != text_colors.end())
-                cl = iter->second;
+                color = iter->second;
             else if (!text_colors.empty())
-                cl = text_colors.begin()->second;
-            if (plugin_item->IsCustomDraw())
-            {
-                int brightness{ (GetRValue(cl) + GetGValue(cl) + GetBValue(cl)) / 2 };
-                ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(plugin_item);
-                if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
-                {
-                    plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(cl).c_str());
-                    plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
-                }
-                draw.GetDC()->SetTextColor(cl);
-                plugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), layout_item.x, layout_item.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
-            }
-            else
+                color = text_colors.begin()->second;
+            if (!iplugin_item->IsCustomDraw())
             {
                 //矩形区域
                 CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
-
                 //绘制文本
                 DrawStr draw_str;
-                draw_str.label = rMainWndData.disp_str.Get(plugin_item).c_str();
-                draw_str.value = plugin_item->GetItemValueText();
-                DrawSkinText(draw, draw_str, rect, cl, layout_item.align);
+                draw_str.label = rMainWndData.disp_str.Get(iplugin_item).c_str();
+                draw_str.value = iplugin_item->GetItemValueText();
+                DrawSkinText(draw, draw_str, rect, color, layout_item.align);
+            }
+            else
+            {
+                int brightness{ (GetRValue(color) + GetGValue(color) + GetBValue(color)) / 2 };
+                ITMPlugin* plugin = rPluginManager.GetITMPluginByIPlguinItem(iplugin_item);
+                if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
+                {
+                    plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(color).c_str());
+                    plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
+                }
+                draw.GetDC()->SetTextColor(color);
+                iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), layout_item.x, layout_item.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
             }
         }
     }

@@ -699,17 +699,18 @@ void CTrafficMonitorDlg::_OnOptions(int tab)
 
 void CTrafficMonitorDlg::ApplySettings(COptionsDlg& optionsDlg)
 {
-    bool is_hardware_monitor_item_changed = (optionsDlg.m_tab3_dlg.m_data.hardware_monitor_item != theApp.m_general_data.hardware_monitor_item);
-    bool is_always_on_top_changed = (optionsDlg.m_tab1_dlg.m_data.m_always_on_top != theApp.m_main_wnd_data.m_always_on_top);
-    bool is_mouse_penerate_changed = (optionsDlg.m_tab1_dlg.m_data.m_mouse_penetrate != theApp.m_main_wnd_data.m_mouse_penetrate);
-    bool is_alow_out_of_border_changed = (optionsDlg.m_tab1_dlg.m_data.m_alow_out_of_border != theApp.m_main_wnd_data.m_alow_out_of_border);
-    bool is_show_notify_icon_changed = (optionsDlg.m_tab3_dlg.m_data.show_notify_icon != theApp.m_general_data.show_notify_icon);
-    bool is_connections_hide_changed = (optionsDlg.m_tab3_dlg.m_data.connections_hide.data() != theApp.m_general_data.connections_hide.data());
+    bool is_hardware_monitor_item_changed   = (optionsDlg.m_tab3_dlg.m_data.hardware_monitor_item   != theApp.m_general_data.hardware_monitor_item);
+    bool is_always_on_top_changed           = (optionsDlg.m_tab1_dlg.m_data.m_always_on_top         != theApp.m_main_wnd_data.m_always_on_top);
+    bool is_mouse_penerate_changed          = (optionsDlg.m_tab1_dlg.m_data.m_mouse_penetrate       != theApp.m_main_wnd_data.m_mouse_penetrate);
+    bool is_alow_out_of_border_changed      = (optionsDlg.m_tab1_dlg.m_data.m_alow_out_of_border    != theApp.m_main_wnd_data.m_alow_out_of_border);
+    bool is_show_notify_icon_changed        = (optionsDlg.m_tab3_dlg.m_data.show_notify_icon        != theApp.m_general_data.show_notify_icon);
+    bool is_connections_hide_changed        = (optionsDlg.m_tab3_dlg.m_data.connections_hide.data() != theApp.m_general_data.connections_hide.data());
     bool d2d_turned_on = (theApp.m_taskbar_data.disable_d2d && !optionsDlg.m_tab2_dlg.m_data.disable_d2d);
 
-    theApp.m_main_wnd_data = optionsDlg.m_tab1_dlg.m_data;
-    theApp.m_taskbar_data = optionsDlg.m_tab2_dlg.m_data;
-    theApp.m_general_data = optionsDlg.m_tab3_dlg.m_data;
+    //保存到App的相关设置数据存储结构中
+    theApp.m_main_wnd_data  = optionsDlg.m_tab1_dlg.m_data;
+    theApp.m_taskbar_data   = optionsDlg.m_tab2_dlg.m_data;
+    theApp.m_general_data   = optionsDlg.m_tab3_dlg.m_data;
     theApp.SendSettingsToPlugin();
 
     CGeneralSettingsDlg::CheckTaskbarDisplayItem();

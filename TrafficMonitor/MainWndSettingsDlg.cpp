@@ -32,10 +32,11 @@ void CMainWndSettingsDlg::SetControlMouseWheelEnable(bool enable)
 
 void CMainWndSettingsDlg::DrawStaticColor()
 {
-    //CCommon::FillStaticColor(m_color_static, m_data.text_color);
-    if (m_data.text_colors.empty())
+    MainWndSettingData& rMainWndData = m_data;
+    //CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
+    if (rMainWndData.text_colors.empty())
         return;
-    if (m_data.specify_each_item_color)
+    if (rMainWndData.specify_each_item_color)
     {
         int color_num{};
 #ifdef WITHOUT_TEMPERATURE
@@ -45,7 +46,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
 #endif
         m_color_static.SetColorNum(color_num);
         int index{};
-        for (const auto& item : m_data.text_colors)
+        for (const auto& item : rMainWndData.text_colors)
         {
             m_color_static.SetFillColor(index, item.second);
             index++;
@@ -54,15 +55,16 @@ void CMainWndSettingsDlg::DrawStaticColor()
     }
     else
     {
-        m_color_static.SetFillColor(m_data.text_colors.begin()->second);
+        m_color_static.SetFillColor(rMainWndData.text_colors.begin()->second);
     }
 }
 
 void CMainWndSettingsDlg::IniUnitCombo()
 {
+    MainWndSettingData& rMainWndData = m_data;
     m_unit_combo.ResetContent();
     m_unit_combo.AddString(CCommon::LoadText(IDS_AUTO));
-    if (m_data.unit_byte)
+    if (rMainWndData.unit_byte)
     {
         m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
         m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
@@ -72,7 +74,7 @@ void CMainWndSettingsDlg::IniUnitCombo()
         m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Kb/s")));
         m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Mb/s")));
     }
-    m_unit_combo.SetCurSel(static_cast<int>(m_data.speed_unit));
+    m_unit_combo.SetCurSel(static_cast<int>(rMainWndData.speed_unit));
 }
 
 void CMainWndSettingsDlg::EnableControl()
@@ -141,25 +143,26 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
+    MainWndSettingData& rMainWndData = m_data;
 
     //初始化各控件状态
-    SetDlgItemText(IDC_FONT_NAME_EDIT, m_data.font.name);
+    SetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
     //wchar_t buff[16];
-    //swprintf_s(buff, L"%d", m_data.font_size);
+    //swprintf_s(buff, L"%d", rMainWndData.font_size);
     //SetDlgItemText(IDC_FONT_SIZE_EDIT, buff);
     m_font_size_edit.SetRange(5, 72);
-    m_font_size_edit.SetValue(m_data.font.size);
+    m_font_size_edit.SetValue(rMainWndData.font.size);
 
-    //SetDlgItemText(IDC_UPLOAD_EDIT, m_data.disp_str.Get(TDI_UP).c_str());
-    //SetDlgItemText(IDC_DOWNLOAD_EDIT, m_data.disp_str.Get(TDI_DOWN).c_str());
-    //SetDlgItemText(IDC_CPU_EDIT, m_data.disp_str.Get(TDI_CPU).c_str());
-    //SetDlgItemText(IDC_MEMORY_EDIT, m_data.disp_str.Get(TDI_MEMORY).c_str());
+    //SetDlgItemText(IDC_UPLOAD_EDIT, rMainWndData.disp_str.Get(TDI_UP).c_str());
+    //SetDlgItemText(IDC_DOWNLOAD_EDIT, rMainWndData.disp_str.Get(TDI_DOWN).c_str());
+    //SetDlgItemText(IDC_CPU_EDIT, rMainWndData.disp_str.Get(TDI_CPU).c_str());
+    //SetDlgItemText(IDC_MEMORY_EDIT, rMainWndData.disp_str.Get(TDI_MEMORY).c_str());
 
-    ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(m_data.swap_up_down);
-    ((CButton*)GetDlgItem(IDC_FULLSCREEN_HIDE_CHECK))->SetCheck(m_data.hide_main_wnd_when_fullscreen);
-    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(m_data.speed_short_mode);
-    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(m_data.separate_value_unit_with_space);
-    ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(m_data.show_tool_tip);
+    ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(     rMainWndData.swap_up_down);
+    ((CButton*)GetDlgItem(IDC_FULLSCREEN_HIDE_CHECK))->SetCheck(    rMainWndData.hide_main_wnd_when_fullscreen);
+    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(  rMainWndData.speed_short_mode);
+    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rMainWndData.separate_value_unit_with_space);
+    ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(        rMainWndData.show_tool_tip);
 
     m_color_static.SetLinkCursor();
     DrawStaticColor();
@@ -168,21 +171,21 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_toolTip.SetMaxTipWidth(theApp.DPI(300));
     m_toolTip.AddTool(GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2), CCommon::LoadText(IDS_SPEED_SHORT_MODE_TIP));
 
-    if (m_data.unit_byte)
+    if (rMainWndData.unit_byte)
         ((CButton*)GetDlgItem(IDC_UNIT_BYTE_RADIO))->SetCheck(TRUE);
     else
         ((CButton*)GetDlgItem(IDC_UNIT_BIT_RADIO))->SetCheck(TRUE);
 
     IniUnitCombo();
 
-    m_hide_unit_chk.SetCheck(m_data.hide_unit);
-    if (m_data.speed_unit == SpeedUnit::AUTO)
+    m_hide_unit_chk.SetCheck(rMainWndData.hide_unit);
+    if (rMainWndData.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        m_data.hide_unit = false;
+        rMainWndData.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
-    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(m_data.hide_percent);
+    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(rMainWndData.hide_percent);
 
     if (m_text_disable)
     {
@@ -191,13 +194,13 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
         //GetDlgItem(IDC_CPU_EDIT)->EnableWindow(FALSE);
         //GetDlgItem(IDC_MEMORY_EDIT)->EnableWindow(FALSE);
         EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
-        m_data.swap_up_down = false;
+        rMainWndData.swap_up_down = false;
         ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(FALSE);
         GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK)->EnableWindow(FALSE);
         //GetDlgItem(IDC_SET_DEFAULT_BUTTON)->EnableWindow(FALSE);
     }
 
-    CheckDlgButton(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, m_data.specify_each_item_color);
+    CheckDlgButton(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, rMainWndData.specify_each_item_color);
 
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_CONNECTION_DETIAL));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_HISTORICAL_TRAFFIC));
@@ -207,21 +210,21 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_double_click_combo.AddString(CCommon::LoadText(IDS_SPECIFIC_APP));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_CHANGE_SKIN));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_NONE));
-    m_double_click_combo.SetCurSel(static_cast<int>(m_data.double_click_action));
+    m_double_click_combo.SetCurSel(static_cast<int>(rMainWndData.double_click_action));
 
-    SetDlgItemText(IDC_EXE_PATH_EDIT, m_data.double_click_exe.c_str());
+    SetDlgItemText(IDC_EXE_PATH_EDIT,               rMainWndData.double_click_exe.c_str());
     EnableControl();
 
     //初始化内存显示方式下拉列表
     m_memory_display_combo.AddString(CCommon::LoadText(IDS_USAGE_PERCENTAGE));
     m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_USED));
     m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_AVAILABLE));
-    m_memory_display_combo.SetCurSel(static_cast<int>(m_data.memory_display));
+    m_memory_display_combo.SetCurSel(static_cast<int>(rMainWndData.memory_display));
 
-    CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK, m_data.m_always_on_top);
-    CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK, m_data.m_mouse_penetrate);
-    CheckDlgButton(IDC_LOCK_WINDOW_POS_CHECK, m_data.m_lock_window_pos);
-    CheckDlgButton(IDC_ALOW_OUT_OF_BORDER_CHECK, m_data.m_alow_out_of_border);
+    CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK,         rMainWndData.m_always_on_top);
+    CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK,       rMainWndData.m_mouse_penetrate);
+    CheckDlgButton(IDC_LOCK_WINDOW_POS_CHECK,       rMainWndData.m_lock_window_pos);
+    CheckDlgButton(IDC_ALOW_OUT_OF_BORDER_CHECK,    rMainWndData.m_alow_out_of_border);
 
     ////设置控件不响应鼠标滚轮消息
     //m_unit_combo.SetMouseWheelEnable(false);
@@ -291,43 +294,46 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 //void CMainWndSettingsDlg::OnBnClickedSetDefaultButton()
 //{
 //  // TODO: 在此添加控件通知处理程序代码
-//  m_data.disp_str.Get(TDI_UP) = CCommon::LoadText(IDS_UPLOAD_DISP, _T(": "));
-//  m_data.disp_str.Get(TDI_DOWN) = CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": "));
-//  m_data.disp_str.Get(TDI_CPU) = L"CPU: ";
-//  m_data.disp_str.Get(TDI_MEMORY) = CCommon::LoadText(IDS_MEMORY_DISP, _T(": "));
-//  SetDlgItemText(IDC_UPLOAD_EDIT, m_data.disp_str.Get(TDI_UP).c_str());
-//  SetDlgItemText(IDC_DOWNLOAD_EDIT, m_data.disp_str.Get(TDI_DOWN).c_str());
-//  SetDlgItemText(IDC_CPU_EDIT, m_data.disp_str.Get(TDI_CPU).c_str());
-//  SetDlgItemText(IDC_MEMORY_EDIT, m_data.disp_str.Get(TDI_MEMORY).c_str());
+//  MainWndSettingData& rMainWndData = m_data;
+//  rMainWndData.disp_str.Get(TDI_UP) = CCommon::LoadText(IDS_UPLOAD_DISP, _T(": "));
+//  rMainWndData.disp_str.Get(TDI_DOWN) = CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": "));
+//  rMainWndData.disp_str.Get(TDI_CPU) = L"CPU: ";
+//  rMainWndData.disp_str.Get(TDI_MEMORY) = CCommon::LoadText(IDS_MEMORY_DISP, _T(": "));
+//  SetDlgItemText(IDC_UPLOAD_EDIT, rMainWndData.disp_str.Get(TDI_UP).c_str());
+//  SetDlgItemText(IDC_DOWNLOAD_EDIT, rMainWndData.disp_str.Get(TDI_DOWN).c_str());
+//  SetDlgItemText(IDC_CPU_EDIT, rMainWndData.disp_str.Get(TDI_CPU).c_str());
+//  SetDlgItemText(IDC_MEMORY_EDIT, rMainWndData.disp_str.Get(TDI_MEMORY).c_str());
 //}
 
 
 void CMainWndSettingsDlg::OnBnClickedSetFontButton()
 {
     // TODO: 在此添加控件通知处理程序代码
+    MainWndSettingData& rMainWndData = m_data;
+
     LOGFONT lf{};
-    lf.lfHeight = FontSizeToLfHeight(m_data.font.size);
-    lf.lfWeight = (m_data.font.bold ? FW_BOLD : FW_NORMAL);
-    lf.lfItalic = m_data.font.italic;
-    lf.lfUnderline = m_data.font.underline;
-    lf.lfStrikeOut = m_data.font.strike_out;
+    lf.lfHeight         = FontSizeToLfHeight(rMainWndData.font.size);
+    lf.lfWeight         = (rMainWndData.font.bold ? FW_BOLD : FW_NORMAL);
+    lf.lfItalic         = rMainWndData.font.italic;
+    lf.lfUnderline      = rMainWndData.font.underline;
+    lf.lfStrikeOut      = rMainWndData.font.strike_out;
     lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
-    //wcsncpy_s(lf.lfFaceName, m_data.font.name.GetString(), 32);
-    CCommon::WStringCopy(lf.lfFaceName, 32, m_data.font.name.GetString());
+    //wcsncpy_s(lf.lfFaceName, rMainWndData.font.name.GetString(), 32);
+    CCommon::WStringCopy(lf.lfFaceName, 32, rMainWndData.font.name.GetString());
     CCommon::NormalizeFont(lf);
     CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
     if (IDOK == fontDlg.DoModal())     // 显示字体对话框
     {
         //获取字体信息
-        m_data.font.name = fontDlg.GetFaceName();
-        m_data.font.size = fontDlg.GetSize() / 10;
-        m_data.font.bold = (fontDlg.IsBold() != FALSE);
-        m_data.font.italic = (fontDlg.IsItalic() != FALSE);
-        m_data.font.underline = (fontDlg.IsUnderline() != FALSE);
-        m_data.font.strike_out = (fontDlg.IsStrikeOut() != FALSE);
+        rMainWndData.font.name = fontDlg.GetFaceName();
+        rMainWndData.font.size = fontDlg.GetSize() / 10;
+        rMainWndData.font.bold = (fontDlg.IsBold() != FALSE);
+        rMainWndData.font.italic = (fontDlg.IsItalic() != FALSE);
+        rMainWndData.font.underline = (fontDlg.IsUnderline() != FALSE);
+        rMainWndData.font.strike_out = (fontDlg.IsStrikeOut() != FALSE);
         //将字体信息显示出来
-        SetDlgItemText(IDC_FONT_NAME_EDIT, m_data.font.name);
-        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(m_data.font.size).c_str());
+        SetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
+        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rMainWndData.font.size).c_str());
     }
 }
 
@@ -356,11 +362,12 @@ void CMainWndSettingsDlg::OnBnClickedSpeedShortModeCheck2()
 void CMainWndSettingsDlg::OnCbnSelchangeUnitCombo()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
-    if (m_data.speed_unit == SpeedUnit::AUTO)
+    MainWndSettingData& rMainWndData = m_data;
+    rMainWndData.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
+    if (rMainWndData.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        m_data.hide_unit = false;
+        rMainWndData.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
     else
@@ -390,6 +397,7 @@ BOOL CMainWndSettingsDlg::PreTranslateMessage(MSG* pMsg)
 void CMainWndSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
+    MainWndSettingData& rMainWndData = m_data;
     //获取字体设置
     int font_size;
     font_size = m_font_size_edit.GetValue();
@@ -401,9 +409,9 @@ void CMainWndSettingsDlg::OnOK()
     }
     else
     {
-        m_data.font.size = font_size;
+        rMainWndData.font.size = font_size;
     }
-    GetDlgItemText(IDC_FONT_NAME_EDIT, m_data.font.name);
+    GetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
 
     CTabDlg::OnOK();
 }
@@ -423,21 +431,22 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     case IDC_TEXT_COLOR_STATIC:
     {
         //设置文本颜色
-        if (m_data.specify_each_item_color)
+        MainWndSettingData& rMainWndData = m_data;
+        if (rMainWndData.specify_each_item_color)
         {
-            CMainWndColorDlg colorDlg(m_data.text_colors);
+            CMainWndColorDlg colorDlg(rMainWndData.text_colors);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.text_colors = colorDlg.GetColors();
+                rMainWndData.text_colors = colorDlg.GetColors();
                 DrawStaticColor();
             }
         }
-        else if (!m_data.text_colors.empty())
+        else if (!rMainWndData.text_colors.empty())
         {
-            CMFCColorDialogEx colorDlg(m_data.text_colors.begin()->second, 0, this);
+            CMFCColorDialogEx colorDlg(rMainWndData.text_colors.begin()->second, 0, this);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.text_colors.begin()->second = colorDlg.GetColor();
+                rMainWndData.text_colors.begin()->second = colorDlg.GetColor();
                 DrawStaticColor();
             }
         }
@@ -499,12 +508,13 @@ void CMainWndSettingsDlg::OnBnClickedShowToolTipChk()
 void CMainWndSettingsDlg::OnBnClickedBrowseButton()
 {
     // TODO: 在此添加控件通知处理程序代码
+    MainWndSettingData& rMainWndData = m_data;
     CString szFilter = CCommon::LoadText(IDS_EXE_FILTER);
     CFileDialog fileDlg(TRUE, NULL, NULL, 0, szFilter, this);
     if (IDOK == fileDlg.DoModal())
     {
-        m_data.double_click_exe = fileDlg.GetPathName();
-        SetDlgItemText(IDC_EXE_PATH_EDIT, m_data.double_click_exe.c_str());
+        rMainWndData.double_click_exe = fileDlg.GetPathName();
+        SetDlgItemText(IDC_EXE_PATH_EDIT, rMainWndData.double_click_exe.c_str());
     }
 }
 

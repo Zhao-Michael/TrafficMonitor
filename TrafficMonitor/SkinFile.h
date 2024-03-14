@@ -32,19 +32,17 @@ public:
     //皮肤中每个显示项的布局信息
     struct LayoutItem
     {
-        int x{};            //X位置
-        int y{};            //Y位置
-        int width{};        //宽度
-        Alignment align{};  //对齐方式
-        bool show{};        //是否显示
+        int                     x{}, y{}, width{};          //X位置、Y位置、宽度
+        Alignment               align{ Alignment::LEFT };   //对齐方式
+        bool                    show{false};                //是否显示
     };
 
     //皮肤布局
     struct Layout
     {
-        int width{};        //宽度
-        int height{};       //高度
-        std::map<CommonDisplayItem, LayoutItem> layout_items; //每一项的布局信息
+        int                     width{}, height{};                  //宽度、高度
+
+        std::map<CommonDisplayItem, LayoutItem> layout_items;       //每一项的布局信息
         LayoutItem GetItem(CommonDisplayItem display_item) const
         {
             auto iter = layout_items.find(display_item);
