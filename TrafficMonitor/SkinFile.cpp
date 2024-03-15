@@ -336,7 +336,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 
     MainWndSettingData&                     rMainWndData    = theApp.m_main_wnd_data;
     CPluginManager&                         rPluginManager  = theApp.m_plugin_manager;
-    std::map<EBuiltinDisplayItem, DrawStr>  map_str;            //存放所有内置项目的显示标签和数值
+    std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
     std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -379,7 +379,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             m_skin_info.display_text.Get(*iter) = rMainWndData.disp_str.Get(*iter);
         if (!m_layout_manager.no_label)
             draw_str.label = m_skin_info.display_text.Get(*iter).c_str();
-        map_str[*iter] = draw_str;
+        map_builtin_str[*iter] = draw_str;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -407,7 +407,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     //绘制预览图文本
     auto drawPreviewText = [&](Layout& layout, const PreviewInfo::Pos& pos)
     {
-        for (auto iter = map_str.begin(); iter != map_str.end(); ++iter)
+        for (auto iter = map_builtin_str.begin(); iter != map_builtin_str.end(); ++iter)
         {
             if (layout.layout_items[iter->first].show)
             {
@@ -482,7 +482,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
 
     MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
     CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
-    std::map<EBuiltinDisplayItem, DrawStr>  map_str;            //存放所有内置项目的显示标签和数值
+    std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
     std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -490,18 +490,18 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     if (!m_layout_manager.no_label)
     {
-        map_str[TDI_UP].label               = rMainWndData.disp_str.Get(TDI_UP).c_str();
-        map_str[TDI_DOWN].label             = rMainWndData.disp_str.Get(TDI_DOWN).c_str();
-        map_str[TDI_CPU].label              = rMainWndData.disp_str.Get(TDI_CPU).c_str();
-        map_str[TDI_MEMORY].label           = rMainWndData.disp_str.Get(TDI_MEMORY).c_str();
-        map_str[TDI_GPU_USAGE].label        = rMainWndData.disp_str.Get(TDI_GPU_USAGE).c_str();
-        map_str[TDI_CPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_CPU_TEMP).c_str();
-        map_str[TDI_GPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_GPU_TEMP).c_str();
-        map_str[TDI_HDD_TEMP].label         = rMainWndData.disp_str.Get(TDI_HDD_TEMP).c_str();
-        map_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
-        map_str[TDI_HDD_USAGE].label        = rMainWndData.disp_str.Get(TDI_HDD_USAGE).c_str();
-        map_str[TDI_TOTAL_SPEED].label      = rMainWndData.disp_str.Get(TDI_TOTAL_SPEED).c_str();
-        map_str[TDI_CPU_FREQ].label         = rMainWndData.disp_str.Get(TDI_CPU_FREQ).c_str();
+        map_builtin_str[TDI_UP].label               = rMainWndData.disp_str.Get(TDI_UP).c_str();
+        map_builtin_str[TDI_DOWN].label             = rMainWndData.disp_str.Get(TDI_DOWN).c_str();
+        map_builtin_str[TDI_CPU].label              = rMainWndData.disp_str.Get(TDI_CPU).c_str();
+        map_builtin_str[TDI_MEMORY].label           = rMainWndData.disp_str.Get(TDI_MEMORY).c_str();
+        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.disp_str.Get(TDI_GPU_USAGE).c_str();
+        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_CPU_TEMP).c_str();
+        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_GPU_TEMP).c_str();
+        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.disp_str.Get(TDI_HDD_TEMP).c_str();
+        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
+        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.disp_str.Get(TDI_HDD_USAGE).c_str();
+        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.disp_str.Get(TDI_TOTAL_SPEED).c_str();
+        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.disp_str.Get(TDI_CPU_FREQ).c_str();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -517,16 +517,16 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         out_speed += _T("/s");
         total_speed += _T("/s");
     }
-    map_str[TDI_UP].value           = out_speed.GetString();
-    map_str[TDI_DOWN].value         = in_speed.GetString();
-    map_str[TDI_TOTAL_SPEED].value  = total_speed.GetString();
+    map_builtin_str[TDI_UP].value           = out_speed.GetString();
+    map_builtin_str[TDI_DOWN].value         = in_speed.GetString();
+    map_builtin_str[TDI_TOTAL_SPEED].value  = total_speed.GetString();
     if (rMainWndData.swap_up_down) //交换上传和下载位置
     {
-        std::swap(map_str[TDI_UP], map_str[TDI_DOWN]);
+        std::swap(map_builtin_str[TDI_UP], map_builtin_str[TDI_DOWN]);
     }
     //CPU/内存/显卡利用率
-    map_str[TDI_CPU].value          = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
-    map_str[TDI_CPU_FREQ].value     = CCommon::FreqToString (theApp.m_cpu_freq,  rMainWndData);
+    map_builtin_str[TDI_CPU].value          = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
+    map_builtin_str[TDI_CPU_FREQ].value     = CCommon::FreqToString (theApp.m_cpu_freq,  rMainWndData);
     CString str_memory_value;
     if (rMainWndData.memory_display == MemoryDisplay::MEMORY_USED)
         str_memory_value            = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWndData.separate_value_unit_with_space);
@@ -535,13 +535,13 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
                                                                     rMainWndData.separate_value_unit_with_space);
     else
         str_memory_value            = CCommon::UsageToString(theApp.m_memory_usage, rMainWndData);
-    map_str[TDI_MEMORY].value       = str_memory_value;
-    map_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
-    map_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
+    map_builtin_str[TDI_MEMORY].value       = str_memory_value;
+    map_builtin_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
+    map_builtin_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
     //温度
     auto getTemperatureStr = [&](EBuiltinDisplayItem display_item, float temperature)
     {
-        map_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);
+        map_builtin_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);
     };
     getTemperatureStr(TDI_CPU_TEMP,         theApp.m_cpu_temperature);
     getTemperatureStr(TDI_GPU_TEMP,         theApp.m_gpu_temperature);
@@ -566,7 +566,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     draw.SetFont(&font);
     //绘制文本
     int index{};
-    for (auto iter = map_str.begin(); iter != map_str.end(); ++iter)
+    for (auto iter = map_builtin_str.begin(); iter != map_builtin_str.end(); ++iter)
     {
         const auto& layout_item = layout.GetItem(iter->first);
         if (layout_item.show)
@@ -576,7 +576,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
             //文本颜色
             COLORREF text_color = text_colors[iter->first];
             //绘制文本
-            DrawSkinText(draw, map_str[iter->first], rect, text_color, layout_item.align);
+            DrawSkinText(draw, map_builtin_str[iter->first], rect, text_color, layout_item.align);
         }
         index++;
     }

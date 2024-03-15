@@ -232,9 +232,6 @@ struct MainWndSettingData : public PublicSettingData
 {
     std::map<CommonDisplayItem, COLORREF> text_colors{};    //方字的颜色                 //以后要像任务栏一样，可以设置标签颜色。
 
-    int  m_position_x;                          //窗口位置的x坐标
-    int  m_position_y;                          //窗口位置的y坐标
-
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
     bool swap_up_down           { false };      //交换上传和下载显示的位置
     bool m_always_on_top        { false };      //窗口置顶
@@ -246,6 +243,9 @@ struct MainWndSettingData : public PublicSettingData
     bool m_show_more_info{ false };             //显示更多信息
     int  m_transparency         { 100 };        //窗口透明度
     wstring m_skin_name;                        //选择的皮肤的名称
+
+    int  m_position_x;                          //窗口位置的x坐标
+    int  m_position_y;                          //窗口位置的y坐标
 };
 
 //#define TASKBAR_COLOR_NUM 18      //任务栏窗口颜色数量
