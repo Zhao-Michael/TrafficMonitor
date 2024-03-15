@@ -1,32 +1,6 @@
 ﻿#pragma once
 #include "PluginInterface.h"
-
-//所有内置显示项目
-enum EBuiltinDisplayItem
-{
-    TDI_UP = 1 << 0,
-    TDI_DOWN = 1 << 1,
-    TDI_CPU = 1 << 2,
-    TDI_MEMORY = 1 << 3,
-    TDI_GPU_USAGE = 1 << 4,
-    TDI_CPU_TEMP = 1 << 5,
-    TDI_GPU_TEMP = 1 << 6,
-    TDI_HDD_TEMP = 1 << 7,
-    TDI_MAIN_BOARD_TEMP = 1 << 8,
-    TDI_HDD_USAGE = 1 << 9,
-    TDI_TOTAL_SPEED = 1 << 10,
-    TDI_CPU_FREQ = 1 << 11
-};
-
-//所有内置显示项目的集合
-const std::set<EBuiltinDisplayItem> gS_AllBuiltinDisplayItems
-{
-    TDI_UP, TDI_DOWN, TDI_CPU, TDI_MEMORY
-#ifndef WITHOUT_TEMPERATURE
-    , TDI_GPU_USAGE, TDI_CPU_TEMP, TDI_GPU_TEMP, TDI_HDD_TEMP, TDI_MAIN_BOARD_TEMP, TDI_HDD_USAGE,TDI_CPU_FREQ
-#endif
-    , TDI_TOTAL_SPEED
-};
+#include "CommonTypes.h"
 
 //显示的项目
 struct CommonDisplayItem

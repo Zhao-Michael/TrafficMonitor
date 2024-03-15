@@ -16,9 +16,9 @@ CSkinFile::~CSkinFile()
 {
 }
 
-static CSkinFile::LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
+static LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
 {
-    CSkinFile::LayoutItem   layout_item;
+    LayoutItem   layout_item;
     layout_item.x       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
     layout_item.y       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width   =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));

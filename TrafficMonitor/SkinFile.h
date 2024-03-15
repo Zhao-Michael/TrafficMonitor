@@ -29,14 +29,6 @@ public:
         }
     };
 
-    //皮肤中每个显示项的布局信息
-    struct LayoutItem
-    {
-        int                     x{}, y{}, width{};          //X位置、Y位置、宽度
-        Alignment               align{ Alignment::LEFT };   //对齐方式
-        bool                    show{false};                //是否显示
-    };
-
     //皮肤布局
     struct Layout
     {

@@ -1,63 +1,9 @@
 ﻿//此文件包含全局结构体、枚举类型的定义
 #pragma once
 #include "stdafx.h"
+#include "CommonTypes.h"
 #include "TaskbarItemOrderHelper.h"
 
-struct Date
-{
-    int year{};
-    int month{};
-    int day{};
-
-    int week() const;       //该日期是一年的第几周
-
-    //比较两个HistoryTraffic对象的日期，如果a的时间大于b，则返回true
-    static bool DateGreater(const Date& a, const Date& b);
-
-    //判断两个HistoryTraffic对象的日期是否相等
-    static bool DateEqual(const Date& a, const Date& b);
-
-};
-
-//储存某一天的历史流量
-struct HistoryTraffic : public Date
-{
-    //当天使用的流量（以KB为单位）
-    unsigned __int64 up_kBytes{};
-    unsigned __int64 down_kBytes{};
-    bool mixed{ true };     //如果不区分上传和下载流量，则为true
-
-    unsigned __int64 kBytes() const;
-
-};
-
-//历史流量统计中用于指示不同范围内的流量的颜色
-#define TRAFFIC_COLOR_BLUE RGB(0, 183, 238)
-#define TRAFFIC_COLOR_GREEN RGB(128, 194, 105)
-#define TRAFFIC_COLOR_YELLOE RGB(255, 216, 58)
-#define TRAFFIC_COLOR_RED RGB(255, 95, 74)
-#define TRAFFIC_COLOR_DARK_RED RGB(166, 19, 0)
-
-//网速单位
-enum class SpeedUnit
-{
-    AUTO,       //自动
-    KBPS,       //KB/s
-    MBPS        //MB/s
-};
-
-
-//硬件监控的项目
-enum HardwareItem
-{
-    HI_CPU = 1 << 0,        //CPU
-    HI_GPU = 1 << 1,        //显卡
-    HI_HDD = 1 << 2,        //硬盘
-    HI_MBD = 1 << 3         //主板
-};
-
-#define DEF_CH L'\"'        //写入和读取ini文件字符串时，在字符串前后添加的字符
-#define NONE_STR L"@@@"     //用于指定一个无效字符串
 struct DispStrings      //显示的文本
 {
 private:
@@ -69,35 +15,6 @@ public:
     void operator=(const DispStrings& disp_str);                                //重载赋值运算符
     void Load(const std::wstring& plugin_id, const std::wstring& disp_str);     //载入一个插件项目的显示文本
     bool IsInvalid() const;                                                     //是否无效
-};
-
-//鼠标双击窗口的动作
-enum class DoubleClickAction
-{
-    CONNECTION_INFO,        //连接详情
-    HISTORY_TRAFFIC,        //历史流量统计
-    SHOW_MORE_INFO,         //显示更多信息
-    OPTIONS,                //选项设置
-    TASK_MANAGER,           //任务管理器
-    SEPCIFIC_APP,           //指定应用程序
-    CHANGE_SKIN,            //更换皮肤
-    NONE                    //不执行任何动作
-};
-
-//语言
-enum class Language
-{
-    FOLLOWING_SYSTEM,       //跟随系统
-    ENGLISH,                //英语
-    SIMPLIFIED_CHINESE,     //简体中文
-    TRADITIONAL_CHINESE     //繁体中文
-};
-
-//颜色模式
-enum class ColorMode
-{
-    Default,                //默认颜色
-    Light                   //浅色
 };
 
 //将字号转成LOGFONT结构中的lfHeight
@@ -144,16 +61,6 @@ struct FontInfo
     }
 };
 
-//历史流量统计列表视图中显示模式
-enum class HistoryTrafficViewType
-{
-    HV_DAY,         //日视图
-    HV_WEEK,        //周视图
-    HV_MONTH,       //月视图
-    HV_QUARTER,     //季视图
-    HV_YEAR         //年视图
-};
-
 struct StringSet
 {
 public:
@@ -192,14 +99,6 @@ struct AppSettingData
     StringSet plugin_disabled;                  //已禁用的插件
 
     int  taskbar_left_space_win11{};            //Windows11下，任务栏窗口显示在左侧时的边距
-};
-
-//内存显示方式
-enum class MemoryDisplay
-{
-    USAGE_PERCENTAGE,       //已使用百分比
-    MEMORY_USED,            //内存已使用
-    MEMORY_AVAILABLE        //内存可用
 };
 
 //选项设置中“主窗口设置”和“任务栏窗口设置”中公共的数据(不使用此结构体创建对象)
@@ -338,20 +237,19 @@ struct GeneralSettingData
     NotifyTipSettings hdd_temp_tip;         //硬盘温度超出提示
     NotifyTipSettings mainboard_temp_tip;   //主板温度超出提示
 
-
     //语言
     Language language;
 
     bool show_all_interface{ true };
     bool m_get_cpu_usage_by_cpu_times{ true };  //获取CPU利用率的方式，如果为true则是使用GetSystemTimes，否则使用Pdh（性能计数器）
 
-    bool portable_mode{ false };        //便携模式，如果为true，则程序所有数据都保存到exe所在目录下，否则保存到Appdata\Romaing目录下
-    int monitor_time_span{ 1000 };    //监控的时间间隔
+    bool portable_mode{ false };                //便携模式，如果为true，则程序所有数据都保存到exe所在目录下，否则保存到Appdata\Romaing目录下
+    int monitor_time_span{ 1000 };              //监控的时间间隔
 
-    std::wstring hard_disk_name;        //要监控的硬盘名称
-    std::wstring cpu_core_name;         //要监控的CPU核心的名称
-
-    unsigned int hardware_monitor_item{};   //要监控哪些硬件
+    //要监控的硬件及其具体的名称
+    unsigned int hardware_monitor_item{};       //要监控哪些硬件
+    std::wstring hard_disk_name;                //要监控的硬盘名称
+    std::wstring cpu_core_name;                 //要监控的CPU核心的名称
     bool IsHardwareEnable(HardwareItem item_type) const
     {
         return hardware_monitor_item & item_type;
@@ -365,18 +263,6 @@ struct GeneralSettingData
     }
 
     StringSet connections_hide;     //用于保存哪些网络要从“选择网络连接”子菜单项中隐藏
-};
-
-//定义监控时间间隔有效的最大值和最小值
-#define MONITOR_TIME_SPAN_MIN 200
-#define MONITOR_TIME_SPAN_MAX 30000
-
-enum class Alignment
-{
-    LEFT,       //左对齐
-    RIGHT,      //右对齐
-    CENTER,     //居中
-    SIDE        //两端对齐
 };
 
 //通过构造函数传递一个bool变量的引用，在构造时将其置为true，析构时置为false
