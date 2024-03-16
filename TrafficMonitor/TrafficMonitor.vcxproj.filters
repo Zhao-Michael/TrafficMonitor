@@ -484,6 +484,9 @@
     <ClInclude Include="SupportedRenderEnums.h">
       <Filter>源文件和头文件\公共的类\DrawCommon</Filter>
     </ClInclude>
+    <ClInclude Include="CommonTypes.h">
+      <Filter>源文件和头文件\头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StaticEx.cpp">

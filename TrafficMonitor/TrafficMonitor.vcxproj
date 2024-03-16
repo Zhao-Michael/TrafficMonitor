@@ -517,6 +517,7 @@
     <ClInclude Include="CMFCColorDialogEx.h" />
     <ClInclude Include="ColorSettingListCtrl.h" />
     <ClInclude Include="ComboBox2.h" />
+    <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="CPUUsage.h" />
     <ClInclude Include="crashtool.h" />
     <ClInclude Include="CTabCtrlEx.h" />
