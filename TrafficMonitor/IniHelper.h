@@ -32,6 +32,10 @@ public:
 	void SaveFontData(const wchar_t * AppName, const FontInfo& font);
 	void LoadFontData(const wchar_t * AppName, FontInfo& font, const FontInfo& default_font) const;
 
+	//新增功能代码
+	void LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item, const wchar_t* default_str, COLORREF default_color);
+	void SaveLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item);
+
     void LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, COLORREF>& text_colors, COLORREF default_color);
     void SaveMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, COLORREF>& text_colors);
 

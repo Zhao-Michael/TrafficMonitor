@@ -53,12 +53,24 @@ BOOL CMainWndColorDlg::OnInitDialog()
     CRect rect;
     m_list_ctrl.GetClientRect(rect);
     m_list_ctrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
-    int width0, width1;
-    width0 = rect.Width() * 2 / 3;
-    width1 = rect.Width() - width0 - theApp.DPI(20) - 1;
-    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_ITEM), LVCFMT_LEFT, width0);		//插入第0列
-    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_COLOR), LVCFMT_LEFT, width1);		//插入第1列
+
+    //新增功能代码
+    UCHAR   num = 5;
+    int width0 =  rect.Width() / (num--);
+    int width1 = (rect.Width() - width0 - theApp.DPI(20) - 1) / (num--);
+    int width2 = (rect.Width() - width0 - width1 - theApp.DPI(20) - 1) / (num--);
+    int width3 = (rect.Width() - width0 - width1 - width2 - theApp.DPI(20) - 1) / (num--);
+    int width4 =  rect.Width() - width0 - width1 - width2 - width3 - theApp.DPI(20) - 1;
+    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_DISP_ITEM_ID),LVCFMT_LEFT, width0);
+    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_ITEM),        LVCFMT_LEFT, width1);
+    m_list_ctrl.InsertColumn(2, CCommon::LoadText(IDS_VALUE),       LVCFMT_LEFT, width2);
+    m_list_ctrl.InsertColumn(3, CCommon::LoadText(IDS_COLOR_LABEL), LVCFMT_LEFT, width3);
+    m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE), LVCFMT_LEFT, width4);
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
+
+//    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_ITEM), LVCFMT_LEFT, width0);		//插入第0列
+//    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_COLOR), LVCFMT_LEFT, width1);		//插入第1列
+//    m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
     //向列表中插入行
     for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); ++iter)
@@ -68,7 +80,7 @@ BOOL CMainWndColorDlg::OnInitDialog()
         {
             int index = m_list_ctrl.GetItemCount();
             m_list_ctrl.InsertItem(index, item_name);
-            m_list_ctrl.SetItemColor(index, 1, m_colors[*iter]);
+            m_list_ctrl.SetItemColor(index, 4, m_colors[*iter]);
             m_list_ctrl.SetItemData(index, (DWORD_PTR)&(*iter));
         }
     }

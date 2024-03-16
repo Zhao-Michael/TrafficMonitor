@@ -87,17 +87,10 @@ private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
     void LoadFromIni(const wstring& file_path);     //从ini文件读取皮肤数据（用于兼容旧版皮肤）
 
-    CSkinFile::Layout GetLayoutFromXmlNode(tinyxml2::XMLElement* ele);
+    //新增功能代码
+    void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item);
 
-    struct DrawStr
-    {
-        CString label;
-        CString value;
-        CString GetStr() const
-        {
-            return label + value;
-        }
-    };
+    CSkinFile::Layout GetLayoutFromXmlNode(tinyxml2::XMLElement* ele);
 
     static void DrawSkinText(CDrawCommon drawer, DrawStr draw_str, CRect rect, COLORREF color, Alignment align);
 

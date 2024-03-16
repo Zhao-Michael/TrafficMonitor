@@ -16,14 +16,22 @@ CSkinFile::~CSkinFile()
 {
 }
 
+void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
+{
+
+}
+
 static LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
 {
     LayoutItem   layout_item;
-    layout_item.x       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
-    layout_item.y       =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
-    layout_item.width   =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout_item.align   =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
-    layout_item.show    = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
+    layout_item.x               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
+    layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
+    layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
+    layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
+    layout_item.LableValueStr.label.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
+    layout_item.label_color     =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
+    layout_item.value_color     =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
     return layout_item;
 }
 
@@ -41,7 +49,9 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
                 {
                     //如果是内置的"UP"等，就找到了。
                     //插件item不能map到内置的"UP"等，否则当内置项处理了。
-                    layout.layout_items[builtin_item] = GetLayoutItemFromXmlNode(ele_layout_item);
+                    layout.layout_items[builtin_item]               = GetLayoutItemFromXmlNode(ele_layout_item);
+                    layout.layout_items[builtin_item].height        = layout.height;
+                    layout.layout_items[builtin_item].id            = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
                     break;
                 }
             }
@@ -52,7 +62,9 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
                 {
                     if (plugin_id == iplugin_item->GetItemId())
                     {
-                        layout.layout_items[iplugin_item] = GetLayoutItemFromXmlNode(ele_layout_item);
+                        layout.layout_items[iplugin_item]           = GetLayoutItemFromXmlNode(ele_layout_item);
+                        layout.layout_items[iplugin_item].height    = layout.height;
+                        layout.layout_items[iplugin_item].id        = plugin_id;
                         break;
                     }
                 }
@@ -159,7 +171,7 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 m_skin_info.font_info.underline = CCommon::GetNumberBit(font_style, 2);
                                 m_skin_info.font_info.strike_out = CCommon::GetNumberBit(font_style, 3);
                             }
-                            else if (skin_item_name == "display_text")
+                            else if (skin_item_name == "display_text")      //定义在这里说明是整个皮肤通用，与layout无关。
                             {
                                 CTinyXml2Helper::IterateChildNode(skin_item, [this](tinyxml2::XMLElement* display_text_item)
                                     {
@@ -538,7 +550,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     map_builtin_str[TDI_MEMORY].value       = str_memory_value;
     map_builtin_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
     map_builtin_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
-    //温度
+    //4个温度
     auto getTemperatureStr = [&](EBuiltinDisplayItem display_item, float temperature)
     {
         map_builtin_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);

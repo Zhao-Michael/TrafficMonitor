@@ -71,6 +71,10 @@ public:
     TaskBarSettingData      m_taskbar_data;
     //APP全局性设置数据
     AppSettingData          m_cfg_data;
+
+    CPluginManager          m_plugin_manager;                       //插件管理器
+    CDllFunctions           m_dll_functions;
+
     int                     m_notify_interval;                      //弹出通知消息的时间间隔
     bool                    m_debug_log{};
     bool                    m_taksbar_transparent_color_enable{};
@@ -85,8 +89,6 @@ public:
     HICON                   m_notify_icons[MAX_NOTIFY_ICON];
 
     CTaskbarDefaultStyle    m_taskbar_default_style;
-    CPluginManager          m_plugin_manager;                       //插件管理器
-    CDllFunctions           m_dll_functions;
 
     CMenu                   m_main_menu;                            //主窗口右键菜单
     CMenu                   m_main_menu_plugin;                     //右击主窗口插件区域的右键菜单

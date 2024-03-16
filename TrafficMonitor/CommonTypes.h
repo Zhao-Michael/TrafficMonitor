@@ -15,7 +15,6 @@ struct Date
 
     //判断两个HistoryTraffic对象的日期是否相等
     static bool DateEqual(const Date& a, const Date& b);
-
 };
 
 //储存某一天的历史流量
@@ -27,7 +26,6 @@ struct HistoryTraffic : public Date
     bool mixed{ true };     //如果不区分上传和下载流量，则为true
 
     unsigned __int64 kBytes() const;
-
 };
 
 //历史流量统计中用于指示不同范围内的流量的颜色
@@ -70,23 +68,49 @@ enum class Alignment
     SIDE        //两端对齐
 };
 
-//皮肤中每个显示项的布局信息
+struct DrawStr
+{
+    CString label;
+    CString value;
+    CString GetStr() const
+    {
+        return label + value;
+    }
+};
+
+//定义显示项可配置的属性个数
+//当前版本先支持3个(标签、标签颜色、数值颜色)
+#define LAYOUT_ITEM_ATTRIBUTE_NUM 3
+
+//皮肤中每个显示项的布局信息。重新加载当前皮肤或切换皮肤时存放新数据，否则不改变数据。
 struct LayoutItem
 {
-    int                     x{}, y{}, width{};              //X位置、Y位置、宽度
-//  int                     height{};                       //目前无法自定义，只能从Layout.height复制。
+    wstring                 id;                     //唯一标识
+//  wstring                 name;                   //用于显示而已，id才是唯一标识。内置项的name已经固定，调用函数随时可以获得，不用保存。插件项的name从插件项接口随时可以获得，不用保存。
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //      只能从皮肤配置文件中定义，GUI无法配置。
+    ////////////////////////////////////////////////////////////////////////////////////////
+    int                     x{}, y{}, width{};              //X位置、Y位置、宽度                
+    int                     height{};                       //目前只能从Layout.height复制。
     Alignment               align{ Alignment::LEFT };       //对齐方式
-    bool                    show{ false };                  //是否显示
-/*
-    //数值属性设置
-    bool hide_unit;                                 //隐藏单位
-    bool hide_percent;                              //隐藏百分号
-    //    bool hide_degree;                         //隐藏温度度数                                            //暂不支持，以后会支持。
-    bool separate_value_unit_with_space{ true };    //网速数值和单位用空格分隔                                //以后改名为：数值和单位用空格分隔(不再只限于网速)
-    bool speed_short_mode{ false };                 //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
-    SpeedUnit speed_unit;                           //网速的单位
-    bool unit_byte{ true };                         //使用字节(B)而不是比特(b)为单位                        //以后某天要取消对bit的支持，因此到时将删除此项。
-*/
+    bool                    show { false };                 //是否显示
+    //全局唯一。//插件dll也应该保证在添加与删除插件项后，剩余各项的id依然保持不变，即使在软件重启后也不变。但是，某些插件没有做到这点。
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //      皮肤配置文件和GUI都可以配置
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //标签、标签颜色、数值颜色
+    DrawStr                 LableValueStr;                  //存放项目的标签和数值      //皮肤配置文件和GUI都可以配置标签，但数值是实时变化的，两者都无法配置。这里把这两项存放一起。
+    COLORREF                label_color{};
+    COLORREF                value_color{};
+    //显示项数值的所有属性设置
+    bool                    B_HideNetUnit;                          //隐藏网络单位(对于速度来说，是MB/s、KB/s)(对于统计来说，是GB、MB、KB)
+    bool                    B_HidePercent;                          //隐藏百分号
+    bool                    B_HideDegree;                           //隐藏温度度数
+    bool                    B_SeparateValueUnitWithSpace{ true };   //数值和单位用空格分隔                                //以后改名为：数值和单位用空格分隔(不再只限于网速)
+    bool                    speed_short_mode{ false };              //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
+    SpeedUnit               speed_unit;                             //网速的单位
+    bool                    unit_byte{ true };                      //使用字节(B)而不是比特(b)为单位                        //以后某天要取消对bit的支持，因此到时将删除此项。
+
 };
 
 //历史流量统计列表视图中显示模式

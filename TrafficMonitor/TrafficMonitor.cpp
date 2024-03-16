@@ -53,6 +53,9 @@ void CTrafficMonitorApp::LoadConfig()
     TaskBarSettingData& rTaskbarData    = m_taskbar_data;
     AppSettingData&     rAppData        = m_cfg_data;
 
+    //新增功能代码
+    std::map<CommonDisplayItem, LayoutItem>&   rM_LayoutItems = rMainWndData.M_LayoutItems;
+
     ////////////////////////////////////////////////////////////////////////////////////////
     //      (一)载入APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -131,22 +134,39 @@ void CTrafficMonitorApp::LoadConfig()
     std::vector<wstring> skin_files;
     CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
     bool is_skin_exist = (!skin_files.empty());
-    //载入用于主窗口的内置显示项文本颜色设置(当前版本情况：只支持全局性设置)
-    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, (is_skin_exist ? 16384 : 16777215)); //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-    rMainWndData.specify_each_item_color = ini.GetBool(_T("config"), _T("specify_each_item_color"), false);
-    //载入用于主窗口的内置显示项文本标签设置(当前版本情况：只支持全局性设置)
-    rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"),L"up_string",              CCommon::LoadText(IDS_UPLOAD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_DOWN)             = ini.GetString(  L"config", L"down_string",            CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": $")));
+    COLORREF default_color = is_skin_exist ? 16384 : 16777215;
+    //载入用于主窗口的内置显示项数值颜色设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
+    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, default_color);
+    rMainWndData.specify_each_item_color            = ini.GetBool(_T("config"), _T("specify_each_item_color"), false);
+    //载入用于主窗口的内置显示项标签设置(当前版本情况：只支持全局性设置)
+    rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"),L"up_string",              CCommon::LoadText(IDS_UPLOAD_DISP,      _T(": $")));
+    rMainWndData.disp_str.Get(TDI_DOWN)             = ini.GetString(  L"config", L"down_string",            CCommon::LoadText(IDS_DOWNLOAD_DISP,    _T(": $")));
     rMainWndData.disp_str.Get(TDI_TOTAL_SPEED)      = ini.GetString(  L"config", L"total_speed_string",   _T("↑↓: $"));
     rMainWndData.disp_str.Get(TDI_CPU)              = ini.GetString(  L"config", L"cpu_string",             L"CPU: $");
-    rMainWndData.disp_str.Get(TDI_CPU_FREQ)         = ini.GetString(  L"config", L"cpu_freq_string",        CCommon::LoadText(IDS_CPU_FREQ, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_MEMORY)           = ini.GetString(  L"config", L"memory_string",          CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_GPU_USAGE)        = ini.GetString(  L"config", L"gpu_string",             CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_CPU_FREQ)         = ini.GetString(  L"config", L"cpu_freq_string",        CCommon::LoadText(IDS_CPU_FREQ,         _T(": $")));
+    rMainWndData.disp_str.Get(TDI_MEMORY)           = ini.GetString(  L"config", L"memory_string",          CCommon::LoadText(IDS_MEMORY_DISP,      _T(": $")));
+    rMainWndData.disp_str.Get(TDI_GPU_USAGE)        = ini.GetString(  L"config", L"gpu_string",             CCommon::LoadText(IDS_GPU_DISP,         _T(": $")));
     rMainWndData.disp_str.Get(TDI_CPU_TEMP)         = ini.GetString(  L"config", L"cpu_temp_string",        L"CPU: $");
-    rMainWndData.disp_str.Get(TDI_GPU_TEMP)         = ini.GetString(  L"config", L"gpu_temp_string",        CCommon::LoadText(IDS_GPU_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_HDD_TEMP)         = ini.GetString(  L"config", L"hdd_temp_string",        CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP)  = ini.GetString(  L"config", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": $")));
-    rMainWndData.disp_str.Get(TDI_HDD_USAGE)        = ini.GetString(  L"config", L"hdd_string",             CCommon::LoadText(IDS_HDD_DISP, _T(": $")));
+    rMainWndData.disp_str.Get(TDI_GPU_TEMP)         = ini.GetString(  L"config", L"gpu_temp_string",        CCommon::LoadText(IDS_GPU_DISP,         _T(": $")));
+    rMainWndData.disp_str.Get(TDI_HDD_TEMP)         = ini.GetString(  L"config", L"hdd_temp_string",        CCommon::LoadText(IDS_HDD_DISP,         _T(": $")));
+    rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP)  = ini.GetString(  L"config", L"main_board_temp_string", CCommon::LoadText(IDS_MAINBOARD_DISP,   _T(": $")));
+    rMainWndData.disp_str.Get(TDI_HDD_USAGE)        = ini.GetString(  L"config", L"hdd_string",             CCommon::LoadText(IDS_HDD_DISP,         _T(": $")));
+
+    //新增功能代码
+    //载入用于主窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
+    ini.LoadLayoutItemAttributes(_T("config"), _T("up_string"),                 rM_LayoutItems[TDI_UP],                 CCommon::LoadText(IDS_UPLOAD_DISP,      _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("down_string"),               rM_LayoutItems[TDI_DOWN],               CCommon::LoadText(IDS_DOWNLOAD_DISP,    _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("total_speed_string"),        rM_LayoutItems[TDI_TOTAL_SPEED],        _T("↑↓: $"),                                        default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("cpu_string"),                rM_LayoutItems[TDI_CPU],                L"CPU: $",                                          default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("cpu_freq_string"),           rM_LayoutItems[TDI_CPU_FREQ],           CCommon::LoadText(IDS_CPU_FREQ,         _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("memory_string"),             rM_LayoutItems[TDI_MEMORY],             CCommon::LoadText(IDS_MEMORY_DISP,      _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("gpu_string"),                rM_LayoutItems[TDI_GPU_USAGE],          CCommon::LoadText(IDS_GPU_DISP,         _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("cpu_temp_string"),           rM_LayoutItems[TDI_CPU_TEMP],           L"CPU: $",                                          default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("gpu_temp_string"),           rM_LayoutItems[TDI_GPU_TEMP],           CCommon::LoadText(IDS_GPU_DISP,         _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("hdd_temp_string"),           rM_LayoutItems[TDI_HDD_TEMP],           CCommon::LoadText(IDS_HDD_DISP,         _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("main_board_temp_string"),    rM_LayoutItems[TDI_MAIN_BOARD_TEMP],    CCommon::LoadText(IDS_MAINBOARD_DISP,   _T(": $")), default_color);
+    ini.LoadLayoutItemAttributes(_T("config"), _T("hdd_string"),                rM_LayoutItems[TDI_HDD_USAGE],          CCommon::LoadText(IDS_HDD_DISP,         _T(": $")), default_color);
+
     //载入其它设置
     rMainWndData.swap_up_down                   = ini.GetBool(_T("config"), _T("swap_up_down"),         false);
     rMainWndData.speed_short_mode               = ini.GetBool(_T("config"), _T("speed_short_mode"),     false);
@@ -331,6 +351,8 @@ void CTrafficMonitorApp::SaveConfig()
     MainWndSettingData& rMainWndData    = m_main_wnd_data;
     TaskBarSettingData& rTaskbarData    = m_taskbar_data;
     AppSettingData&     rAppData        = m_cfg_data;
+
+    std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = rMainWndData.M_LayoutItems;
 
     //常规设置
     ini.WriteBool    (_T("general"), _T("check_update_when_start"),     rGeneralData.check_update_when_start);

@@ -263,6 +263,74 @@ void CIniHelper::LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyN
     }
 }
 
+//新增功能代码
+void CIniHelper::LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item, const wchar_t* default_str, COLORREF default_color)
+{
+    //每项的所有属性保存格式为： 标签，标签颜色，数值颜色
+    wstring str = _GetString(AppName, KeyName, default_str);   //get at least 1 lable
+    std::vector<wstring>    ColorsStr_SplitResult;
+    CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
+    size_t ColorsStr_num = ColorsStr_SplitResult.size();
+    if (0 == ColorsStr_num)
+    {
+        //something wrong in _GetString()
+        return;
+    }
+    layout_item.LableValueStr.label = ColorsStr_SplitResult[0].c_str();     //保存标签
+    size_t index = 1;
+    for (; index < LAYOUT_ITEM_ATTRIBUTE_NUM; index++)
+    {
+        const wchar_t* color_str = nullptr;
+        if (index < ColorsStr_num)
+        {
+            if (index == 1)             //保存标签颜色
+            {
+                color_str = ColorsStr_SplitResult[index].c_str();
+                //support Decimal data or Hex data from saved data
+                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
+                    layout_item.label_color = wcstol(color_str, nullptr, 16);
+                else
+                    layout_item.label_color = _wtoi(color_str);
+            }
+            else if (index == 2)        //保存数值颜色
+            {
+                color_str = ColorsStr_SplitResult[index].c_str();
+                //support Decimal data or Hex data from saved data
+                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
+                    layout_item.value_color = wcstol(color_str, nullptr, 16);
+                else
+                    layout_item.value_color = _wtoi(color_str);
+            }
+            else;
+        }
+        else
+        {
+            if (index == 1)             //没找到标签颜色
+            {
+                layout_item.label_color = default_color;
+                index++;
+            }
+            if (index == 2)             //没找到数值颜色
+            {
+                layout_item.value_color = default_color;
+                index++;
+            }
+            else;
+        }
+    }
+}
+
+void CIniHelper::SaveLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item)
+{
+    CString str;
+
+        CString tmp;
+        tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.LableValueStr.label, layout_item.label_color, layout_item.value_color);      //saved as Hex data
+        str += tmp;
+
+    _WriteString(AppName, KeyName, wstring(str));
+}
+
 void CIniHelper::SaveMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, COLORREF>& text_colors)
 {
     CString str;
