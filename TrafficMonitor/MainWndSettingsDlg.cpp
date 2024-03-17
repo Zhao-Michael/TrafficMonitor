@@ -34,7 +34,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
 {
     MainWndSettingData& rMainWndData = m_data;
     //CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
-    if (rMainWndData.text_colors.empty())
+    if (rMainWndData.M_ValueColors.empty())
         return;
     if (rMainWndData.specify_each_item_color)
     {
@@ -46,7 +46,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
 #endif
         m_color_static.SetColorNum(color_num);
         int index{};
-        for (const auto& item : rMainWndData.text_colors)
+        for (const auto& item : rMainWndData.M_ValueColors)
         {
             m_color_static.SetFillColor(index, item.second);
             index++;
@@ -55,7 +55,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
     }
     else
     {
-        m_color_static.SetFillColor(rMainWndData.text_colors.begin()->second);
+        m_color_static.SetFillColor(rMainWndData.M_ValueColors.begin()->second);
     }
 }
 
@@ -434,19 +434,19 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         MainWndSettingData& rMainWndData = m_data;
         if (rMainWndData.specify_each_item_color)
         {
-            CMainWndColorDlg colorDlg(rMainWndData.text_colors);
+            CMainWndColorDlg colorDlg(rMainWndData.M_ValueColors);
             if (colorDlg.DoModal() == IDOK)
             {
-                rMainWndData.text_colors = colorDlg.GetColors();
+                rMainWndData.M_ValueColors = colorDlg.GetColors();
                 DrawStaticColor();
             }
         }
-        else if (!rMainWndData.text_colors.empty())
+        else if (!rMainWndData.M_ValueColors.empty())
         {
-            CMFCColorDialogEx colorDlg(rMainWndData.text_colors.begin()->second, 0, this);
+            CMFCColorDialogEx colorDlg(rMainWndData.M_ValueColors.begin()->second, 0, this);
             if (colorDlg.DoModal() == IDOK)
             {
-                rMainWndData.text_colors.begin()->second = colorDlg.GetColor();
+                rMainWndData.M_ValueColors.begin()->second = colorDlg.GetColor();
                 DrawStaticColor();
             }
         }

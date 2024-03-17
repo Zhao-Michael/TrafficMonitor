@@ -86,40 +86,39 @@ protected:
         }
     };
 
+    vector<wstring>     m_skins;                //储存皮肤文件的路径                 //皮肤预览窗口也包含一个，因此显示皮肤预览时各不冲突。
+    int                 m_skin_selected{};      //选择的皮肤序号
+    CSkinFile           m_skin;                 //保存皮肤配置文件中的配置
+    CFont               m_font;                 //字体
+
     //CRect m_screen_rect;                      //屏幕的范围（不包含任务栏）
     vector<CRect>       m_screen_rects;         //所有屏幕的范围（不包含任务栏）
     vector<CRect>       m_last_screen_rects;    //上一次所有屏幕的范围（不包含任务栏）
     CSize               m_screen_size;          //屏幕的大小（包含任务栏）
-    CSkinFile           m_skin;
     CommonDisplayItem   m_clicked_item;         //鼠标点击的项目
 
-    CFont m_font;           //字体
-
-    int m_restart_cnt{ -1 };    //重新初始化次数
-    unsigned int m_timer_cnt{};     //定时器触发次数（自程序启动以来的秒数）
-    unsigned int m_taskbar_timer_cnt{0}; //适用于TaskBarDlg的定时器触发次数（自程序启动以来的秒数）
-    unsigned int m_monitor_time_cnt{};
-    int m_zero_speed_cnt{}; //如果检测不到网速，该变量就会自加
-    int m_insert_to_taskbar_cnt{};  //用来统计尝试嵌入任务栏的次数
-    int m_cannot_insert_to_task_bar_warning{ true };   //指示是否会在无法嵌入任务栏时弹出提示框
+    int                 m_restart_cnt{ -1 };                            //重新初始化次数
+    unsigned int        m_timer_cnt{};                                  //定时器触发次数（自程序启动以来的秒数）
+    unsigned int        m_taskbar_timer_cnt{0};                         //适用于TaskBarDlg的定时器触发次数（自程序启动以来的秒数）
+    unsigned int        m_monitor_time_cnt{};
+    int                 m_zero_speed_cnt{};                             //如果检测不到网速，该变量就会自加
+    int                 m_insert_to_taskbar_cnt{};                      //用来统计尝试嵌入任务栏的次数
+    int                 m_cannot_insert_to_task_bar_warning{ true };    //指示是否会在无法嵌入任务栏时弹出提示框
 
     static unsigned int m_WM_TASKBARCREATED;    //任务栏重启消息
 
-    vector<wstring> m_skins;    //储存皮肤文件的路径
-    int m_skin_selected{};      //选择的皮肤序号
+    SYSTEMTIME                          m_start_time;                                           //程序启动时的时间
+    CHistoryTrafficFile                 m_history_traffic{ theApp.m_history_traffic_path };     //储存历史流量
 
-    SYSTEMTIME m_start_time;    //程序启动时的时间
-    CHistoryTrafficFile m_history_traffic{ theApp.m_history_traffic_path }; //储存历史流量
+    CToolTipCtrl                        m_tool_tips;
 
-    CToolTipCtrl m_tool_tips;
+    bool                                m_connection_change_flag{ false };                      //如果执行过IniConnection()函数，该flag会置为true
+    bool                                m_is_foreground_fullscreen{ false };                    //指示前台窗口是否正在全局显示
+    bool                                m_menu_popuped{ false };                                //指示当前是否有菜单处于弹出状态
 
-    bool m_connection_change_flag{ false };     //如果执行过IniConnection()函数，该flag会置为true
-    bool m_is_foreground_fullscreen{ false };   //指示前台窗口是否正在全局显示
-    bool m_menu_popuped{ false };               //指示当前是否有菜单处于弹出状态
+    HDC                                 m_desktop_dc;
 
-    HDC m_desktop_dc;
-
-    string m_connection_name_preferd{ theApp.m_cfg_data.m_connection_name };          //保存用户手动选择的网络连接名称
+    string                              m_connection_name_preferd{ theApp.m_cfg_data.m_connection_name };   //保存用户手动选择的网络连接名称
 
     //CHighResolutionTimer m_timer;           // 采用多媒体定时器(也防止了界面阻塞出现的卡顿现象)
     CCriticalSection m_critical;

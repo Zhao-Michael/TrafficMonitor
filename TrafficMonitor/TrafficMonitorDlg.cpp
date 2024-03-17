@@ -828,6 +828,8 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     if (!CCommon::FileExist(skin_cfg_path.c_str()))
         skin_cfg_path = theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.ini";
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
+
+    //接下来是比在皮肤预览窗口切换皮肤预览后，额外要做的事情。
     if (m_skin.GetLayoutManager().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
         theApp.m_main_wnd_data.swap_up_down = false;
 }
@@ -909,7 +911,7 @@ void CTrafficMonitorDlg::TaskbarShowHideItem(EBuiltinDisplayItem type)
 void CTrafficMonitorDlg::CheckClickedItem(CPoint point)
 {
     const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
-    for (const auto& layout_item : skin_layout.layout_items)
+    for (const auto& layout_item : skin_layout.M_LayoutItems)
     {
         CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, m_skin.GetLayoutManager().text_height));
         if (rect.PtInRect(point))
@@ -2382,18 +2384,24 @@ void CTrafficMonitorDlg::OnChangeSkin()
     skinDlg.m_pFont = &m_font;
     if (skinDlg.DoModal() == IDOK)
     {
-        m_skin_selected                     = skinDlg.m_skin_selected;
-        theApp.m_main_wnd_data.m_skin_name   = m_skins[m_skin_selected];
+        MainWndSettingData& rMainWndData    = theApp.m_main_wnd_data;
+
+        m_skin_selected             = skinDlg.m_skin_selected;
+        rMainWndData.m_skin_name    = m_skins[m_skin_selected];             //切换皮肤后主窗口保存新选择的皮肤序号
         //获取皮肤布局
-        LoadSkinLayout();
+        LoadSkinLayout();                                                   //加载新选择的皮肤
         //载入背景图片
         LoadBackGroundImage();
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+        //      切换皮肤后需要做些改变：
+        ////////////////////////////////////////////////////////////////////////////////////////
         //获取皮肤的文字颜色
-        theApp.m_main_wnd_data.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
+        rMainWndData.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
         size_t i{};
         for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
-            theApp.m_main_wnd_data.text_colors[item] = skinDlg.GetSkinData().GetSkinInfo().TextColor(i);
+            rMainWndData.M_ValueColors[item] = skinDlg.GetSkinData().GetSkinInfo().TextColor(i);
             i++;
         }
         //SetTextColor();
@@ -2402,20 +2410,20 @@ void CTrafficMonitorDlg::OnChangeSkin()
         {
             if (!skinDlg.GetSkinData().GetSkinInfo().font_info.name.IsEmpty())
             {
-                theApp.m_main_wnd_data.font.name = skinDlg.GetSkinData().GetSkinInfo().font_info.name;
-                theApp.m_main_wnd_data.font.bold = skinDlg.GetSkinData().GetSkinInfo().font_info.bold;
-                theApp.m_main_wnd_data.font.italic = skinDlg.GetSkinData().GetSkinInfo().font_info.italic;
-                theApp.m_main_wnd_data.font.underline = skinDlg.GetSkinData().GetSkinInfo().font_info.underline;
-                theApp.m_main_wnd_data.font.strike_out = skinDlg.GetSkinData().GetSkinInfo().font_info.strike_out;
+                rMainWndData.font.name          = skinDlg.GetSkinData().GetSkinInfo().font_info.name;
+                rMainWndData.font.bold          = skinDlg.GetSkinData().GetSkinInfo().font_info.bold;
+                rMainWndData.font.italic        = skinDlg.GetSkinData().GetSkinInfo().font_info.italic;
+                rMainWndData.font.underline     = skinDlg.GetSkinData().GetSkinInfo().font_info.underline;
+                rMainWndData.font.strike_out    = skinDlg.GetSkinData().GetSkinInfo().font_info.strike_out;
             }
             if (skinDlg.GetSkinData().GetSkinInfo().font_info.size >= MIN_FONT_SIZE && skinDlg.GetSkinData().GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
-                theApp.m_main_wnd_data.font.size = skinDlg.GetSkinData().GetSkinInfo().font_info.size;
+                rMainWndData.font.size = skinDlg.GetSkinData().GetSkinInfo().font_info.size;
             SetTextFont();
         }
-        //获取项目的显示文本
+        //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
         if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
         {
-            theApp.m_main_wnd_data.disp_str = skinDlg.GetSkinData().GetSkinInfo().display_text;
+            rMainWndData.disp_str = skinDlg.GetSkinData().GetSkinInfo().display_text;
         }
         SetItemPosition();
         Invalidate(FALSE);      //更换皮肤后立即刷新窗口信息

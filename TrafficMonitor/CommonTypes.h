@@ -82,7 +82,7 @@ struct DrawStr
 //当前版本先支持3个(标签、标签颜色、数值颜色)
 #define LAYOUT_ITEM_ATTRIBUTE_NUM 3
 
-//皮肤中每个显示项的布局信息。重新加载当前皮肤或切换皮肤时存放新数据，否则不改变数据。
+//皮肤中每个显示项的布局信息。
 struct LayoutItem
 {
     wstring                 id;                     //唯一标识

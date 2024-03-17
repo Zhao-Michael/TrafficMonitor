@@ -130,9 +130,9 @@ struct PublicSettingData
 struct MainWndSettingData : public PublicSettingData
 {
     //新增功能代码
-    std::map<CommonDisplayItem, LayoutItem>   M_LayoutItems{};                          //存放所有项目的属性配置
+    std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems{};                          //存放所有项目的属性配置
 
-    std::map<CommonDisplayItem, COLORREF> text_colors{};    //方字的颜色                 //以后要像任务栏一样，可以设置标签颜色。
+    std::map<CommonDisplayItem, COLORREF>       M_ValueColors{};    //方字的颜色                 //以后要像任务栏一样，可以设置标签颜色。
 
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
     bool swap_up_down           { false };      //交换上传和下载显示的位置

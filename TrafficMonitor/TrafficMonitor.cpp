@@ -136,7 +136,7 @@ void CTrafficMonitorApp::LoadConfig()
     bool is_skin_exist = (!skin_files.empty());
     COLORREF default_color = is_skin_exist ? 16384 : 16777215;
     //载入用于主窗口的内置显示项数值颜色设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.text_colors, default_color);
+    ini.LoadMainWndColors(_T("config"), _T("text_color"), rMainWndData.M_ValueColors, default_color);
     rMainWndData.specify_each_item_color            = ini.GetBool(_T("config"), _T("specify_each_item_color"), false);
     //载入用于主窗口的内置显示项标签设置(当前版本情况：只支持全局性设置)
     rMainWndData.disp_str.Get(TDI_UP)               = ini.GetString(_T("config"),L"up_string",              CCommon::LoadText(IDS_UPLOAD_DISP,      _T(": $")));
@@ -377,7 +377,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool           (L"config",     L"show_task_bar_wnd",               rAppData.m_show_task_bar_wnd);
     ini.WriteInt            (L"config",     L"position_x",                      rMainWndData.m_position_x);
     ini.WriteInt            (L"config",     L"position_y",                      rMainWndData.m_position_y);
-    ini.SaveMainWndColors   (L"config",     L"text_color",                      rMainWndData.text_colors);
+    ini.SaveMainWndColors   (L"config",     L"text_color",                      rMainWndData.M_ValueColors);
     ini.WriteBool         (_T("config"),  _T("specify_each_item_color"),        rMainWndData.specify_each_item_color);
     ini.WriteInt            (L"config",     L"hide_main_window",                rAppData.m_hide_main_window);
     ini.WriteString       (_T("config"),  _T("skin_selected"),                  rMainWndData.m_skin_name.c_str());

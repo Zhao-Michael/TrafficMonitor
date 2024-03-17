@@ -32,13 +32,14 @@ public:
     //皮肤布局
     struct Layout
     {
-        int                     width{}, height{};                  //宽度、高度
+        int                                         width{}, height{};          //宽度、高度
 
-        std::map<CommonDisplayItem, LayoutItem> layout_items;       //每一项的布局信息
+        //保存皮肤配置文件中单个Layout配置的每一项的布局信息，不包含没有配置的项。   //切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
+        std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems;
         LayoutItem GetItem(CommonDisplayItem display_item) const
         {
-            auto iter = layout_items.find(display_item);
-            if (iter != layout_items.end())
+            auto iter = M_LayoutItems.find(display_item);
+            if (iter != M_LayoutItems.end())
                 return iter->second;
             return LayoutItem();
         }
@@ -92,7 +93,7 @@ private:
 
     CSkinFile::Layout GetLayoutFromXmlNode(tinyxml2::XMLElement* ele);
 
-    static void DrawSkinText(CDrawCommon drawer, DrawStr draw_str, CRect rect, COLORREF color, Alignment align);
+    static void DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF color, Alignment align);
 
 private:
     SkinInfo        m_skin_info;
