@@ -45,7 +45,7 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
             string layout_item_cfg_name = CTinyXml2Helper::ElementName(ele_layout_item);
             for (auto builtin_item : gS_AllBuiltinDisplayItems)
             {
-                if (layout_item_cfg_name == CSkinFile::GetDisplayItemXmlNodeName(builtin_item))
+                if (layout_item_cfg_name == CCommon::GetDisplayItemXmlNodeName(builtin_item))
                 {
                     //如果是内置的"UP"等，就找到了。
                     //插件item不能map到内置的"UP"等，否则当内置项处理了。
@@ -179,7 +179,7 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                         wstring item_text = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(display_text_item), true);
                                         for (auto display_item : gS_AllBuiltinDisplayItems)
                                         {
-                                            if (item_name == CSkinFile::GetDisplayItemXmlNodeName(display_item))
+                                            if (item_name == CCommon::GetDisplayItemXmlNodeName(display_item))
                                             {
                                                 m_skin_info.display_text.Get(display_item) = item_text;
                                                 break;
@@ -633,48 +633,3 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     }
 }
 
-string CSkinFile::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
-{
-    switch (display_item)
-    {
-    case TDI_UP:
-        return "up";
-        break;
-    case TDI_DOWN:
-        return "down";
-        break;
-    case TDI_TOTAL_SPEED:
-        return "total_speed";
-        break;
-    case TDI_CPU:
-        return "cpu";
-        break;
-    case TDI_MEMORY:
-        return "memory";
-        break;
-    case TDI_GPU_USAGE:
-        return "gpu";
-        break;
-    case TDI_CPU_TEMP:
-        return "cpu_temperature";
-        break;
-    case TDI_GPU_TEMP:
-        return "gpu_temperature";
-        break;
-    case TDI_HDD_TEMP:
-        return "hdd_temperature";
-        break;
-    case TDI_MAIN_BOARD_TEMP:
-        return "main_board_temperature";
-        break;
-    case TDI_HDD_USAGE:
-        return "hdd";
-        break;
-    case TDI_CPU_FREQ:
-        return "cpu_freq";
-        break;
-    default:
-        return string();
-        break;
-    }
-}

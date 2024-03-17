@@ -190,6 +190,8 @@ public:
     //获取Appdata/Local/TrafficMonitor的目录，如果不存在，则会自动创建
     static wstring GetAppDataConfigDir();
 
+    static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
+
     //在指定位置绘制文本
     static void DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color);
 

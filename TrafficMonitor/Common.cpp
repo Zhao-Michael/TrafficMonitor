@@ -544,6 +544,52 @@ wstring CCommon::GetAppDataConfigDir()
     return app_data_path;
 }
 
+string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
+{
+    switch (display_item)
+    {
+    case TDI_UP:
+        return "up";
+        break;
+    case TDI_DOWN:
+        return "down";
+        break;
+    case TDI_TOTAL_SPEED:
+        return "total_speed";
+        break;
+    case TDI_CPU:
+        return "cpu";
+        break;
+    case TDI_MEMORY:
+        return "memory";
+        break;
+    case TDI_GPU_USAGE:
+        return "gpu";
+        break;
+    case TDI_CPU_TEMP:
+        return "cpu_temperature";
+        break;
+    case TDI_GPU_TEMP:
+        return "gpu_temperature";
+        break;
+    case TDI_HDD_TEMP:
+        return "hdd_temperature";
+        break;
+    case TDI_MAIN_BOARD_TEMP:
+        return "main_board_temperature";
+        break;
+    case TDI_HDD_USAGE:
+        return "hdd";
+        break;
+    case TDI_CPU_FREQ:
+        return "cpu_freq";
+        break;
+    default:
+        return string();
+        break;
+    }
+}
+
 void CCommon::DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color)
 {
     pDC->SetTextColor(color);

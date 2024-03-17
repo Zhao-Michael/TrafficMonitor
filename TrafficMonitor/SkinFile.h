@@ -74,7 +74,6 @@ public:
     const LayoutManager&    GetLayoutManager()  const { return m_layout_manager;    }
     const PreviewInfo&      GetPreviewInfo()    const { return m_preview_info;      }
 
-    static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
     //从文件载入皮肤信息
     void LoadCfgAndBGImage(const wstring& file_path);
 
