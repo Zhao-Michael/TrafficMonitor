@@ -590,6 +590,36 @@ string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
     }
 }
 
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+//此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
+void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color)
+{
+    std::vector<wstring>    ColorsStr_SplitResult;
+    CCommon::StringSplit(str_text_color, L',', ColorsStr_SplitResult);
+    size_t ColorsStr_num = ColorsStr_SplitResult.size();
+    if (0 == ColorsStr_num)
+    {
+        return;
+    }
+
+    size_t index = 0;
+    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++, index++)
+    {
+        const wchar_t* color_str = nullptr;
+        if (index < ColorsStr_num)
+            color_str = ColorsStr_SplitResult[index].c_str();
+        else
+            color_str = ColorsStr_SplitResult[0].c_str();
+
+        //support Decimal data or Hex data from saved data
+        if (wcslen(color_str) >=3  && '0' == color_str[0] && 'x' == color_str[1])
+            M_LayoutItems[*iter].ValueColor = wcstol(color_str, nullptr, 16);
+        else
+            M_LayoutItems[*iter].ValueColor = _wtoi(color_str);
+    }
+}
+#endif
+
 void CCommon::DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color)
 {
     pDC->SetTextColor(color);

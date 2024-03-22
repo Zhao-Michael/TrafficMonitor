@@ -46,6 +46,15 @@ void CIniHelper::SetSaveAsUTF8(bool utf8)
     m_save_as_utf8 = utf8;
 }
 
+void CIniHelper::RemoveSpecialChar(wstring& rtn)
+{
+    //如果读取的字符串前后有指定的字符，则删除它
+    if (!rtn.empty() && (rtn.front() == L'$' || rtn.front() == DEF_CH))
+        rtn = rtn.substr(1);
+    if (!rtn.empty() && (rtn.back() == L'$' || rtn.back() == DEF_CH))
+        rtn.pop_back();
+}
+
 void CIniHelper::WriteString(const wchar_t * AppName, const wchar_t * KeyName, const wstring& str)
 {
     wstring write_str{ str };
@@ -60,6 +69,7 @@ void CIniHelper::WriteString(const wchar_t * AppName, const wchar_t * KeyName, c
 wstring CIniHelper::GetString(const wchar_t * AppName, const wchar_t * KeyName, const wchar_t* default_str) const
 {
     wstring rtn{_GetString(AppName, KeyName, default_str)};
+//    return RemoveSpecialChar(rtn);
     //如果读取的字符串前后有指定的字符，则删除它
     if (!rtn.empty() && (rtn.front() == L'$' || rtn.front() == DEF_CH))
         rtn = rtn.substr(1);
@@ -232,18 +242,151 @@ void CIniHelper::LoadFontData(const wchar_t * AppName, FontInfo & font, const Fo
     font.strike_out = style[3];
 }
 
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
+                            EBuiltinDisplayItem item_type, IPluginItem* iplugin_item, const wchar_t* default_str, COLORREF default_color)
+{
+    LayoutItem* pLayoutItem = nullptr;
+    if (nullptr == iplugin_item)
+    {
+        pLayoutItem         = &M_layout_items[item_type];
+        pLayoutItem->id     = CCommon::StrToUnicode(CCommon::GetDisplayItemXmlNodeName(item_type).c_str());
+    }
+    else
+    {
+        pLayoutItem         = &M_layout_items[iplugin_item];
+        pLayoutItem->id     = iplugin_item->GetItemId();
+    }
+
+    wchar_t* AppName = nullptr;
+    if (LIAO_MAINWND == eOwner)
+        AppName = _T("config");
+    else if (LIAO_TASKBAR == eOwner)
+        AppName = _T("task_bar");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
+        AppName = _T("taskbar_default_style_1");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)
+        AppName = _T("taskbar_default_style_2");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_3 == eOwner)
+        AppName = _T("taskbar_default_style_3");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_4 == eOwner)
+        AppName = _T("taskbar_default_style_4");
+    else
+        return;
+
+    //每项的所有属性保存格式为： 标签，标签颜色，数值颜色
+    wstring str = _GetString(AppName, KeyName, default_str);    //如果找不到AppName.KeyName =，则说明这项LayoutItem从来没自定义过，会返回default_str。
+                                                                //如果找到了AppName.KeyName =，但后面都是空字符串，则返回空字符串。但这是人为修改引起的错误(因为软件写入时后面至少还有颜色数据)，我们兼容这种情况。
+    std::vector<wstring>    ColorsStr_SplitResult;
+    CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
+    size_t ColorsStr_num = ColorsStr_SplitResult.size();
+    if (0 == ColorsStr_num)                                     //找到了AppName.KeyName =，但后面都是空字符串。我们兼容这种情况。
+    {
+        //标签值留空，颜色值使用default_color。
+        pLayoutItem->LabelColor = default_color;
+        pLayoutItem->ValueColor = default_color;
+        return;
+    }
+    //去除引号后保存标签
+    RemoveSpecialChar(ColorsStr_SplitResult[0]);
+    pLayoutItem->LabelValueStr.label = ColorsStr_SplitResult[0].c_str();     //保存标签
+
+    size_t index = 1;
+    for (; index < LAYOUT_ITEM_ATTRIBUTE_NUM; index++)
+    {
+        const wchar_t* color_str = nullptr;
+        if (index < ColorsStr_num)
+        {
+            if (index == 1)             //保存标签颜色
+            {
+                color_str = ColorsStr_SplitResult[index].c_str();
+                //support Decimal data or Hex data from saved data
+                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
+                    pLayoutItem->LabelColor = wcstol(color_str, nullptr, 16);
+                else
+                    pLayoutItem->LabelColor = _wtoi(color_str);
+            }
+            else if (index == 2)        //保存数值颜色
+            {
+                color_str = ColorsStr_SplitResult[index].c_str();
+                //support Decimal data or Hex data from saved data
+                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
+                    pLayoutItem->ValueColor = wcstol(color_str, nullptr, 16);
+                else
+                    pLayoutItem->ValueColor = _wtoi(color_str);
+            }
+            else;
+        }
+        else
+        {
+            if (index == 1)             //没找到标签颜色
+            {
+                pLayoutItem->LabelColor = default_color;
+                index++;
+            }
+            if (index == 2)             //没找到数值颜色
+            {
+                pLayoutItem->ValueColor = default_color;
+                index++;
+            }
+        }
+    }
+}
+
+void CIniHelper::SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, LayoutItem& layout_item)
+{
+    CString str;
+
+    CString tmp;
+    tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.LabelValueStr.label, layout_item.LabelColor, layout_item.ValueColor);      //saved as Hex data
+    str += tmp;
+
+    wchar_t* AppName = nullptr;
+    if (LIAO_MAINWND == eOwner)
+        AppName = _T("config");
+    else if (LIAO_TASKBAR == eOwner)
+        AppName = _T("task_bar");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
+        AppName = _T("taskbar_default_style_1");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)
+        AppName = _T("taskbar_default_style_2");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_3 == eOwner)
+        AppName = _T("taskbar_default_style_3");
+    else if (LIAO_TASKBAR_DEFAULT_STYLE_4 == eOwner)
+        AppName = _T("taskbar_default_style_4");
+    else
+        return;
+
+    _WriteString(AppName, KeyName, wstring(str));
+}
+
+void CIniHelper::LoadPluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
+{
+    for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
+    {
+        LoadLayoutItemAttributes(eOwner, plugin->GetItemId(), M_layout_items, TDI_UP, plugin, plugin->GetItemLableText(), 0xffffff);
+    }
+}
+
+void CIniHelper::SavePluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
+{
+    for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
+    {
+        SaveLayoutItemAttributes(eOwner, plugin->GetItemId(), M_layout_items[plugin]);
+    }
+}
+#else
 void CIniHelper::LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, COLORREF>& text_colors, COLORREF default_color)
 {
     CString ColorStr_default;
     ColorStr_default.Format(_T("%d"), default_color);
 
-    wstring str = _GetString(AppName, KeyName, ColorStr_default);   //get at least 1 color
+    wstring str = _GetString(AppName, KeyName, ColorStr_default);
     std::vector<wstring>    ColorsStr_SplitResult;
     CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
     size_t ColorsStr_num = ColorsStr_SplitResult.size();
     if (0 == ColorsStr_num)
     {
-        //something wrong in _GetString()
         return;
     }
     size_t index = 0;
@@ -263,74 +406,6 @@ void CIniHelper::LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyN
     }
 }
 
-//新增功能代码
-void CIniHelper::LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item, const wchar_t* default_str, COLORREF default_color)
-{
-    //每项的所有属性保存格式为： 标签，标签颜色，数值颜色
-    wstring str = _GetString(AppName, KeyName, default_str);   //get at least 1 lable
-    std::vector<wstring>    ColorsStr_SplitResult;
-    CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
-    size_t ColorsStr_num = ColorsStr_SplitResult.size();
-    if (0 == ColorsStr_num)
-    {
-        //something wrong in _GetString()
-        return;
-    }
-    layout_item.LableValueStr.label = ColorsStr_SplitResult[0].c_str();     //保存标签
-    size_t index = 1;
-    for (; index < LAYOUT_ITEM_ATTRIBUTE_NUM; index++)
-    {
-        const wchar_t* color_str = nullptr;
-        if (index < ColorsStr_num)
-        {
-            if (index == 1)             //保存标签颜色
-            {
-                color_str = ColorsStr_SplitResult[index].c_str();
-                //support Decimal data or Hex data from saved data
-                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-                    layout_item.label_color = wcstol(color_str, nullptr, 16);
-                else
-                    layout_item.label_color = _wtoi(color_str);
-            }
-            else if (index == 2)        //保存数值颜色
-            {
-                color_str = ColorsStr_SplitResult[index].c_str();
-                //support Decimal data or Hex data from saved data
-                if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-                    layout_item.value_color = wcstol(color_str, nullptr, 16);
-                else
-                    layout_item.value_color = _wtoi(color_str);
-            }
-            else;
-        }
-        else
-        {
-            if (index == 1)             //没找到标签颜色
-            {
-                layout_item.label_color = default_color;
-                index++;
-            }
-            if (index == 2)             //没找到数值颜色
-            {
-                layout_item.value_color = default_color;
-                index++;
-            }
-            else;
-        }
-    }
-}
-
-void CIniHelper::SaveLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item)
-{
-    CString str;
-
-        CString tmp;
-        tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.LableValueStr.label, layout_item.label_color, layout_item.value_color);      //saved as Hex data
-        str += tmp;
-
-    _WriteString(AppName, KeyName, wstring(str));
-}
-
 void CIniHelper::SaveMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, COLORREF>& text_colors)
 {
     CString str;
@@ -348,13 +423,12 @@ void CIniHelper::LoadTaskbarWndColors(const wchar_t * AppName, const wchar_t * K
     CString ColorStr_default;
     ColorStr_default.Format(_T("%d"), default_color);
 
-    wstring str = _GetString(AppName, KeyName, ColorStr_default);   //get at least 1 color
+    wstring str = _GetString(AppName, KeyName, ColorStr_default);
     std::vector<wstring> ColorsStr_SplitResult;
     CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
     size_t ColorsStr_num = ColorsStr_SplitResult.size();
     if (0 == ColorsStr_num)
     {
-        //something wrong in _GetString()
         return;
     }
     size_t index = 0;
@@ -404,7 +478,7 @@ void CIniHelper::SaveTaskbarWndColors(const wchar_t * AppName, const wchar_t * K
 
 void CIniHelper::LoadPluginDisplayStr(bool is_main_window)
 {
-    DispStrings&    disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
+    DispStrings& disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
     std::wstring    app_name{ is_main_window ? L"plugin_display_str_main_window" : L"plugin_display_str_taskbar_window" };
     for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
     {
@@ -421,6 +495,7 @@ void CIniHelper::SavePluginDisplayStr(bool is_main_window)
         WriteString(app_name.c_str(), plugin->GetItemId(), disp_str.Get(plugin));
     }
 }
+#endif
 
 void CIniHelper::_WriteString(const wchar_t * AppName, const wchar_t * KeyName, const wstring & str)
 {
@@ -507,6 +582,9 @@ wstring CIniHelper::_GetString(const wchar_t * AppName, const wchar_t * KeyName,
         {
             str_pos++;
         }
+        ////////////////////////////////////////////////////////////////////////////
+        //  注意：如果等号后面是空的或者全是空格，则返回空字符串，而不是返回默认字符串。
+        ////////////////////////////////////////////////////////////////////////////
         size_t str_end_pos;
         str_end_pos = m_ini_str.find(L"\n", str_pos);
         //获取文本

@@ -28,8 +28,25 @@ CTaskBarSettingsDlg::~CTaskBarSettingsDlg()
 
 bool CTaskBarSettingsDlg::IsStyleModified()
 {
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+    bool modified{false};
+    for (auto iter = m_data.M_LayoutItems.begin(); iter != m_data.M_LayoutItems.end(); ++iter)
+    {
+        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].LabelColor != iter->second.LabelColor)
+        {
+            modified = true;
+            break;
+        }
+        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].ValueColor != iter->second.ValueColor)
+        {
+            modified = true;
+            break;
+        }
+    }
+#else
     bool modified{};
     modified |= (theApp.m_taskbar_data.text_colors != m_data.text_colors);
+#endif
     modified |= (theApp.m_taskbar_data.back_color != m_data.back_color);
     modified |= (theApp.m_taskbar_data.transparent_color != m_data.transparent_color);
     modified |= (theApp.m_taskbar_data.status_bar_color != m_data.status_bar_color);
@@ -51,17 +68,17 @@ void CTaskBarSettingsDlg::DrawStaticColor()
 #endif
         int i{};
         m_text_color_static.SetColorNum(color_num);
-        for (const auto& item : m_data.text_colors)
+        for (const auto& item : m_data.M_LayoutItems)
         {
-            m_text_color_static.SetFillColor(i, item.second.label);
-            m_text_color_static.SetFillColor(i + 1, item.second.value);
+            m_text_color_static.SetFillColor(i, item.second.LabelColor);
+            m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
             i += 2;
         }
         m_text_color_static.Invalidate();
     }
-    else if (!m_data.text_colors.empty())
+    else if (!m_data.M_LayoutItems.empty())
     {
-        m_text_color_static.SetFillColor(m_data.text_colors.begin()->second.label);
+        m_text_color_static.SetFillColor(m_data.M_LayoutItems.begin()->second.LabelColor);
     }
     m_back_color_static.SetFillColor(m_data.back_color);
     //m_trans_color_static.SetFillColor(m_data.transparent_color);
@@ -507,21 +524,21 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         //设置文本颜色
         if (m_data.specify_each_item_color)
         {
-            CTaskbarColorDlg colorDlg(m_data.text_colors);
+            CTaskbarColorDlg colorDlg(m_data.M_LayoutItems);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.text_colors = colorDlg.GetColors();
+                m_data.M_LayoutItems = colorDlg.GetLayoutItems();
                 DrawStaticColor();
                 m_style_modified = true;
             }
         }
-        else if (!m_data.text_colors.empty())
+        else if (!m_data.M_LayoutItems.empty())
         {
-            CMFCColorDialogEx colorDlg(m_data.text_colors.begin()->second.label, 0, this);
+            CMFCColorDialogEx colorDlg(m_data.M_LayoutItems.begin()->second.LabelColor, 0, this);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.text_colors.begin()->second.label = colorDlg.GetColor();
-                if (m_data.back_color == m_data.text_colors.begin()->second.label)
+                m_data.M_LayoutItems.begin()->second.LabelColor = colorDlg.GetColor();
+                if (m_data.back_color == m_data.M_LayoutItems.begin()->second.LabelColor)
                     MessageBox(CCommon::LoadText(IDS_SAME_TEXT_BACK_COLOR_WARNING), NULL, MB_ICONWARNING);
                 DrawStaticColor();
                 m_style_modified = true;
@@ -537,7 +554,7 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         {
             bool background_transparent = m_data.IsTaskbarTransparent();
             m_data.back_color = colorDlg.GetColor();
-            if (m_data.back_color == m_data.text_colors.begin()->second.label)
+            if (m_data.back_color == m_data.M_LayoutItems.begin()->second.LabelColor)
                 MessageBox(CCommon::LoadText(IDS_SAME_BACK_TEXT_COLOR_WARNING), NULL, MB_ICONWARNING);
             if (background_transparent)
             {
@@ -723,7 +740,7 @@ void CTaskBarSettingsDlg::OnBnClickedAutoSetBackColorCheck()
 void CTaskBarSettingsDlg::OnBnClickedDisplayTextSettingButton()
 {
     // TODO: 在此添加控件通知处理程序代码
-    CDisplayTextSettingDlg dlg(m_data.disp_str);
+    CDisplayTextSettingDlg dlg(m_data.M_LayoutItems);
     dlg.DoModal();
 }
 

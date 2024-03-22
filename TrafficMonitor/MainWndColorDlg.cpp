@@ -12,8 +12,8 @@
 
 IMPLEMENT_DYNAMIC(CMainWndColorDlg, CBaseDialog)
 
-CMainWndColorDlg::CMainWndColorDlg(const std::map<CommonDisplayItem, COLORREF>& colors, CWnd* pParent /*=NULL*/)
-	: CBaseDialog(IDD_MAIN_COLOR_DIALOG, pParent), m_colors(colors)
+CMainWndColorDlg::CMainWndColorDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent /*=NULL*/)
+	: CBaseDialog(IDD_MAIN_COLOR_DIALOG, pParent), m_layout_items(layoutItems)
 {
 }
 
@@ -54,7 +54,6 @@ BOOL CMainWndColorDlg::OnInitDialog()
     m_list_ctrl.GetClientRect(rect);
     m_list_ctrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_LABELTIP);
 
-    //新增功能代码
     UCHAR   num = 5;
     int width0 =  rect.Width() / (num--);
     int width1 = (rect.Width() - width0 - theApp.DPI(20) - 1) / (num--);
@@ -68,22 +67,55 @@ BOOL CMainWndColorDlg::OnInitDialog()
     m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE), LVCFMT_LEFT, width4);
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
-//    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_ITEM), LVCFMT_LEFT, width0);		//插入第0列
-//    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_COLOR), LVCFMT_LEFT, width1);		//插入第1列
-//    m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
-
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+/*
     //向列表中插入行
     for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); ++iter)
     {
+        LayoutItem&     layout_item = m_layout_item[*iter];
+        wstring         item_id     = layout_item.id;
+
         CString item_name = iter->GetItemName();
+        int index = m_list_ctrl.GetItemCount();
+        m_list_ctrl.InsertItem(index, item_id.c_str());     //参数类型为CString
+        m_list_ctrl.SetItemText(index, 1, item_name);
+        m_list_ctrl.SetItemText(index, 2, layout_item.LabelValueStr.label);
+        m_list_ctrl.SetItemColor(index, 3, layout_item.label_color);
+        m_list_ctrl.SetItemColor(index, 4, layout_item.value_color);
+        m_list_ctrl.SetItemData(index, (DWORD_PTR)&(*iter));
+    }
+*/
+    //向列表中插入行
+    for (auto iter = m_layout_items.begin(); iter != m_layout_items.end(); ++iter)
+    {
+        LayoutItem& layout_item = iter->second;
+        wstring         item_id = layout_item.id;
+
+        CString item_name = iter->first.GetItemName();
+        int index = m_list_ctrl.GetItemCount();
+        m_list_ctrl.InsertItem(index, item_id.c_str());                 //参数类型为CString
+        m_list_ctrl.SetItemText(index, 1, item_name);
+        m_list_ctrl.SetItemText(index, 2, layout_item.LabelValueStr.label);
+        m_list_ctrl.SetItemColor(index, 3, layout_item.LabelColor);
+        m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
+        m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));    //传递iter->second也行，就是取的时候是LayoutItem类型了。
+    }
+//    m_list_ctrl.SetEditColMethod(CListCtrlEx::EC_SPECIFIED);        //设置列表可编辑
+//    m_list_ctrl.SetEditableCol({ 2 });                              //设置可编辑的列
+#else
+    //向列表中插入行
+    for (auto iter = m_display_texts.GetAllItems().begin(); iter != m_display_texts.GetAllItems().end(); ++iter)
+    {
+        CString item_name = iter->first.GetItemName();
         if (!item_name.IsEmpty())
         {
             int index = m_list_ctrl.GetItemCount();
             m_list_ctrl.InsertItem(index, item_name);
-            m_list_ctrl.SetItemColor(index, 4, m_colors[*iter]);
-            m_list_ctrl.SetItemData(index, (DWORD_PTR)&(*iter));
+            m_list_ctrl.SetItemText(index, 1, iter->second.c_str());
+            m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));
         }
     }
+#endif
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
@@ -94,14 +126,21 @@ void CMainWndColorDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
     int index = pNMItemActivate->iItem;
-    COLORREF color = m_list_ctrl.GetItemColor(index, 1);
-    CMFCColorDialogEx colorDlg(color, 0, this);
-    if (colorDlg.DoModal() == IDOK)
+    int col = pNMItemActivate->iSubItem;
+    if (col == 3 || col == 4)
     {
-        color = colorDlg.GetColor();
-        m_list_ctrl.SetItemColor(index, 1, color);
-        CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
-        m_colors[*item] = color;
+        COLORREF color = m_list_ctrl.GetItemColor(index, col);
+        CMFCColorDialogEx colorDlg(color, 0, this);
+        if (colorDlg.DoModal() == IDOK)
+        {
+            color = colorDlg.GetColor();
+            m_list_ctrl.SetItemColor(index, col, color);
+            CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
+            if (col == 3)
+                m_layout_items[*item].LabelColor = color;
+            else
+                m_layout_items[*item].ValueColor = color;
+        }
     }
 
     *pResult = 0;

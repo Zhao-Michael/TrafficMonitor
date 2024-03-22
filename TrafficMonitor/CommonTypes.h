@@ -2,6 +2,8 @@
 #pragma once
 #include "stdafx.h"
 
+#define	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+
 struct Date
 {
     int year{};
@@ -68,6 +70,16 @@ enum class Alignment
     SIDE        //两端对齐
 };
 
+enum ELayoutItemAttributesOwner
+{
+    LIAO_MAINWND,
+    LIAO_TASKBAR,
+    LIAO_TASKBAR_DEFAULT_STYLE_1,
+    LIAO_TASKBAR_DEFAULT_STYLE_2,
+    LIAO_TASKBAR_DEFAULT_STYLE_3,
+    LIAO_TASKBAR_DEFAULT_STYLE_4
+};
+
 struct DrawStr
 {
     CString label;
@@ -85,23 +97,25 @@ struct DrawStr
 //皮肤中每个显示项的布局信息。
 struct LayoutItem
 {
+    //全局唯一。//插件dll也应该保证在添加与删除插件项后，剩余各项的id依然保持不变，即使在软件重启后也不变。但是，某些插件没有做到这点。
     wstring                 id;                     //唯一标识
 //  wstring                 name;                   //用于显示而已，id才是唯一标识。内置项的name已经固定，调用函数随时可以获得，不用保存。插件项的name从插件项接口随时可以获得，不用保存。
     ////////////////////////////////////////////////////////////////////////////////////////
     //      只能从皮肤配置文件中定义，GUI无法配置。
     ////////////////////////////////////////////////////////////////////////////////////////
     int                     x{}, y{}, width{};              //X位置、Y位置、宽度                
-    int                     height{};                       //目前只能从Layout.height复制。
+//  int                     height{};                       //目前只能从Layout.height复制。
     Alignment               align{ Alignment::LEFT };       //对齐方式
     bool                    show { false };                 //是否显示
-    //全局唯一。//插件dll也应该保证在添加与删除插件项后，剩余各项的id依然保持不变，即使在软件重启后也不变。但是，某些插件没有做到这点。
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     ////////////////////////////////////////////////////////////////////////////////////////
     //      皮肤配置文件和GUI都可以配置
     ////////////////////////////////////////////////////////////////////////////////////////
     //标签、标签颜色、数值颜色
-    DrawStr                 LableValueStr;                  //存放项目的标签和数值      //皮肤配置文件和GUI都可以配置标签，但数值是实时变化的，两者都无法配置。这里把这两项存放一起。
-    COLORREF                label_color{};
-    COLORREF                value_color{};
+    DrawStr                 LabelValueStr;                  //存放项目的标签和数值      //皮肤配置文件和GUI都可以配置标签，但数值是实时变化的，两者都无法配置。这里把这两项存放一起。
+    COLORREF                LabelColor{};
+    COLORREF                ValueColor{};
+/*
     //显示项数值的所有属性设置
     bool                    B_HideNetUnit;                          //隐藏网络单位(对于速度来说，是MB/s、KB/s)(对于统计来说，是GB、MB、KB)
     bool                    B_HidePercent;                          //隐藏百分号
@@ -110,7 +124,8 @@ struct LayoutItem
     bool                    speed_short_mode{ false };              //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
     SpeedUnit               speed_unit;                             //网速的单位
     bool                    unit_byte{ true };                      //使用字节(B)而不是比特(b)为单位                        //以后某天要取消对bit的支持，因此到时将删除此项。
-
+*/
+#endif
 };
 
 //历史流量统计列表视图中显示模式
@@ -155,18 +170,18 @@ enum class ColorMode
 //所有内置显示项目
 enum EBuiltinDisplayItem
 {
-    TDI_UP = 1 << 0,
-    TDI_DOWN = 1 << 1,
-    TDI_CPU = 1 << 2,
-    TDI_MEMORY = 1 << 3,
-    TDI_GPU_USAGE = 1 << 4,
-    TDI_CPU_TEMP = 1 << 5,
-    TDI_GPU_TEMP = 1 << 6,
-    TDI_HDD_TEMP = 1 << 7,
+    TDI_UP              = 1 << 0,
+    TDI_DOWN            = 1 << 1,
+    TDI_CPU             = 1 << 2,
+    TDI_MEMORY          = 1 << 3,
+    TDI_GPU_USAGE       = 1 << 4,
+    TDI_CPU_TEMP        = 1 << 5,
+    TDI_GPU_TEMP        = 1 << 6,
+    TDI_HDD_TEMP        = 1 << 7,
     TDI_MAIN_BOARD_TEMP = 1 << 8,
-    TDI_HDD_USAGE = 1 << 9,
-    TDI_TOTAL_SPEED = 1 << 10,
-    TDI_CPU_FREQ = 1 << 11
+    TDI_HDD_USAGE       = 1 << 9,
+    TDI_TOTAL_SPEED     = 1 << 10,
+    TDI_CPU_FREQ        = 1 << 11
 };
 
 //所有内置显示项目的集合
@@ -174,7 +189,9 @@ const std::set<EBuiltinDisplayItem> gS_AllBuiltinDisplayItems
 {
     TDI_UP, TDI_DOWN, TDI_CPU, TDI_MEMORY
 #ifndef WITHOUT_TEMPERATURE
-    , TDI_GPU_USAGE, TDI_CPU_TEMP, TDI_GPU_TEMP, TDI_HDD_TEMP, TDI_MAIN_BOARD_TEMP, TDI_HDD_USAGE,TDI_CPU_FREQ
+    , TDI_GPU_USAGE
+    , TDI_CPU_TEMP, TDI_GPU_TEMP, TDI_HDD_TEMP, TDI_MAIN_BOARD_TEMP
+    , TDI_HDD_USAGE,TDI_CPU_FREQ
 #endif
     , TDI_TOTAL_SPEED
 };

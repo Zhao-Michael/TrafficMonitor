@@ -10,10 +10,9 @@
 
 IMPLEMENT_DYNAMIC(CDisplayTextSettingDlg, CBaseDialog)
 
-CDisplayTextSettingDlg::CDisplayTextSettingDlg(DispStrings& display_texts, bool main_window_text, CWnd* pParent /*=nullptr*/)
-	: CBaseDialog(IDD_DISPLAY_TEXT_SETTINGS_DIALOG, pParent), m_display_texts(display_texts), m_main_window_text(main_window_text)
+CDisplayTextSettingDlg::CDisplayTextSettingDlg(std::map<CommonDisplayItem, LayoutItem>& layout_items, bool main_window_text, CWnd* pParent /*=nullptr*/)
+	: CBaseDialog(IDD_DISPLAY_TEXT_SETTINGS_DIALOG, pParent), m_layout_items(layout_items), m_main_window_text(main_window_text)
 {
-
 }
 
 CDisplayTextSettingDlg::~CDisplayTextSettingDlg()
@@ -59,14 +58,14 @@ BOOL CDisplayTextSettingDlg::OnInitDialog()
     m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_VALUE), LVCFMT_LEFT, width1);		//插入第1列
 
     //向列表中插入行
-    for (auto iter = m_display_texts.GetAllItems().begin(); iter != m_display_texts.GetAllItems().end(); ++iter)
+    for (auto iter = m_layout_items.begin(); iter != m_layout_items.end(); ++iter)
     {
         CString item_name = iter->first.GetItemName();
         if (!item_name.IsEmpty())
         {
             int index = m_list_ctrl.GetItemCount();
             m_list_ctrl.InsertItem(index, item_name);
-            m_list_ctrl.SetItemText(index, 1, iter->second.c_str());
+            m_list_ctrl.SetItemText(index, 1, iter->second.LabelValueStr.label);
             m_list_ctrl.SetItemData(index, (DWORD_PTR)&(iter->first));
         }
     }
@@ -92,13 +91,11 @@ void CDisplayTextSettingDlg::OnOK()
     for (int i{}; i < item_count; i++)
     {
         CommonDisplayItem display_item = GetDisplayItem(i);
-        m_display_texts.Get(display_item) = m_list_ctrl.GetItemText(i, 1).GetString();
+        m_layout_items[display_item].LabelValueStr.label = m_list_ctrl.GetItemText(i, 1).GetString();
     }
 
     CBaseDialog::OnOK();
 }
-
-
 
 void CDisplayTextSettingDlg::OnBnClickedRestoreDefaultButton()
 {

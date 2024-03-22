@@ -53,8 +53,29 @@ void CSkinDlg::ShowPreview()
     //显示皮肤作者
     SetDlgItemText(IDC_SKIN_INFO, CCommon::LoadText(IDS_SKIN_AUTHOUR, m_skin_data.GetSkinInfo().skin_author.c_str()));
     //设置提示信息
-    bool cover_font_setting{ !m_skin_data.GetSkinInfo().font_info.name.IsEmpty() || (m_skin_data.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin_data.GetSkinInfo().font_info.size <= MAX_FONT_SIZE) };
+    bool cover_font_setting{ !m_skin_data.GetSkinInfo().font_info.name.IsEmpty()
+                        || (m_skin_data.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin_data.GetSkinInfo().font_info.size <= MAX_FONT_SIZE) };
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+    bool cover_str_setting = false;
+    for (auto iter = m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.end(); ++iter)
+    {
+        if (!iter->second.LabelValueStr.label.IsEmpty())
+        {
+            cover_str_setting = true;
+            break;
+        }
+    }
+    for (auto iter = m_skin_data.GetLayoutManager().layout_s.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_s.M_LayoutItems.end(); ++iter)
+    {
+        if (!iter->second.LabelValueStr.label.IsEmpty())
+        {
+            cover_str_setting = true;
+            break;
+        }
+    }
+#else
     bool cover_str_setting{ !m_skin_data.GetSkinInfo().display_text.IsInvalid() };
+#endif
     cover_font_setting = cover_font_setting && theApp.m_general_data.allow_skin_cover_font;
     cover_str_setting = cover_str_setting && theApp.m_general_data.allow_skin_cover_text;
     if (cover_font_setting && cover_str_setting)

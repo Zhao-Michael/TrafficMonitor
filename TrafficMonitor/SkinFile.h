@@ -14,8 +14,10 @@ public:
     {
         wstring                 skin_author;                //皮肤的作者
         FontInfo                font_info;                  //字体信息
-        DispStrings             display_text;               //每一项的显示文本
         bool                    specify_each_item_color{};  //是否指定每个项目的颜色
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+#else
+        DispStrings             display_text;               //每一项的显示文本
         std::vector<COLORREF>   text_color;                 //文本颜色
 
         COLORREF TextColor(size_t i) const
@@ -27,15 +29,23 @@ public:
             else
                 return 0;
         }
+#endif
     };
 
     //皮肤布局
     struct Layout
     {
-        int                                         width{}, height{};          //宽度、高度
+        int                     width{}, height{};                              //整个Layout的宽度与高度
+
+        //////////////////////////////////////////////////////////////
+        //      以后将支持下面这几项
+        //////////////////////////////////////////////////////////////
+//      FontInfo                font_info;                                      //字体信息
+//      int     text_height{};                                                  //皮肤文本的高度，即每个显示项的数值显示高度。
+//      bool    no_label{};                                                     //是否不显示标签
 
         //保存皮肤配置文件中单个Layout配置的每一项的布局信息，不包含没有配置的项。   //切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
-        std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems;
+        std::map<CommonDisplayItem, LayoutItem>             M_LayoutItems{};
         LayoutItem GetItem(CommonDisplayItem display_item) const
         {
             auto iter = M_LayoutItems.find(display_item);
@@ -48,7 +58,7 @@ public:
     //皮肤布局信息
     struct LayoutManager
     {
-        int     text_height{};      //皮肤文本的高度
+        int     text_height{};      //皮肤文本的高度，即每个显示项的数值显示高度。
         bool    no_label{};         //是否不显示标签
         Layout  layout_l;           //“显示更多信息”时的布局
         Layout  layout_s;           //不“显示更多信息”时的布局
@@ -87,12 +97,11 @@ private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
     void LoadFromIni(const wstring& file_path);     //从ini文件读取皮肤数据（用于兼容旧版皮肤）
 
-    //新增功能代码
-    void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item);
+//  void InitLayoutItemAttributes(LayoutItem&   layout_item);
+    void LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele);
+    void LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele);
 
-    CSkinFile::Layout GetLayoutFromXmlNode(tinyxml2::XMLElement* ele);
-
-    static void DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF color, Alignment align);
+    static void DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF label_color, COLORREF value_color, Alignment align);
 
 private:
     SkinInfo        m_skin_info;

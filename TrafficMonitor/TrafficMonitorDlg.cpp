@@ -1665,11 +1665,11 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                     log_str += std::to_wstring(theApp.m_taskbar_data.transparent_color).c_str();
                     log_str += _T("\n");
                     log_str += _T("taskbar_text_colors: ");
-                    for (const auto& item : theApp.m_taskbar_data.text_colors)
+                    for (const auto& item : theApp.m_taskbar_data.M_LayoutItems)
                     {
-                        log_str += std::to_wstring(item.second.label).c_str();
+                        log_str += std::to_wstring(item.second.LabelColor).c_str();
                         log_str += _T('|');
-                        log_str += std::to_wstring(item.second.value).c_str();
+                        log_str += std::to_wstring(item.second.ValueColor).c_str();
                         log_str += _T(", ");
                     }
                     log_str += _T("\n");
@@ -1723,7 +1723,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
         //当检测到背景色和文字颜色都为黑色写入错误日志
         static bool erro_log_write{ false };
-        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.text_colors.empty() && theApp.m_taskbar_data.text_colors.begin()->second.label == 0)
+        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.M_LayoutItems.empty() && theApp.m_taskbar_data.M_LayoutItems.begin()->second.LabelColor == 0)
         {
             if (!erro_log_write)
             {
@@ -2395,21 +2395,49 @@ void CTrafficMonitorDlg::OnChangeSkin()
 
         ////////////////////////////////////////////////////////////////////////////////////////
         //      切换皮肤后需要做些改变：
+        //      (1)切换到皮肤配置文件中设置的颜色
+        //      (2)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
+        //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
         ////////////////////////////////////////////////////////////////////////////////////////
-        //获取皮肤的文字颜色
+        //丢弃当前GUI配置的数值颜色，切换到皮肤自带的数值颜色。
         rMainWndData.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
         size_t i{};
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+        CSkinFile::Layout LayoutInUse = {};
+        if (rMainWndData.m_show_more_info)
+            LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_l;
+        else
+            LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_s;
+        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+        {
+            /////////////////////////////////////////////////////////////////////////////////////
+            //      注意：函数GetSkinData()和GetSkinInfo()都返回了const属性，
+            //           所以不能用引用来接收，编译器报错。使用赋值后，就没有const属性了。
+            /////////////////////////////////////////////////////////////////////////////////////
+
+            //更换数值颜色
+            rMainWndData.M_LayoutItems[item].ValueColor = LayoutInUse.M_LayoutItems[item].ValueColor;
+            //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
+            if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
+            {
+                //更换标签
+                rMainWndData.M_LayoutItems[item].LabelValueStr.label = LayoutInUse.M_LayoutItems[item].LabelValueStr.label;
+            }
+        }
+#else
         for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
             rMainWndData.M_ValueColors[item] = skinDlg.GetSkinData().GetSkinInfo().TextColor(i);
             i++;
         }
+#endif
         //SetTextColor();
         //获取皮肤的字体
         if (theApp.m_general_data.allow_skin_cover_font)
         {
             if (!skinDlg.GetSkinData().GetSkinInfo().font_info.name.IsEmpty())
             {
+                //更换字体
                 rMainWndData.font.name          = skinDlg.GetSkinData().GetSkinInfo().font_info.name;
                 rMainWndData.font.bold          = skinDlg.GetSkinData().GetSkinInfo().font_info.bold;
                 rMainWndData.font.italic        = skinDlg.GetSkinData().GetSkinInfo().font_info.italic;
@@ -2420,18 +2448,20 @@ void CTrafficMonitorDlg::OnChangeSkin()
                 rMainWndData.font.size = skinDlg.GetSkinData().GetSkinInfo().font_info.size;
             SetTextFont();
         }
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+
+#else
         //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
         if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
         {
             rMainWndData.disp_str = skinDlg.GetSkinData().GetSkinInfo().display_text;
         }
+#endif
         SetItemPosition();
         Invalidate(FALSE);      //更换皮肤后立即刷新窗口信息
         theApp.SaveConfig();
     }
 }
-
-
 
 void CTrafficMonitorDlg::OnTrafficHistory()
 {

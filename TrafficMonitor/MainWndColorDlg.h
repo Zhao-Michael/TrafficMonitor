@@ -11,17 +11,17 @@ class CMainWndColorDlg : public CBaseDialog
 	DECLARE_DYNAMIC(CMainWndColorDlg)
 
 public:
-	CMainWndColorDlg(const std::map<CommonDisplayItem, COLORREF>& colors, CWnd* pParent = NULL);   // 标准构造函数
+	CMainWndColorDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CMainWndColorDlg();
 
-    const std::map<CommonDisplayItem, COLORREF>& GetColors() const { return m_colors; }
+    const std::map<CommonDisplayItem, LayoutItem>& GetLayoutItems() const { return m_layout_items; }
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MAIN_COLOR_DIALOG };
 #endif
 protected:
-    std::map<CommonDisplayItem, COLORREF> m_colors;
+    std::map<CommonDisplayItem, LayoutItem> m_layout_items;
     CColorSettingListCtrl m_list_ctrl;
 
     virtual CString GetDialogName() const override;

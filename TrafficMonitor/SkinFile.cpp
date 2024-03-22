@@ -16,28 +16,26 @@ CSkinFile::~CSkinFile()
 {
 }
 
+/*
 void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 {
-
 }
+*/
 
-static LayoutItem GetLayoutItemFromXmlNode(tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
-    LayoutItem   layout_item;
     layout_item.x               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
     layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
-    layout_item.LableValueStr.label.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
-    layout_item.label_color     =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
-    layout_item.value_color     =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
-    return layout_item;
+//    layout_item.LabelValueStr.label.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
+//    layout_item.LabelColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
+//    layout_item.ValueColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
 }
 
-CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele)
 {
-    CSkinFile::Layout layout;
     layout.width    = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout.height   = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
@@ -49,8 +47,8 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
                 {
                     //如果是内置的"UP"等，就找到了。
                     //插件item不能map到内置的"UP"等，否则当内置项处理了。
-                    layout.M_LayoutItems[builtin_item]              = GetLayoutItemFromXmlNode(ele_layout_item);
-                    layout.M_LayoutItems[builtin_item].height       = layout.height;
+                    LoadLayoutItemFromXmlNode(layout.M_LayoutItems[builtin_item], ele_layout_item);
+//                  layout.M_LayoutItems[builtin_item].height       = layout.height;
                     layout.M_LayoutItems[builtin_item].id           = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
                     break;
                 }
@@ -62,32 +60,95 @@ CSkinFile::Layout CSkinFile::GetLayoutFromXmlNode(tinyxml2::XMLElement* ele)
                 {
                     if (plugin_id == iplugin_item->GetItemId())
                     {
-                        layout.M_LayoutItems[iplugin_item]          = GetLayoutItemFromXmlNode(ele_layout_item);
-                        layout.M_LayoutItems[iplugin_item].height   = layout.height;
+                        LoadLayoutItemFromXmlNode(layout.M_LayoutItems[iplugin_item], ele_layout_item);
+//                      layout.M_LayoutItems[iplugin_item].height   = layout.height;
                         layout.M_LayoutItems[iplugin_item].id       = plugin_id;
                         break;
                     }
                 }
             }
         });
-    return layout;
 }
 
-void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF color, Alignment align)
+void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF label_color, COLORREF value_color, Alignment align)
 {
-    int text_width = drawer.GetDC()->GetTextExtent(draw_str.GetStr()).cx;
-    //标签和数值两端对齐
-    if (align == Alignment::SIDE && text_width < rect.Width())      //只有文本宽度小于矩形的宽度时才使用两端对齐
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+    int whole_width = drawer.GetDC()->GetTextExtent(draw_str.GetStr()).cx;
+    int label_width = drawer.GetDC()->GetTextExtent(draw_str.label).cx;
+    if (label_width == 0)                   //只画数值
     {
-        //绘制标签
-        drawer.DrawWindowText(rect, draw_str.label, color, Alignment::LEFT);
         //绘制数值
-        drawer.DrawWindowText(rect, draw_str.value, color, Alignment::RIGHT);
+        drawer.DrawWindowText(rect, draw_str.value, value_color, align);
+        return;
     }
-    else
+
+    if (align == Alignment::SIDE)               //标签和数值两端对齐
     {
-        drawer.DrawWindowText(rect, draw_str.GetStr(), color, align);
+        if (whole_width <= rect.Width())      //只有标签和数值总宽度小于矩形的宽度时才使用两端对齐
+        {
+            //绘制标签
+            drawer.DrawWindowText(rect, draw_str.label, label_color, Alignment::LEFT);
+            //绘制数值
+            drawer.DrawWindowText(rect, draw_str.value, value_color, Alignment::RIGHT);
+            return;
+        }
+        else                                //否则以数值为优先，当右对齐处理。
+        {
+            align = Alignment::RIGHT;
+        }
     }
+
+    if (align == Alignment::CENTER)             //标签和数值居中
+    {
+        if (whole_width <= rect.Width())      //只有标签和数值总宽度小于矩形的宽度时才使用居中对齐
+        {
+            //计算标签和数值的rect
+            CRect rect_label, rect_value;
+            rect_label = rect_value = rect;
+            rect_label.left     += (rect.Width() - whole_width) / 2;
+            rect_label.right    = rect_label.left + label_width;
+            rect_value.left     = rect_label.right;
+            rect_value.right    -= (rect.Width() - whole_width) / 2;
+            //画标签
+            drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+            //画数值
+            drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+            return;
+        }
+        else                                //否则以数值为优先，当右对齐处理。
+        {
+            align = Alignment::RIGHT;
+        }
+    }
+
+    if (align == Alignment::LEFT)              //标签和数值左对齐
+    {
+        //计算标签和数值的rect
+        CRect rect_label, rect_value;
+        rect_label = rect_value = rect;
+        rect_label.right = rect_label.left + label_width;
+        rect_value.left = rect_label.right;
+        //画标签
+        drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+        //画数值
+        drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+        
+    }
+    else if(align == Alignment::RIGHT)              //标签和数值右对齐
+    {
+        //计算标签和数值的rect
+        CRect rect_label, rect_value;
+        rect_label = rect_value = rect;
+        rect_value.left = rect_value.right - (whole_width - label_width);
+        rect_label.right = rect_value.left;
+        rect_label.left = rect_label.right - label_width;
+        //画标签
+        drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+        //画数值
+        drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+    }
+    else;
+#endif
 }
 
 void CSkinFile::LoadCfgAndBGImage(const wstring& file_path)
@@ -134,6 +195,46 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                             //文本颜色
                             if (skin_item_name == "text_color")
                             {
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+                                wstring str_text_color = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item));
+/*                                std::vector<wstring> split_result;
+                                CCommon::StringSplit(str_text_color, L',', split_result);
+                                for (const auto& str : split_result)
+                                {
+                                    m_skin_info.text_color.push_back(_wtoi(str.c_str()));
+                                }
+*/
+                                /*
+                                std::vector<wstring>    ColorsStr_SplitResult;
+                                CCommon::StringSplit(str_text_color, L',', ColorsStr_SplitResult);
+                                size_t ColorsStr_num = ColorsStr_SplitResult.size();
+                                if (ColorsStr_num > 0)
+                                {
+                                    size_t index = 0;
+                                    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++, index++)
+                                    {
+                                        const wchar_t* color_str = nullptr;
+                                        if (index < ColorsStr_num)
+                                            color_str = ColorsStr_SplitResult[index].c_str();
+                                        else
+                                            color_str = ColorsStr_SplitResult[0].c_str();
+
+                                        //support Decimal data or Hex data from saved data
+                                        if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
+                                        {
+                                            m_layout_manager.layout_l.M_LayoutItems[*iter].ValueColor = wcstol(color_str, nullptr, 16);
+                                            m_layout_manager.layout_s.M_LayoutItems[*iter].ValueColor = wcstol(color_str, nullptr, 16);
+                                        }
+                                        else
+                                        {
+                                            m_layout_manager.layout_l.M_LayoutItems[*iter].ValueColor = _wtoi(color_str);
+                                            m_layout_manager.layout_s.M_LayoutItems[*iter].ValueColor = _wtoi(color_str);
+                                        }
+                                    }
+                                }*/
+                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color);
+                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color);
+#else
                                 string str_text_color = CTinyXml2Helper::ElementText(skin_item);
                                 std::vector<string> split_result;
                                 CCommon::StringSplit(str_text_color, L',', split_result);
@@ -141,14 +242,14 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 {
                                     m_skin_info.text_color.push_back(atoi(str.c_str()));
                                 }
-                            }
-
-                            if (m_skin_info.text_color.size() < theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size())
-                            {
-                                COLORREF default_color{};
-                                if (!m_skin_info.text_color.empty())
-                                    default_color = m_skin_info.text_color.front();
-                                m_skin_info.text_color.resize(theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size(), default_color);
+                                if (m_skin_info.text_color.size() < theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size())
+                                {
+                                    COLORREF default_color{};
+                                    if (!m_skin_info.text_color.empty())
+                                        default_color = m_skin_info.text_color.front();
+                                    m_skin_info.text_color.resize(theApp.m_plugin_manager.AllDisplayItemsWithPlugins().size(), default_color);
+                                }
+#endif
                             }
                             //指定每个项目的颜色
                             else if (skin_item_name == "specify_each_item_color")
@@ -177,15 +278,22 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                     {
                                         string item_name = CTinyXml2Helper::ElementName(display_text_item);
                                         wstring item_text = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(display_text_item), true);
-                                        for (auto display_item : gS_AllBuiltinDisplayItems)
+                                        for (auto display_item : gS_AllBuiltinDisplayItems)     //只支持内置项标签，暂时不修改，因为以后标签将作为各监控项的属性来设置。
                                         {
                                             if (item_name == CCommon::GetDisplayItemXmlNodeName(display_item))
                                             {
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+                                                /////////目前只针对皮肤范围配置，所以都复制。
+                                                m_layout_manager.layout_l.M_LayoutItems[display_item].LabelValueStr.label = item_text.c_str();
+                                                m_layout_manager.layout_s.M_LayoutItems[display_item].LabelValueStr.label = item_text.c_str();
+#else
                                                 m_skin_info.display_text.Get(display_item) = item_text;
+#endif
                                                 break;
                                             }
                                         }
-                                    });
+                                    }
+                                                                );
                             }
                         });
                 }
@@ -198,9 +306,9 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                         {
                             string str_layout = CTinyXml2Helper::ElementName(ele_layout);
                             if (str_layout == "layout_l")
-                                m_layout_manager.layout_l = GetLayoutFromXmlNode(ele_layout);
+                                LoadLayoutFromXmlNode(m_layout_manager.layout_l, ele_layout);
                             else if (str_layout == "layout_s")
-                                m_layout_manager.layout_s = GetLayoutFromXmlNode(ele_layout);
+                                LoadLayoutFromXmlNode(m_layout_manager.layout_s, ele_layout);
                         });
                 }
                 //预览图
@@ -249,26 +357,40 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     //获取皮肤信息
     CIniHelper ini(file_path);
     //获取皮肤作者
-    m_skin_info.skin_author                     = ini.GetString(_T("skin"),   _T("skin_author"),    _T("unknow"));
-    //获取当前皮肤的文字颜色
-    std::map<CommonDisplayItem, COLORREF> text_colors{};
-    ini.LoadMainWndColors(_T("skin"), _T("text_color"), text_colors, 0);
-    for (const auto& item : text_colors)
-    {
-        m_skin_info.text_color.push_back(item.second);
-    }
+    m_skin_info.skin_author             = ini.GetString(_T("skin"),   _T("skin_author"),    _T("unknow"));
     m_skin_info.specify_each_item_color = ini.GetBool(_T("skin"), _T("specify_each_item_color"), false);
     //获取当前皮肤的字体
     FontInfo default_font{};
     ini.LoadFontData(L"skin", m_skin_info.font_info, default_font);
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+    //获取当前皮肤的文字颜色
+    wstring str_text_color                                  = ini.GetString(_T("skin"), _T("text_color"), _T(""));
+    CCommon::LoadValueColorsFromColorStr(rLayout_L.M_LayoutItems, str_text_color);
+    CCommon::LoadValueColorsFromColorStr(rLayout_S.M_LayoutItems, str_text_color);
+    //获取显示文本
+    rLayout_L.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"), NONE_STR).c_str();
+    rLayout_L.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"), NONE_STR).c_str();
+    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"), NONE_STR).c_str();
+    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"), NONE_STR).c_str();
+    /////////目前只针对皮肤范围配置，所以复制一份。
+    rLayout_S.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"), NONE_STR).c_str();
+    rLayout_S.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"), NONE_STR).c_str();
+    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"), NONE_STR).c_str();
+    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"), NONE_STR).c_str();
+#else
+    //获取当前皮肤的文字颜色
+    std::map<CommonDisplayItem, COLORREF> value_colors{};
+    ini.LoadMainWndColors(_T("skin"), _T("text_color"), value_colors, 0);
+    for (const auto& item : value_colors)
+    {
+        m_skin_info.text_color.push_back(item.second);
+    }
     //获取显示文本
     m_skin_info.display_text.Get(TDI_UP)        = ini.GetString(_T("skin"),   _T("up_string"),      NONE_STR);
     m_skin_info.display_text.Get(TDI_DOWN)      = ini.GetString(_T("skin"),   _T("down_string"),    NONE_STR);
     m_skin_info.display_text.Get(TDI_CPU)       = ini.GetString(_T("skin"),   _T("cpu_string"),     NONE_STR);
     m_skin_info.display_text.Get(TDI_MEMORY)    = ini.GetString(_T("skin"),   _T("memory_string"),  NONE_STR);
-    //获取预览区大小
-    m_preview_info.width =             theApp.DPI(ini.GetInt(   _T("layout"), _T("preview_width"),  238));
-    m_preview_info.height =            theApp.DPI(ini.GetInt(   _T("layout"), _T("preview_height"), 105));
+#endif
 
     //从ini文件读取皮肤布局，并根据DPI进行缩放
     m_layout_manager.text_height = theApp.DPI(    ini.GetInt(   _T("layout"), _T("text_height"),    20));
@@ -296,8 +418,6 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     rLayout_L.M_LayoutItems[TDI_DOWN].show      =                        ini.GetBool(_T("layout"), _T("show_down_l"), true);
     rLayout_L.M_LayoutItems[TDI_CPU].show       =                        ini.GetBool(_T("layout"), _T("show_cpu_l"), true);
     rLayout_L.M_LayoutItems[TDI_MEMORY].show    =                        ini.GetBool(_T("layout"), _T("show_memory_l"), true);
-    m_preview_info.l_pos.x                      =             theApp.DPI(ini.GetInt (_T("layout"), _T("preview_x_l"), 0));
-    m_preview_info.l_pos.y                      =             theApp.DPI(ini.GetInt (_T("layout"), _T("preview_y_l"), 47));
 
     rLayout_S.width                             =             theApp.DPI(ini.GetInt(_T("layout"), _T("width_s"), 220));
     rLayout_S.height                            =             theApp.DPI(ini.GetInt(_T("layout"), _T("height_s"), 28));
@@ -305,22 +425,28 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     rLayout_S.M_LayoutItems[TDI_UP].y           =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_s"), 4));
     rLayout_S.M_LayoutItems[TDI_UP].width       =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_s"), 108));
     rLayout_S.M_LayoutItems[TDI_UP].align       = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_s"), 0));
+    rLayout_S.M_LayoutItems[TDI_UP].show        =                       ini.GetBool(_T("layout"), _T("show_up_s"), true);
     rLayout_S.M_LayoutItems[TDI_DOWN].x         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_s"), 114));
     rLayout_S.M_LayoutItems[TDI_DOWN].y         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_s"), 4));
     rLayout_S.M_LayoutItems[TDI_DOWN].width     =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_s"), 110));
     rLayout_S.M_LayoutItems[TDI_DOWN].align     = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_s"), 0));
+    rLayout_S.M_LayoutItems[TDI_DOWN].show      =                       ini.GetBool(_T("layout"), _T("show_down_s"), true);
     rLayout_S.M_LayoutItems[TDI_CPU].x          =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_s"), 0));
     rLayout_S.M_LayoutItems[TDI_CPU].y          =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_s"), 0));
     rLayout_S.M_LayoutItems[TDI_CPU].width      =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_s"), 0));
     rLayout_S.M_LayoutItems[TDI_CPU].align      = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_s"), 0));
+    rLayout_S.M_LayoutItems[TDI_CPU].show       =                       ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
     rLayout_S.M_LayoutItems[TDI_MEMORY].x       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_s"), 0));
     rLayout_S.M_LayoutItems[TDI_MEMORY].y       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_s"), 0));
     rLayout_S.M_LayoutItems[TDI_MEMORY].width   =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_s"), 0));
     rLayout_S.M_LayoutItems[TDI_MEMORY].align   = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_UP].show        =                       ini.GetBool(_T("layout"), _T("show_up_s"), true);
-    rLayout_S.M_LayoutItems[TDI_DOWN].show      =                       ini.GetBool(_T("layout"), _T("show_down_s"), true);
-    rLayout_S.M_LayoutItems[TDI_CPU].show       =                       ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
     rLayout_S.M_LayoutItems[TDI_MEMORY].show    =                       ini.GetBool(_T("layout"), _T("show_memory_s"), false);
+
+    //获取预览区配置
+    m_preview_info.width                        =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_width"), 238));
+    m_preview_info.height                       =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_height"), 105));
+    m_preview_info.l_pos.x                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_l"), 0));
+    m_preview_info.l_pos.y                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_l"), 47));
     m_preview_info.s_pos.x                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_s"), 0));
     m_preview_info.s_pos.y                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_s"), 0));
 }
@@ -350,7 +476,8 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     MainWndSettingData&                     rMainWndData    = theApp.m_main_wnd_data;
     CPluginManager&                         rPluginManager  = theApp.m_plugin_manager;
     std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
-    std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
+    std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
+    std::map<CommonDisplayItem, COLORREF>   value_colors{};     //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (1)所有内置项目的显示标签数值
@@ -388,23 +515,61 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             draw_str.value = _T("99");
             break;
         }
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+        if (m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
+            m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label = rMainWndData.M_LayoutItems[*iter].LabelValueStr.label;
+        if (m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
+            m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label = rMainWndData.M_LayoutItems[*iter].LabelValueStr.label;
+        if (!m_layout_manager.no_label)
+        {
+            /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
+            draw_str.label = m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label;
+        }
+#else
         if (m_skin_info.display_text.Get(*iter) == NONE_STR)
             m_skin_info.display_text.Get(*iter) = rMainWndData.disp_str.Get(*iter);
         if (!m_layout_manager.no_label)
             draw_str.label = m_skin_info.display_text.Get(*iter).c_str();
+#endif
         map_builtin_str[*iter] = draw_str;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //              (2)所有项目的显示数值的颜色
+    //              (2)所有显示项目的标签颜色和数值颜色
     ////////////////////////////////////////////////////////////////////////////////////////
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+    if (m_skin_info.specify_each_item_color)
+    {
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
+        {
+            /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
+            label_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].ValueColor;      //目前皮肤配置文件中不能配置标签颜色
+            value_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].ValueColor;
+        }
+    }
+    else        //皮肤配置文件为ini格式的，都走这里，因为都没有设置specify_each_item_color。
+    {
+ //       if (!m_skin_info.text_color.empty())
+        {
+            for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
+            {
+                if (!m_layout_manager.layout_l.M_LayoutItems.empty())
+                {
+                    /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
+                    label_colors[item]  = m_layout_manager.layout_l.M_LayoutItems.begin()->second.ValueColor;
+                    value_colors[item]  = m_layout_manager.layout_l.M_LayoutItems.begin()->second.ValueColor;
+                }
+            }
+        }
+    }
+#else
     if (m_skin_info.specify_each_item_color)
     {
         int i{};
         for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
             if (i < static_cast<int>(m_skin_info.text_color.size()))
-                text_colors[item] = m_skin_info.text_color[i];
+                value_colors[item] = m_skin_info.text_color[i];
             i++;
         }
     }
@@ -413,9 +578,10 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
             if (!m_skin_info.text_color.empty())
-                text_colors[item] = m_skin_info.text_color[0];
+                value_colors[item] = m_skin_info.text_color[0];
         }
     }
+#endif
 
     //绘制预览图文本
     auto drawPreviewText = [&](Layout& layout, const PreviewInfo::Pos& pos)
@@ -424,13 +590,15 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         {
             if (layout.M_LayoutItems[iter->first].show)
             {
+                //矩形区域
                 CPoint point;
                 point.SetPoint(layout.M_LayoutItems[iter->first].x, layout.M_LayoutItems[iter->first].y);
                 point.Offset(pos.x, pos.y);
                 CRect rect(point, CSize(layout.M_LayoutItems[iter->first].width, m_layout_manager.text_height));
-                COLORREF text_color{};
-                text_color = text_colors[iter->first];
-                DrawSkinText(draw, rect, iter->second, text_color, layout.M_LayoutItems[iter->first].align);
+                //标签和数值颜色
+                COLORREF label_color    = label_colors[iter->first];
+                COLORREF text_color     = value_colors[iter->first];
+                DrawSkinText(draw, rect, iter->second, label_color, text_color, layout.M_LayoutItems[iter->first].align);
             }
         }
 
@@ -440,35 +608,32 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             LayoutItem layout_item = layout.GetItem(iplugin_item);
             if (layout_item.show)
             {
-                COLORREF color{};
-                auto iter = text_colors.find(iplugin_item);
-                if (iter != text_colors.end())
-                    color = iter->second;
-                else if (!text_colors.empty())
-                    color = text_colors.begin()->second;
                 //矩形区域
                 CPoint point;
                 point.SetPoint(layout_item.x, layout_item.y);
                 point.Offset(pos.x, pos.y);
                 CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
+                //标签和数值颜色
+                COLORREF label_color    = label_colors[iplugin_item];
+                COLORREF value_color    = value_colors[iplugin_item];
                 if (!iplugin_item->IsCustomDraw())
                 {
                     //绘制文本
                     DrawStr draw_str;
-                    draw_str.label = iplugin_item->GetItemLableText();
+                    draw_str.label = iplugin_item->GetItemLableText();              //这里没有使用皮肤配置文件设置的标签，可能是因为当前的皮肤配置文件中都没有设置插件标签。
                     draw_str.value = iplugin_item->GetItemValueSampleText();
-                    DrawSkinText(draw, rect, draw_str, color, layout_item.align);
+                    DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
                 }
-                else
+                else           //插件项目自绘
                 {
-                    int brightness{ (GetRValue(color) + GetGValue(color) + GetBValue(color)) / 2 };
+                    int brightness{ (GetRValue(value_color) + GetGValue(value_color) + GetBValue(value_color)) / 2 };
                     ITMPlugin* plugin = rPluginManager.GetITMPluginByIPlguinItem(iplugin_item);
                     if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
                     {
-                        plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(color).c_str());
+                        plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(value_color).c_str());
                         plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
                     }
-                    draw.GetDC()->SetTextColor(color);
+                    draw.GetDC()->SetTextColor(value_color);
                     iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), point.x, point.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
                 }
             }
@@ -496,26 +661,45 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
     CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
     std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
-    std::map<CommonDisplayItem, COLORREF>   text_colors{};      //存放所有项目的显示数值的颜色
+    std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
+    std::map<CommonDisplayItem, COLORREF>   value_colors{};     //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (1)获取所有内置项目的显示标签
     ////////////////////////////////////////////////////////////////////////////////////////
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     if (!m_layout_manager.no_label)
     {
-        map_builtin_str[TDI_UP].label               = rMainWndData.disp_str.Get(TDI_UP).c_str();
-        map_builtin_str[TDI_DOWN].label             = rMainWndData.disp_str.Get(TDI_DOWN).c_str();
-        map_builtin_str[TDI_CPU].label              = rMainWndData.disp_str.Get(TDI_CPU).c_str();
-        map_builtin_str[TDI_MEMORY].label           = rMainWndData.disp_str.Get(TDI_MEMORY).c_str();
-        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.disp_str.Get(TDI_GPU_USAGE).c_str();
-        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_CPU_TEMP).c_str();
-        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.disp_str.Get(TDI_GPU_TEMP).c_str();
-        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.disp_str.Get(TDI_HDD_TEMP).c_str();
-        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
-        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.disp_str.Get(TDI_HDD_USAGE).c_str();
-        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.disp_str.Get(TDI_TOTAL_SPEED).c_str();
-        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.disp_str.Get(TDI_CPU_FREQ).c_str();
+        map_builtin_str[TDI_UP].label               = rMainWndData.M_LayoutItems[TDI_UP].LabelValueStr.label;
+        map_builtin_str[TDI_DOWN].label             = rMainWndData.M_LayoutItems[TDI_DOWN].LabelValueStr.label;
+        map_builtin_str[TDI_CPU].label              = rMainWndData.M_LayoutItems[TDI_CPU].LabelValueStr.label;
+        map_builtin_str[TDI_MEMORY].label           = rMainWndData.M_LayoutItems[TDI_MEMORY].LabelValueStr.label;
+        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.M_LayoutItems[TDI_GPU_USAGE].LabelValueStr.label;
+        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_CPU_TEMP].LabelValueStr.label;
+        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_GPU_TEMP].LabelValueStr.label;
+        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.M_LayoutItems[TDI_HDD_TEMP].LabelValueStr.label;
+        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.M_LayoutItems[TDI_MAIN_BOARD_TEMP].LabelValueStr.label;
+        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.M_LayoutItems[TDI_HDD_USAGE].LabelValueStr.label;
+        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.M_LayoutItems[TDI_TOTAL_SPEED].LabelValueStr.label;
+        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.M_LayoutItems[TDI_CPU_FREQ].LabelValueStr.label;
     }
+#else
+    if (!m_layout_manager.no_label)
+    {
+        map_builtin_str[TDI_UP].label = rMainWndData.disp_str.Get(TDI_UP).c_str();
+        map_builtin_str[TDI_DOWN].label = rMainWndData.disp_str.Get(TDI_DOWN).c_str();
+        map_builtin_str[TDI_CPU].label = rMainWndData.disp_str.Get(TDI_CPU).c_str();
+        map_builtin_str[TDI_MEMORY].label = rMainWndData.disp_str.Get(TDI_MEMORY).c_str();
+        map_builtin_str[TDI_GPU_USAGE].label = rMainWndData.disp_str.Get(TDI_GPU_USAGE).c_str();
+        map_builtin_str[TDI_CPU_TEMP].label = rMainWndData.disp_str.Get(TDI_CPU_TEMP).c_str();
+        map_builtin_str[TDI_GPU_TEMP].label = rMainWndData.disp_str.Get(TDI_GPU_TEMP).c_str();
+        map_builtin_str[TDI_HDD_TEMP].label = rMainWndData.disp_str.Get(TDI_HDD_TEMP).c_str();
+        map_builtin_str[TDI_MAIN_BOARD_TEMP].label = rMainWndData.disp_str.Get(TDI_MAIN_BOARD_TEMP).c_str();
+        map_builtin_str[TDI_HDD_USAGE].label = rMainWndData.disp_str.Get(TDI_HDD_USAGE).c_str();
+        map_builtin_str[TDI_TOTAL_SPEED].label = rMainWndData.disp_str.Get(TDI_TOTAL_SPEED).c_str();
+        map_builtin_str[TDI_CPU_FREQ].label = rMainWndData.disp_str.Get(TDI_CPU_FREQ).c_str();
+    }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (2)获取所有内置项目的显示数值
@@ -561,23 +745,42 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     getTemperatureStr(TDI_HDD_TEMP,         theApp.m_hdd_temperature);
     getTemperatureStr(TDI_MAIN_BOARD_TEMP,  theApp.m_main_board_temperature);
     ////////////////////////////////////////////////////////////////////////////////////////
-    //              (3)获取所有项目的显示数值的颜色
+    //              (3)获取所有显示项目的标签颜色和数值颜色
     ////////////////////////////////////////////////////////////////////////////////////////
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     if (rMainWndData.specify_each_item_color)
     {
-        text_colors = rMainWndData.M_ValueColors;
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
+        {
+            label_colors[item] = rMainWndData.M_LayoutItems[item].LabelColor;
+            value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
+        }
+    }
+    else if (!rMainWndData.M_LayoutItems.empty())
+    {
+        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
+        {
+            label_colors[item] = rMainWndData.M_LayoutItems.begin()->second.ValueColor;     //标签颜色保存在数值颜色里
+            value_colors[item] = rMainWndData.M_LayoutItems.begin()->second.ValueColor;
+        }
+    }
+#else
+    if (rMainWndData.specify_each_item_color)
+    {
+        value_colors = rMainWndData.M_ValueColors;
     }
     else if (!rMainWndData.M_ValueColors.empty())
     {
         for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
-            text_colors[item] = rMainWndData.M_ValueColors.begin()->second;
+            value_colors[item] = rMainWndData.M_ValueColors.begin()->second;
         }
     }
+#endif
 
     //设置字体。目前不支持每个显示项单独设置字体。
     draw.SetFont(&font);
-    //绘制文本
+    //绘制标签和数值
     int index{};
     for (auto iter = map_builtin_str.begin(); iter != map_builtin_str.end(); ++iter)
     {
@@ -586,10 +789,11 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         {
             //矩形区域
             CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
-            //文本颜色
-            COLORREF text_color = text_colors[iter->first];
+            //标签和数值颜色
+            COLORREF label_color = label_colors[iter->first];
+            COLORREF value_color = value_colors[iter->first];
             //绘制文本
-            DrawSkinText(draw, rect, map_builtin_str[iter->first], text_color, layout_item.align);
+            DrawSkinText(draw, rect, iter->second, label_color, value_color, layout_item.align);
         }
         index++;
     }
@@ -600,33 +804,29 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         const auto& layout_item = layoutInUse.GetItem(iplugin_item);
         if (layout_item.show)
         {
-            //插件项目自绘
-            COLORREF color{};
-            auto iter = text_colors.find(iplugin_item);
-            if (iter != text_colors.end())
-                color = iter->second;
-            else if (!text_colors.empty())
-                color = text_colors.begin()->second;
+            //标签和数值颜色
+            COLORREF label_color = label_colors[iplugin_item];
+            COLORREF value_color = value_colors[iplugin_item];
             if (!iplugin_item->IsCustomDraw())
             {
                 //矩形区域
                 CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
-                //绘制文本
+                //绘制标签和数值
                 DrawStr draw_str;
-                draw_str.label = rMainWndData.disp_str.Get(iplugin_item).c_str();
+                draw_str.label = rMainWndData.M_LayoutItems[iplugin_item].LabelValueStr.label;
                 draw_str.value = iplugin_item->GetItemValueText();
-                DrawSkinText(draw, rect, draw_str, color, layout_item.align);
+                DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
             }
-            else
+            else               //插件项目自绘
             {
-                int brightness{ (GetRValue(color) + GetGValue(color) + GetBValue(color)) / 2 };
+                int brightness{ (GetRValue(value_color) + GetGValue(value_color) + GetBValue(value_color)) / 2 };
                 ITMPlugin* plugin = rPluginManager.GetITMPluginByIPlguinItem(iplugin_item);
                 if (plugin != nullptr && plugin->GetAPIVersion() >= 2)
                 {
-                    plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(color).c_str());
+                    plugin->OnExtenedInfo(ITMPlugin::EI_VALUE_TEXT_COLOR, std::to_wstring(value_color).c_str());
                     plugin->OnExtenedInfo(ITMPlugin::EI_DRAW_TASKBAR_WND, L"0");
                 }
-                draw.GetDC()->SetTextColor(color);
+                draw.GetDC()->SetTextColor(value_color);
                 iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), layout_item.x, layout_item.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
             }
         }

@@ -34,7 +34,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
 {
     MainWndSettingData& rMainWndData = m_data;
     //CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
-    if (rMainWndData.M_ValueColors.empty())
+    if (rMainWndData.M_LayoutItems.empty())
         return;
     if (rMainWndData.specify_each_item_color)
     {
@@ -42,20 +42,20 @@ void CMainWndSettingsDlg::DrawStaticColor()
 #ifdef WITHOUT_TEMPERATURE
         color_num = 4;
 #else
-        color_num = 8;
+        color_num = 16;
 #endif
         m_color_static.SetColorNum(color_num);
         int index{};
-        for (const auto& item : rMainWndData.M_ValueColors)
+        for (const auto& item : rMainWndData.M_LayoutItems)
         {
-            m_color_static.SetFillColor(index, item.second);
+            m_color_static.SetFillColor(index, item.second.ValueColor);
             index++;
         }
         m_color_static.Invalidate();
     }
     else
     {
-        m_color_static.SetFillColor(rMainWndData.M_ValueColors.begin()->second);
+        m_color_static.SetFillColor(rMainWndData.M_LayoutItems.begin()->second.ValueColor);
     }
 }
 
@@ -434,6 +434,27 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         MainWndSettingData& rMainWndData = m_data;
         if (rMainWndData.specify_each_item_color)
         {
+            CMainWndColorDlg colorDlg(rMainWndData.M_LayoutItems);
+            if (colorDlg.DoModal() == IDOK)
+            {
+                rMainWndData.M_LayoutItems = colorDlg.GetLayoutItems();
+                DrawStaticColor();
+            }
+        }
+        else if (!rMainWndData.M_LayoutItems.empty())
+        {
+            CMFCColorDialogEx colorDlg(rMainWndData.M_LayoutItems.begin()->second.ValueColor, 0, this);
+            if (colorDlg.DoModal() == IDOK)
+            {
+                rMainWndData.M_LayoutItems.begin()->second.ValueColor = colorDlg.GetColor();
+                DrawStaticColor();
+            }
+        }
+        break;
+/*
+        MainWndSettingData& rMainWndData = m_data;
+        if (rMainWndData.specify_each_item_color)
+        {
             CMainWndColorDlg colorDlg(rMainWndData.M_ValueColors);
             if (colorDlg.DoModal() == IDOK)
             {
@@ -451,6 +472,7 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
             }
         }
         break;
+*/
     }
     default:
         break;
@@ -522,7 +544,7 @@ void CMainWndSettingsDlg::OnBnClickedBrowseButton()
 void CMainWndSettingsDlg::OnBnClickedDisplayTextSettingButton()
 {
     // TODO: 在此添加控件通知处理程序代码
-    CDisplayTextSettingDlg dlg(m_data.disp_str, true);
+    CDisplayTextSettingDlg dlg(m_data.M_LayoutItems, true);
     dlg.DoModal();
 }
 
