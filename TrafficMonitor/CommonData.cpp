@@ -53,7 +53,7 @@ unsigned __int64 HistoryTraffic::kBytes() const
     return up_kBytes + down_kBytes;
 }
 
-
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 ///////////////////////////////////////////////////////////////////////////////////
 wstring& DispStrings::Get(CommonDisplayItem item)
 {
@@ -94,6 +94,7 @@ void DispStrings::Load(const std::wstring& plugin_id, const std::wstring& disp_s
         map_str[plugin] = disp_str;
     }
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////
 bool StringSet::Contains(const std::wstring& str) const

@@ -4,6 +4,7 @@
 #include "CommonTypes.h"
 #include "TaskbarItemOrderHelper.h"
 
+#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 struct DispStrings      //显示的文本
 {
 private:
@@ -16,6 +17,7 @@ public:
     void Load(const std::wstring& plugin_id, const std::wstring& disp_str);     //载入一个插件项目的显示文本
     bool IsInvalid() const;                                                     //是否无效
 };
+#endif
 
 //将字号转成LOGFONT结构中的lfHeight
 inline int FontSizeToLfHeight(int font_size, int dpi = 0)
