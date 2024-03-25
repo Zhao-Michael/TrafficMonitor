@@ -67,24 +67,6 @@ BOOL CMainWndColorDlg::OnInitDialog()
     m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE), LVCFMT_LEFT, width4);
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-/*
-    //向列表中插入行
-    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); ++iter)
-    {
-        LayoutItem&     layout_item = m_layout_item[*iter];
-        wstring         item_id     = layout_item.id;
-
-        CString item_name = iter->GetItemName();
-        int index = m_list_ctrl.GetItemCount();
-        m_list_ctrl.InsertItem(index, item_id.c_str());     //参数类型为CString
-        m_list_ctrl.SetItemText(index, 1, item_name);
-        m_list_ctrl.SetItemText(index, 2, layout_item.LabelValueStr.label);
-        m_list_ctrl.SetItemColor(index, 3, layout_item.label_color);
-        m_list_ctrl.SetItemColor(index, 4, layout_item.value_color);
-        m_list_ctrl.SetItemData(index, (DWORD_PTR)&(*iter));
-    }
-*/
     //向列表中插入行
     for (auto iter = m_layout_items.begin(); iter != m_layout_items.end(); ++iter)
     {
@@ -102,20 +84,6 @@ BOOL CMainWndColorDlg::OnInitDialog()
     }
 //    m_list_ctrl.SetEditColMethod(CListCtrlEx::EC_SPECIFIED);        //设置列表可编辑
 //    m_list_ctrl.SetEditableCol({ 2 });                              //设置可编辑的列
-#else
-    //向列表中插入行
-    for (auto iter = m_display_texts.GetAllItems().begin(); iter != m_display_texts.GetAllItems().end(); ++iter)
-    {
-        CString item_name = iter->first.GetItemName();
-        if (!item_name.IsEmpty())
-        {
-            int index = m_list_ctrl.GetItemCount();
-            m_list_ctrl.InsertItem(index, item_name);
-            m_list_ctrl.SetItemText(index, 1, iter->second.c_str());
-            m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));
-        }
-    }
-#endif
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE

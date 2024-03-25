@@ -15,21 +15,6 @@ public:
         wstring                 skin_author;                //皮肤的作者
         FontInfo                font_info;                  //字体信息
         bool                    specify_each_item_color{};  //是否指定每个项目的颜色
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-#else
-        DispStrings             display_text;               //每一项的显示文本
-        std::vector<COLORREF>   text_color;                 //文本颜色
-
-        COLORREF TextColor(size_t i) const
-        {
-            if (i < text_color.size())
-                return text_color[i];
-            else if (!text_color.empty())
-                return text_color.front();
-            else
-                return 0;
-        }
-#endif
     };
 
     //皮肤布局

@@ -33,22 +33,11 @@ public:
 	void SaveFontData(const wchar_t * AppName, const FontInfo& font);
 	void LoadFontData(const wchar_t * AppName, FontInfo& font, const FontInfo& default_font) const;
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 	void LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
 							EBuiltinDisplayItem item_type, IPluginItem* iplugin_item, const wchar_t* default_str, COLORREF default_color);
 	void SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, LayoutItem& layout_item);
     void LoadPluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
     void SavePluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
-#else
-    void LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, COLORREF>& text_colors, COLORREF default_color);
-    void SaveMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, COLORREF>& text_colors);
-
-    void LoadTaskbarWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, TaskbarItemColor>& text_colors, COLORREF default_color);
-    void SaveTaskbarWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, TaskbarItemColor>& text_colors);
-
-    void LoadPluginDisplayStr(bool is_main_window);
-    void SavePluginDisplayStr(bool is_main_window);
-#endif
 
 	bool Save();		//将ini文件保存到文件，成功返回true
 

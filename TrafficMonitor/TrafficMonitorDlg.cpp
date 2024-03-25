@@ -2401,8 +2401,6 @@ void CTrafficMonitorDlg::OnChangeSkin()
         ////////////////////////////////////////////////////////////////////////////////////////
         //丢弃当前GUI配置的数值颜色，切换到皮肤自带的数值颜色。
         rMainWndData.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
-        size_t i{};
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
         CSkinFile::Layout LayoutInUse = {};
         if (rMainWndData.m_show_more_info)
             LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_l;
@@ -2424,13 +2422,6 @@ void CTrafficMonitorDlg::OnChangeSkin()
                 rMainWndData.M_LayoutItems[item].LabelValueStr.label = LayoutInUse.M_LayoutItems[item].LabelValueStr.label;
             }
         }
-#else
-        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
-        {
-            rMainWndData.M_ValueColors[item] = skinDlg.GetSkinData().GetSkinInfo().TextColor(i);
-            i++;
-        }
-#endif
         //SetTextColor();
         //获取皮肤的字体
         if (theApp.m_general_data.allow_skin_cover_font)
@@ -2448,15 +2439,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
                 rMainWndData.font.size = skinDlg.GetSkinData().GetSkinInfo().font_info.size;
             SetTextFont();
         }
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 
-#else
-        //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
-        if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
-        {
-            rMainWndData.disp_str = skinDlg.GetSkinData().GetSkinInfo().display_text;
-        }
-#endif
         SetItemPosition();
         Invalidate(FALSE);      //更换皮肤后立即刷新窗口信息
         theApp.SaveConfig();

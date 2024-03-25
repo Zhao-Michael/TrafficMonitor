@@ -242,7 +242,6 @@ void CIniHelper::LoadFontData(const wchar_t * AppName, FontInfo & font, const Fo
     font.strike_out = style[3];
 }
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
                             EBuiltinDisplayItem item_type, IPluginItem* iplugin_item, const wchar_t* default_str, COLORREF default_color)
 {
@@ -375,127 +374,6 @@ void CIniHelper::SavePluginItemsAttributes(const ELayoutItemAttributesOwner eOwn
         SaveLayoutItemAttributes(eOwner, plugin->GetItemId(), M_layout_items[plugin]);
     }
 }
-#else
-void CIniHelper::LoadMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, COLORREF>& text_colors, COLORREF default_color)
-{
-    CString ColorStr_default;
-    ColorStr_default.Format(_T("%d"), default_color);
-
-    wstring str = _GetString(AppName, KeyName, ColorStr_default);
-    std::vector<wstring>    ColorsStr_SplitResult;
-    CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
-    size_t ColorsStr_num = ColorsStr_SplitResult.size();
-    if (0 == ColorsStr_num)
-    {
-        return;
-    }
-    size_t index = 0;
-    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++, index++)
-    {
-        const wchar_t * color_str   = nullptr;
-        if (index < ColorsStr_num)
-            color_str = ColorsStr_SplitResult[index].c_str();
-        else
-            color_str = ColorsStr_SplitResult[0].c_str();
-
-        //support Decimal data or Hex data from saved data
-        if(wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-            text_colors[*iter] = wcstol(color_str, nullptr, 16);
-        else
-            text_colors[*iter] = _wtoi(color_str);
-    }
-}
-
-void CIniHelper::SaveMainWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, COLORREF>& text_colors)
-{
-    CString str;
-    for (auto iter = text_colors.begin(); iter != text_colors.end(); ++iter)
-    {
-        CString tmp;
-        tmp.Format(_T("0x%x,"), iter->second);      //saved as Hex data
-        str += tmp;
-    }
-    _WriteString(AppName, KeyName, wstring(str));
-}
-
-void CIniHelper::LoadTaskbarWndColors(const wchar_t * AppName, const wchar_t * KeyName, std::map<CommonDisplayItem, TaskbarItemColor>& text_colors, COLORREF default_color)
-{
-    CString ColorStr_default;
-    ColorStr_default.Format(_T("%d"), default_color);
-
-    wstring str = _GetString(AppName, KeyName, ColorStr_default);
-    std::vector<wstring> ColorsStr_SplitResult;
-    CCommon::StringSplit(str, L',', ColorsStr_SplitResult);
-    size_t ColorsStr_num = ColorsStr_SplitResult.size();
-    if (0 == ColorsStr_num)
-    {
-        return;
-    }
-    size_t index = 0;
-    for (auto iter = theApp.m_plugin_manager.AllDisplayItemsWithPlugins().begin(); iter != theApp.m_plugin_manager.AllDisplayItemsWithPlugins().end(); iter++)
-    {
-        const wchar_t* color_str = nullptr;
-        if (index < ColorsStr_num)
-            color_str = ColorsStr_SplitResult[index].c_str();
-        else
-            color_str = ColorsStr_SplitResult[0].c_str();
-
-        //support Decimal data or Hex data from saved data
-        if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-            text_colors[*iter].label = wcstol(color_str, nullptr, 16);
-        else
-            text_colors[*iter].label = _wtoi(color_str);
-
-        index++;
-        if (index < ColorsStr_num)
-            color_str = ColorsStr_SplitResult[index].c_str();
-        else if (ColorsStr_num > 1)
-            color_str = ColorsStr_SplitResult[1].c_str();
-        else
-            color_str = ColorsStr_SplitResult[0].c_str();
-
-        //support Decimal data or Hex data from saved data
-        if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-            text_colors[*iter].value = wcstol(color_str, nullptr, 16);
-        else
-            text_colors[*iter].value = _wtoi(color_str);
-
-        index++;
-    }
-}
-
-void CIniHelper::SaveTaskbarWndColors(const wchar_t * AppName, const wchar_t * KeyName, const std::map<CommonDisplayItem, TaskbarItemColor>& text_colors)
-{
-    CString str;
-    for (auto iter = text_colors.begin(); iter != text_colors.end(); ++iter)
-    {
-        CString tmp;
-        tmp.Format(_T("0x%x,0x%x,"), iter->second.label, iter->second.value);   //saved as Hex data
-        str += tmp;
-    }
-    _WriteString(AppName, KeyName, wstring(str));
-}
-
-void CIniHelper::LoadPluginDisplayStr(bool is_main_window)
-{
-    DispStrings& disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
-    std::wstring    app_name{ is_main_window ? L"plugin_display_str_main_window" : L"plugin_display_str_taskbar_window" };
-    for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
-    {
-        disp_str.Load(plugin->GetItemId(), GetString(app_name.c_str(), plugin->GetItemId(), plugin->GetItemLableText()));
-    }
-}
-
-void CIniHelper::SavePluginDisplayStr(bool is_main_window)
-{
-    DispStrings& disp_str{ is_main_window ? theApp.m_main_wnd_data.disp_str : theApp.m_taskbar_data.disp_str };
-    std::wstring app_name{ is_main_window ? L"plugin_display_str_main_window" : L"plugin_display_str_taskbar_window" };
-    for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
-    {
-        WriteString(app_name.c_str(), plugin->GetItemId(), disp_str.Get(plugin));
-    }
-}
-#endif
 
 void CIniHelper::_WriteString(const wchar_t * AppName, const wchar_t * KeyName, const wstring & str)
 {

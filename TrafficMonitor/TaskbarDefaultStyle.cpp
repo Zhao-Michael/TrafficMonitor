@@ -22,7 +22,6 @@ void CTaskbarDefaultStyle::LoadConfig()
         COLORREF default_back_color         = (i == TASKBAR_DEFAULT_LIGHT_STYLE_INDEX ? RGB(210, 210, 211)  : 0);
         COLORREF default_transparent_color  = (i == TASKBAR_DEFAULT_LIGHT_STYLE_INDEX ? RGB(210, 210, 211)  : 0);
         COLORREF default_status_bar_color   = (i == TASKBAR_DEFAULT_LIGHT_STYLE_INDEX ? RGB(165, 165, 165)  : 0x005A5A5A);
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
         ELayoutItemAttributesOwner      eOwner = LIAO_TASKBAR_DEFAULT_STYLE_1;
         if (i == 1)
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_2;
@@ -56,16 +55,6 @@ void CTaskbarDefaultStyle::LoadConfig()
 
         //载入插件项目的显示文本设置(false表示任务栏窗口)
         ini.LoadPluginItemsAttributes(eOwner, m_default_style[i].M_LayoutItems);
-#else
-        wchar_t buff[64];
-        swprintf_s(buff, L"default%d_", i + 1);
-        wstring key_name = buff;
-        ini.LoadTaskbarWndColors                                 (L"taskbar_default_style", (key_name + L"text_color").c_str(),             m_default_style[i].text_colors, default_text_color);
-        m_default_style[i].back_color               = ini.GetInt (L"taskbar_default_style", (key_name + L"back_color").c_str(),             default_back_color, 16);
-        m_default_style[i].transparent_color        = ini.GetInt (L"taskbar_default_style", (key_name + L"transparent_color").c_str(),      default_transparent_color, 16);
-        m_default_style[i].status_bar_color         = ini.GetInt (L"taskbar_default_style", (key_name + L"status_bar_color").c_str(),       default_status_bar_color, 16);
-        m_default_style[i].specify_each_item_color  = ini.GetBool(L"taskbar_default_style", (key_name + L"specify_each_item_color").c_str(),false);
-#endif
 	}
 }
 
@@ -74,7 +63,6 @@ void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
 	CIniHelper ini{ theApp.m_config_path };
 	for (int i = 0; i < TASKBAR_DEFAULT_STYLE_NUM; i++)
 	{
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
         ELayoutItemAttributesOwner      eOwner = LIAO_TASKBAR_DEFAULT_STYLE_1;
         if (i == 1)
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_2;
@@ -119,27 +107,6 @@ void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
             CCommon::WriteLog(log_str, theApp.m_log_path.c_str());
             return;
         }
-#else
-        wchar_t buff[64];
-		swprintf_s(buff, L"default%d_", i + 1);
-		wstring key_name = buff;
-        if (IsTaskBarStyleDataValid(m_default_style[i]))           //保存前检查当前颜色预设是否有效
-        {
-            ini.SaveTaskbarWndColors(L"taskbar_default_style", (key_name + L"text_color").c_str(),              m_default_style[i].text_colors);
-                        ini.WriteInt(L"taskbar_default_style", (key_name + L"back_color").c_str(),              m_default_style[i].back_color, 16);
-                        ini.WriteInt(L"taskbar_default_style", (key_name + L"transparent_color").c_str(),       m_default_style[i].transparent_color, 16);
-                        ini.WriteInt(L"taskbar_default_style", (key_name + L"status_bar_color").c_str(),        m_default_style[i].status_bar_color, 16);
-                       ini.WriteBool(L"taskbar_default_style", (key_name + L"specify_each_item_color").c_str(), m_default_style[i].specify_each_item_color);
-        }
-        else
-        {
-            //写入日志
-            CString log_str;
-            log_str.Format(_T("在保存预设%d时检测到背景色和文字颜色都为黑色，该预设未被保存。"), i);
-            CCommon::WriteLog(log_str, theApp.m_log_path.c_str());
-            return;
-        }
-#endif
 	}
 	ini.Save();
 }
@@ -159,15 +126,11 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
 		data.transparent_color          = m_default_style[index].transparent_color;
 		data.status_bar_color           = m_default_style[index].status_bar_color;
         data.specify_each_item_color    = m_default_style[index].specify_each_item_color;
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
         for (auto iter = m_default_style[index].M_LayoutItems.begin(); iter != m_default_style[index].M_LayoutItems.end(); ++iter)
         {
             data.M_LayoutItems[iter->first].LabelColor = iter->second.LabelColor;
             data.M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
         }
-#else
-        data.text_colors                = m_default_style[index].text_colors;
-#endif
 		if (data.transparent_color == data.back_color)
 		{
 			CCommon::TransparentColorConvert(data.back_color);
@@ -197,15 +160,11 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
 	m_default_style[index].transparent_color = data.transparent_color;
 	m_default_style[index].status_bar_color = data.status_bar_color;
 	m_default_style[index].specify_each_item_color = data.specify_each_item_color;
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     for (auto iter = data.M_LayoutItems.begin(); iter != data.M_LayoutItems.end(); ++iter)
     {
         m_default_style[index].M_LayoutItems[iter->first].LabelColor = iter->second.LabelColor;
         m_default_style[index].M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
     }
-#else
-    m_default_style[index].text_colors = data.text_colors;
-#endif
 }
 
 bool CTaskbarDefaultStyle::IsTaskBarStyleDataValid(const TaskBarStyleData& data)

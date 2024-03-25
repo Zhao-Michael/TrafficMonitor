@@ -53,49 +53,6 @@ unsigned __int64 HistoryTraffic::kBytes() const
     return up_kBytes + down_kBytes;
 }
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-///////////////////////////////////////////////////////////////////////////////////
-wstring& DispStrings::Get(CommonDisplayItem item)
-{
-    return map_str[item];
-}
-
-const std::map<CommonDisplayItem, wstring>& DispStrings::GetAllItems() const
-{
-    return map_str;
-}
-
-void DispStrings::operator=(const DispStrings& disp_str)
-{
-    map_str = disp_str.map_str;
-    //如果赋值的字符串是定义的无效字符串，则不赋值
-    for (auto& iter = map_str.begin(); iter != map_str.end(); ++iter)
-    {
-        if (iter->second == NONE_STR)
-            iter->second.clear();
-    }
-}
-
-bool DispStrings::IsInvalid() const
-{
-    for (auto& iter = map_str.begin(); iter != map_str.end(); ++iter)
-    {
-        if (iter->second == NONE_STR)
-            return true;
-    }
-    return false;
-}
-
-void DispStrings::Load(const std::wstring& plugin_id, const std::wstring& disp_str)
-{
-    auto plugin = theApp.m_plugin_manager.GetIPluginItemById(plugin_id);
-    if (plugin != nullptr)
-    {
-        map_str[plugin] = disp_str;
-    }
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////////
 bool StringSet::Contains(const std::wstring& str) const
 {

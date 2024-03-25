@@ -4,21 +4,6 @@
 #include "CommonTypes.h"
 #include "TaskbarItemOrderHelper.h"
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-struct DispStrings      //显示的文本
-{
-private:
-    std::map<CommonDisplayItem, wstring> map_str;
-
-public:
-    wstring&                                    Get(CommonDisplayItem item);    //获取一个显示的文本
-    const std::map<CommonDisplayItem, wstring>& GetAllItems() const;
-    void operator=(const DispStrings& disp_str);                                //重载赋值运算符
-    void Load(const std::wstring& plugin_id, const std::wstring& disp_str);     //载入一个插件项目的显示文本
-    bool IsInvalid() const;                                                     //是否无效
-};
-#endif
-
 //将字号转成LOGFONT结构中的lfHeight
 inline int FontSizeToLfHeight(int font_size, int dpi = 0)
 {
@@ -110,11 +95,7 @@ struct PublicSettingData
     bool show_tool_tip{ true };                     //显示鼠标提示
 
     bool specify_each_item_color{ false };          //是否指定每个项目的颜色
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-    std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems{};                          //存放所有项目的属性配置
-#else
-    DispStrings disp_str;                           //标签    //里面存放了所有标签的map
-#endif
+    std::map<CommonDisplayItem, LayoutItem> M_LayoutItems{};                          //存放所有项目的属性配置
 
     //数值属性设置
     bool hide_unit;                                 //隐藏单位
@@ -135,10 +116,6 @@ struct PublicSettingData
 //选项设置中“主窗口设置”的数据
 struct MainWndSettingData : public PublicSettingData
 {
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-#else
-    std::map<CommonDisplayItem, COLORREF>       M_ValueColors{};    //数值颜色
-#endif
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
     bool swap_up_down           { false };      //交换上传和下载显示的位置
     bool m_always_on_top        { false };      //窗口置顶
@@ -157,19 +134,6 @@ struct MainWndSettingData : public PublicSettingData
 
 //#define TASKBAR_COLOR_NUM 18      //任务栏窗口颜色数量
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-#else
-struct TaskbarItemColor //任务栏窗口每一项的颜色
-{
-    COLORREF label{};   //标签颜色
-    COLORREF value{};   //数值颜色
-
-    bool operator==(const TaskbarItemColor& item) const
-    {
-        return label == item.label && value == item.value;
-    }
-};
-#endif
 
 //选项设置中“任务栏窗口设置”的数据
 struct TaskBarSettingData : public PublicSettingData
@@ -178,10 +142,6 @@ struct TaskBarSettingData : public PublicSettingData
     COLORREF    back_color          { RGB(0, 0, 0) };       //背景颜色
     COLORREF    transparent_color   { RGB(0, 0, 0) };       //透明色
     COLORREF    status_bar_color    { RGB(0, 0, 0) };       // CPU/内存 状态条颜色
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-#else
-    std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};    //数值颜色
-#endif
 
     //缺省颜色
     int dft_back_color = 0;                                 //默认背景颜色

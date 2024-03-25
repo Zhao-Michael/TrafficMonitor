@@ -55,7 +55,6 @@ void CSkinDlg::ShowPreview()
     //设置提示信息
     bool cover_font_setting{ !m_skin_data.GetSkinInfo().font_info.name.IsEmpty()
                         || (m_skin_data.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin_data.GetSkinInfo().font_info.size <= MAX_FONT_SIZE) };
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     bool cover_str_setting = false;
     for (auto iter = m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.end(); ++iter)
     {
@@ -73,9 +72,6 @@ void CSkinDlg::ShowPreview()
             break;
         }
     }
-#else
-    bool cover_str_setting{ !m_skin_data.GetSkinInfo().display_text.IsInvalid() };
-#endif
     cover_font_setting = cover_font_setting && theApp.m_general_data.allow_skin_cover_font;
     cover_str_setting = cover_str_setting && theApp.m_general_data.allow_skin_cover_text;
     if (cover_font_setting && cover_str_setting)

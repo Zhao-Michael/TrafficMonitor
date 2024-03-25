@@ -13,13 +13,7 @@ public:
 		COLORREF transparent_color{};
 		COLORREF status_bar_color{};
 		bool specify_each_item_color{};
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-		//新增功能代码
 		std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems{};                          //存放所有项目的属性配置
-#else
-		DispStrings disp_str;                           //标签    //里面存放了所有标签的map
-		std::map<CommonDisplayItem, TaskbarItemColor> text_colors{};
-#endif
 	};
 
 	CTaskbarDefaultStyle();

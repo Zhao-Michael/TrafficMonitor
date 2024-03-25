@@ -191,10 +191,9 @@ public:
     static wstring GetAppDataConfigDir();
 
     static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
+
     //此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
     static void LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color);
-#endif
 
     //在指定位置绘制文本
     static void DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color);

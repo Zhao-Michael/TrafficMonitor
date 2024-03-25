@@ -590,7 +590,6 @@ string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
     }
 }
 
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
 //此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
 void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color)
 {
@@ -618,7 +617,6 @@ void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem
             M_LayoutItems[*iter].ValueColor = _wtoi(color_str);
     }
 }
-#endif
 
 void CCommon::DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color)
 {

@@ -28,7 +28,6 @@ CTaskBarSettingsDlg::~CTaskBarSettingsDlg()
 
 bool CTaskBarSettingsDlg::IsStyleModified()
 {
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     bool modified{false};
     for (auto iter = m_data.M_LayoutItems.begin(); iter != m_data.M_LayoutItems.end(); ++iter)
     {
@@ -43,10 +42,6 @@ bool CTaskBarSettingsDlg::IsStyleModified()
             break;
         }
     }
-#else
-    bool modified{};
-    modified |= (theApp.m_taskbar_data.text_colors != m_data.text_colors);
-#endif
     modified |= (theApp.m_taskbar_data.back_color != m_data.back_color);
     modified |= (theApp.m_taskbar_data.transparent_color != m_data.transparent_color);
     modified |= (theApp.m_taskbar_data.status_bar_color != m_data.status_bar_color);

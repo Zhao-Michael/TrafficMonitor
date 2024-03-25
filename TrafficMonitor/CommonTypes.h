@@ -2,8 +2,6 @@
 #pragma once
 #include "stdafx.h"
 
-#define	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
-
 struct Date
 {
     int year{};
@@ -107,7 +105,6 @@ struct LayoutItem
 //  int                     height{};                       //目前只能从Layout.height复制。
     Alignment               align{ Alignment::LEFT };       //对齐方式
     bool                    show { false };                 //是否显示
-#ifdef	STORE_MONITOR_ITEM_DATA_IN_NEW_WAY
     ////////////////////////////////////////////////////////////////////////////////////////
     //      皮肤配置文件和GUI都可以配置
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +122,6 @@ struct LayoutItem
     SpeedUnit               speed_unit;                             //网速的单位
     bool                    unit_byte{ true };                      //使用字节(B)而不是比特(b)为单位                        //以后某天要取消对bit的支持，因此到时将删除此项。
 */
-#endif
 };
 
 //历史流量统计列表视图中显示模式
