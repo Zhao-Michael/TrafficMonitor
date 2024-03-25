@@ -70,5 +70,5 @@ void CAppAlreadyRuningDlg::OnBnClickedShowHideMainWindowButton()
 
 void CAppAlreadyRuningDlg::OnBnClickedShowHideTaskbarWindowButton()
 {
-    ::PostMessage(m_handle, WM_COMMAND, ID_SHOW_TASK_BAR_WND, 0);
+    ::PostMessage(m_handle, WM_COMMAND, ID_SHOW_TASKBAR_WND, 0);
 }

@@ -544,7 +544,7 @@
 #define ID_32798                        32798
 #define ID_TEXT_COLOR                   32799
 #define ID_32800                        32800
-#define ID_SHOW_TASK_BAR_WND            32801
+#define ID_SHOW_TASKBAR_WND             32801
 #define ID_32802                        32802
 #define ID_32803                        32803
 #define ID_32804                        32804

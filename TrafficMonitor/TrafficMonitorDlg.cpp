@@ -84,7 +84,7 @@ BEGIN_MESSAGE_MAP(CTrafficMonitorDlg, CDialog)
     ON_WM_DESTROY()
     ON_COMMAND(ID_SHOW_CPU_MEMORY, &CTrafficMonitorDlg::OnShowCpuMemory)
     ON_COMMAND(ID_MOUSE_PENETRATE, &CTrafficMonitorDlg::OnMousePenetrate)
-    ON_COMMAND(ID_SHOW_TASK_BAR_WND, &CTrafficMonitorDlg::OnShowTaskBarWnd)
+    ON_COMMAND(ID_SHOW_TASKBAR_WND, &CTrafficMonitorDlg::OnShowTaskBarWnd)
     ON_COMMAND(ID_APP_ABOUT, &CTrafficMonitorDlg::OnAppAbout)
     ON_COMMAND(ID_SHOW_CPU_MEMORY2, &CTrafficMonitorDlg::OnShowCpuMemory2)
     ON_COMMAND(ID_SHOW_MAIN_WND, &CTrafficMonitorDlg::OnShowMainWnd)
@@ -569,21 +569,21 @@ void CTrafficMonitorDlg::OpenTaskBarWnd()
 
 void CTrafficMonitorDlg::AddNotifyIcon()
 {
-    if (theApp.m_cfg_data.m_show_task_bar_wnd)
+    if (theApp.m_cfg_data.m_show_taskbar_wnd)
         CloseTaskBarWnd();
     //添加通知栏图标
     ::Shell_NotifyIcon(NIM_ADD, &m_ntIcon);
-    if (theApp.m_cfg_data.m_show_task_bar_wnd)
+    if (theApp.m_cfg_data.m_show_taskbar_wnd)
         OpenTaskBarWnd();
 }
 
 void CTrafficMonitorDlg::DeleteNotifyIcon()
 {
-    if (theApp.m_cfg_data.m_show_task_bar_wnd)
+    if (theApp.m_cfg_data.m_show_taskbar_wnd)
         CloseTaskBarWnd();
     //删除通知栏图标
     ::Shell_NotifyIcon(NIM_DELETE, &m_ntIcon);
-    if (theApp.m_cfg_data.m_show_task_bar_wnd)
+    if (theApp.m_cfg_data.m_show_taskbar_wnd)
         OpenTaskBarWnd();
 }
 
@@ -927,7 +927,7 @@ bool CTrafficMonitorDlg::IsTemperatureNeeded() const
     //判断是否需要从OpenHardwareMonitor获取信息。
     ////只有主窗口和任务栏窗口中CPU温度、显卡利用率、显卡温度、硬盘温度和主板温度中至少有一个要显示，才返回true
     //bool needed = false;
-    //if (theApp.m_cfg_data.m_show_task_bar_wnd && IsTaskbarWndValid())
+    //if (theApp.m_cfg_data.m_show_taskbar_wnd && IsTaskbarWndValid())
     //{
     //    needed |= m_tBarDlg->IsShowCpuTemperature();
     //    needed |= m_tBarDlg->IsShowGpu();
@@ -985,7 +985,7 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
     IniConnection();    //初始化连接
 
     //如果启动时设置了鼠标穿透或隐藏主窗口，并且没有显示任务栏窗口，则显示通知区图标
-    if ((theApp.m_main_wnd_data.m_mouse_penetrate || theApp.m_cfg_data.m_hide_main_window) && !theApp.m_cfg_data.m_show_task_bar_wnd)
+    if ((theApp.m_main_wnd_data.m_mouse_penetrate || theApp.m_cfg_data.m_hide_main_window) && !theApp.m_cfg_data.m_show_taskbar_wnd)
         theApp.m_general_data.show_notify_icon = true;
 
     //载入通知区图标
@@ -1273,7 +1273,7 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
     }
 
     ////只有主窗口和任务栏窗口至少有一个显示时才执行下面的处理
-    //if (!theApp.m_cfg_data.m_hide_main_window || theApp.m_cfg_data.m_show_task_bar_wnd)
+    //if (!theApp.m_cfg_data.m_hide_main_window || theApp.m_cfg_data.m_show_taskbar_wnd)
     //{
     //获取CPU使用率
     theApp.m_cpu_usage = pThis->m_cpu_usage.GetCPUUsage();
@@ -1435,7 +1435,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                 ShowWindow(SW_HIDE);
 
             //打开任务栏窗口
-            if (theApp.m_cfg_data.m_show_task_bar_wnd && m_tBarDlg == nullptr)
+            if (theApp.m_cfg_data.m_show_taskbar_wnd && m_tBarDlg == nullptr)
                 OpenTaskBarWnd();
 
             //如果窗口的位置为(0, 0)，则在初始化时MoveWindow函数无效，此时再移动一次窗口
@@ -1514,7 +1514,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
         }
 
         //只有主窗口和任务栏窗口至少有一个显示时才执行下面的处理
-        if (!theApp.m_cfg_data.m_hide_main_window || theApp.m_cfg_data.m_show_task_bar_wnd)
+        if (!theApp.m_cfg_data.m_hide_main_window || theApp.m_cfg_data.m_show_taskbar_wnd)
         {
             //每隔10秒钟检测一次是否可以嵌入任务栏
             if (IsTaskbarWndValid() && m_timer_cnt % 10 == 1)
@@ -1532,10 +1532,10 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                         info.Replace(_T("<%cnt%>"), CCommon::IntToString(m_insert_to_taskbar_cnt));
                         info.Replace(_T("<%error_code%>"), CCommon::IntToString(m_tBarDlg->GetErrorCode()));
                         CCommon::WriteLog(info, theApp.m_log_path.c_str());
-                        if (m_cannot_insert_to_task_bar_warning)      //确保提示信息只弹出一次
+                        if (m_cannot_insert_to_taskbar_warning)      //确保提示信息只弹出一次
                         {
                             //弹出错误信息
-                            m_cannot_insert_to_task_bar_warning = false;
+                            m_cannot_insert_to_taskbar_warning = false;
                             MessageBox(CCommon::LoadText(IDS_CONNOT_INSERT_TO_TASKBAR, CCommon::IntToString(m_tBarDlg->GetErrorCode())), NULL, MB_ICONWARNING);
                         }
                     }
@@ -2015,7 +2015,7 @@ void CTrafficMonitorDlg::OnInitMenu(CMenu* pMenu)
     pMenu->CheckMenuItem(ID_ALWAYS_ON_TOP,      MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_always_on_top       ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_LOCK_WINDOW_POS,    MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_lock_window_pos     ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_SHOW_CPU_MEMORY,    MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_show_more_info      ? MF_CHECKED : MF_UNCHECKED));
-    pMenu->CheckMenuItem(ID_SHOW_TASK_BAR_WND,  MF_BYCOMMAND    | (theApp.m_cfg_data.m_show_task_bar_wnd        ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_SHOW_TASKBAR_WND,  MF_BYCOMMAND     | (theApp.m_cfg_data.m_show_taskbar_wnd         ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_SHOW_MAIN_WND,      MF_BYCOMMAND    | (!theApp.m_cfg_data.m_hide_main_window        ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_MOUSE_PENETRATE,    MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_mouse_penetrate     ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_ALOW_OUT_OF_BORDER, MF_BYCOMMAND    | (theApp.m_main_wnd_data.m_alow_out_of_border  ? MF_CHECKED : MF_UNCHECKED));
@@ -2301,14 +2301,14 @@ void CTrafficMonitorDlg::OnShowTaskBarWnd()
     {
         CloseTaskBarWnd();
     }
-    if (!theApp.m_cfg_data.m_show_task_bar_wnd)
+    if (!theApp.m_cfg_data.m_show_taskbar_wnd)
     {
-        theApp.m_cfg_data.m_show_task_bar_wnd = true;
+        theApp.m_cfg_data.m_show_taskbar_wnd = true;
         OpenTaskBarWnd();
     }
     else
     {
-        theApp.m_cfg_data.m_show_task_bar_wnd = false;
+        theApp.m_cfg_data.m_show_taskbar_wnd = false;
         //关闭任务栏窗口后，如果没有显示通知区图标，且没有显示主窗口或设置了鼠标穿透，则将通知区图标显示出来
         if (!theApp.m_general_data.show_notify_icon && theApp.IsForceShowNotifyIcon())
         {
@@ -2649,7 +2649,7 @@ afx_msg LRESULT CTrafficMonitorDlg::OnDpichanged(WPARAM wParam, LPARAM lParam)
 
 afx_msg LRESULT CTrafficMonitorDlg::OnTaskbarWndClosed(WPARAM wParam, LPARAM lParam)
 {
-    theApp.m_cfg_data.m_show_task_bar_wnd = false;
+    theApp.m_cfg_data.m_show_taskbar_wnd = false;
     //关闭任务栏窗口后，如果没有显示通知区图标，且没有显示主窗口或设置了鼠标穿透，则将通知区图标显示出来
     if (!theApp.m_general_data.show_notify_icon && theApp.IsForceShowNotifyIcon())
     {

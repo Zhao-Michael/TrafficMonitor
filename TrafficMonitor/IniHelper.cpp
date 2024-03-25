@@ -261,7 +261,7 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     if (LIAO_MAINWND == eOwner)
         AppName = _T("config");
     else if (LIAO_TASKBAR == eOwner)
-        AppName = _T("task_bar");
+        AppName = _T("taskbar");
     else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
         AppName = _T("taskbar_default_style_1");
     else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)
@@ -344,7 +344,7 @@ void CIniHelper::SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     if (LIAO_MAINWND == eOwner)
         AppName = _T("config");
     else if (LIAO_TASKBAR == eOwner)
-        AppName = _T("task_bar");
+        AppName = _T("taskbar");
     else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
         AppName = _T("taskbar_default_style_1");
     else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)

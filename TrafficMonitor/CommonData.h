@@ -65,7 +65,7 @@ private:
 //APP全局性设置数据
 struct AppSettingData
 {
-    bool m_show_task_bar_wnd{ false };          //显示任务栏窗口
+    bool m_show_taskbar_wnd{ false };          //显示任务栏窗口
     bool m_hide_main_window;                    //隐藏主窗口
     //bool m_tbar_show_cpu_memory;              //任务栏窗口显示CPU和内存利用率
 

@@ -94,7 +94,7 @@ void CTrafficMonitorApp::LoadConfig()
     rGeneralData.allow_skin_cover_font          = ini.GetBool(_T("general"),  _T("allow_skin_cover_font"),  true);
     rGeneralData.allow_skin_cover_text          = ini.GetBool(_T("general"),  _T("allow_skin_cover_text"),  true);
     //(2)鼠标右键中的部分设置
-    rAppData.m_show_task_bar_wnd                = ini.GetBool(_T("config"),   _T("show_task_bar_wnd"),      false);
+    rAppData.m_show_taskbar_wnd                 = ini.GetBool(_T("config"),   _T("show_taskbar_wnd"),       false);
     rAppData.m_hide_main_window                 = ini.GetBool(_T("config"),   _T("hide_main_window"),       false);
     //网络连接设置
     rAppData.m_auto_select                      = ini.GetBool(_T("connection"), _T("auto_select"),          true);
@@ -168,7 +168,7 @@ void CTrafficMonitorApp::LoadConfig()
     rMainWndData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("config"), _T("double_click_action"), 0));
     rMainWndData.double_click_exe               = ini.GetString(L"config", L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
     //(2)鼠标右键中的部分设置
-    rMainWndData.m_show_more_info               = ini.GetBool(_T("config"), _T("show_cpu_memory"),      false);
+    rMainWndData.m_show_more_info               = ini.GetBool(_T("config"), _T("show_more_info"),       false);
     rMainWndData.m_transparency                 = ini.GetInt (_T("config"), _T("transparency"),     80);
     rMainWndData.m_skin_name                    = ini.GetString(_T("config"), _T("skin_selected"), _T(""));
     if (rMainWndData.m_skin_name.substr(0, 8) == L".\\skins\\")       //如果读取到的皮肤名称前面有".\\skins\\"，则把它删除。（用于和前一个版本保持兼容性）
@@ -181,17 +181,16 @@ void CTrafficMonitorApp::LoadConfig()
     //      (三)载入任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    rTaskbarData.back_color                         = ini.GetInt(_T("task_bar"), _T("task_bar_back_color"), rTaskbarData.dft_back_color, 16);
-    rTaskbarData.transparent_color                  = ini.GetInt(_T("task_bar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
+    rTaskbarData.back_color                         = ini.GetInt(_T("taskbar"), _T("taskbar_back_color"), rTaskbarData.dft_back_color, 16);
+    rTaskbarData.transparent_color                  = ini.GetInt(_T("taskbar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
     if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
     {
         CCommon::TransparentColorConvert(rTaskbarData.back_color);
         CCommon::TransparentColorConvert(rTaskbarData.transparent_color);
     }
-    rTaskbarData.status_bar_color                 = ini.GetInt(_T("task_bar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
-    rTaskbarData.specify_each_item_color          = ini.GetBool (L"task_bar",    L"specify_each_item_color", false);
-    //rAppData.m_tbar_show_cpu_memory               = ini.GetBool(_T("task_bar"), _T("task_bar_show_cpu_memory"), false);
-    rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"task_bar",    L"tbar_display_item", TDI_UP | TDI_DOWN);
+    rTaskbarData.status_bar_color                 = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
+    rTaskbarData.specify_each_item_color          = ini.GetBool (L"taskbar",    L"specify_each_item_color", false);
+    rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"tbar_display_item", TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
 #ifdef WITHOUT_TEMPERATURE
@@ -219,7 +218,7 @@ void CTrafficMonitorApp::LoadConfig()
     if (!rGeneralData.IsHardwareEnable(HI_MBD))
         rTaskbarData.m_tbar_display_item &= ~TDI_MAIN_BOARD_TEMP;
 
-    //rTaskbarData.swap_up_down = ini.GetBool(_T("task_bar"), _T("task_bar_swap_up_down"), false);
+    //rTaskbarData.swap_up_down = ini.GetBool(_T("taskbar"), _T("taskbar_swap_up_down"), false);
 
     if (rTaskbarData.back_color == 0 && !rTaskbarData.M_LayoutItems.empty() && rTaskbarData.M_LayoutItems.begin()->second.LabelColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
     {
@@ -228,12 +227,12 @@ void CTrafficMonitorApp::LoadConfig()
     }
 
     //任务栏窗口字体设置
-    //rTaskbarData.font.name = ini.GetString(_T("task_bar"), _T("tack_bar_font_name"), CCommon::LoadText(IDS_MICROSOFT_YAHEI)).c_str();
-    //rTaskbarData.font.size = ini.GetInt(_T("task_bar"), _T("tack_bar_font_size"), 9);
+    //rTaskbarData.font.name = ini.GetString(_T("taskbar"), _T("tack_bar_font_name"), CCommon::LoadText(IDS_MICROSOFT_YAHEI)).c_str();
+    //rTaskbarData.font.size = ini.GetInt(_T("taskbar"), _T("tack_bar_font_size"), 9);
     default_font = FontInfo{};
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
     default_font.size = 9;
-    ini.LoadFontData(_T("task_bar"), rTaskbarData.font, default_font);
+    ini.LoadFontData(_T("taskbar"), rTaskbarData.font, default_font);
     //新增功能代码
     //载入用于任务栏窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)
     ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("up_string"),               rTaskbarData.M_LayoutItems, TDI_UP, nullptr, L"↑: $", default_color);
@@ -252,54 +251,54 @@ void CTrafficMonitorApp::LoadConfig()
     ini.LoadPluginItemsAttributes(LIAO_TASKBAR, rTaskbarData.M_LayoutItems);
 
     //任务栏选项设置
-    rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_on_left"),           false);
-    rTaskbarData.speed_short_mode                       = ini.GetBool(_T("task_bar"), _T("task_bar_speed_short_mode"),      false);
-    rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("task_bar"), _T("task_bar_wnd_snap"),              false);
-    rTaskbarData.unit_byte                              = ini.GetBool(_T("task_bar"), _T("unit_byte"),                      true);
-    rTaskbarData.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("task_bar"), _T("task_bar_speed_unit"),            0));
-    rTaskbarData.hide_unit                              = ini.GetBool(_T("task_bar"), _T("task_bar_hide_unit"),             false);
-    rTaskbarData.hide_percent                           = ini.GetBool(_T("task_bar"), _T("task_bar_hide_percent"),          false);
-    rTaskbarData.value_right_align                      = ini.GetBool(_T("task_bar"), _T("value_right_align"),              false);
-    rTaskbarData.horizontal_arrange                     = ini.GetBool(_T("task_bar"), _T("horizontal_arrange"),             false);
-    rTaskbarData.b_show_resource_figure                 = ini.GetBool(_T("task_bar"), _T("show_status_bar"),                false);
-    rTaskbarData.separate_value_unit_with_space         = ini.GetBool(_T("task_bar"), _T("separate_value_unit_with_space"), true);
-    rTaskbarData.show_tool_tip                          = ini.GetBool(_T("task_bar"), _T("show_tool_tip"),                  true);
-    rTaskbarData.digits_number                          = ini.GetInt (_T("task_bar"), _T("digits_number"),                  4);
-    rTaskbarData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"task_bar",    L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
-    rTaskbarData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("task_bar"), _T("double_click_action"), 0));
-    rTaskbarData.double_click_exe                       = ini.GetString(L"task_bar",    L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
-    rTaskbarData.cm_graph_type                          = ini.GetBool(_T("task_bar"), _T("cm_graph_type"),                  true);
-    rTaskbarData.b_show_graph_dashed_box                = ini.GetBool  (L"task_bar",    L"show_graph_dashed_box",           false);
-    rTaskbarData.item_space                             = ini.GetInt   (L"task_bar",    L"item_space",                      4);
-    rTaskbarData.window_offset_top                      = ini.GetInt   (L"task_bar",    L"window_offset_top",               0);
-    rTaskbarData.vertical_margin                        = ini.GetInt   (L"task_bar",    L"vertical_margin",                 0);
+    rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_on_left"),             false);
+    rTaskbarData.speed_short_mode                       = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
+    rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_snap"),                false);
+    rTaskbarData.unit_byte                              = ini.GetBool(_T("taskbar"), _T("unit_byte"),                       true);
+    rTaskbarData.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),              0));
+    rTaskbarData.hide_unit                              = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
+    rTaskbarData.hide_percent                           = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
+    rTaskbarData.value_right_align                      = ini.GetBool(_T("taskbar"), _T("value_right_align"),               false);
+    rTaskbarData.horizontal_arrange                     = ini.GetBool(_T("taskbar"), _T("horizontal_arrange"),              false);
+    rTaskbarData.b_show_resource_figure                 = ini.GetBool(_T("taskbar"), _T("show_status_bar"),                 false);
+    rTaskbarData.separate_value_unit_with_space         = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
+    rTaskbarData.show_tool_tip                          = ini.GetBool(_T("taskbar"), _T("show_tool_tip"),                   true);
+    rTaskbarData.digits_number                          = ini.GetInt (_T("taskbar"), _T("digits_number"),                   4);
+    rTaskbarData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"taskbar",    L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
+    rTaskbarData.double_click_action = static_cast<DoubleClickAction>(ini.GetInt(_T("taskbar"), _T("double_click_action"),  0));
+    rTaskbarData.double_click_exe                       = ini.GetString(L"taskbar",    L"double_click_exe", (theApp.m_system_dir + L"\\Taskmgr.exe").c_str());
+    rTaskbarData.cm_graph_type                          = ini.GetBool(_T("taskbar"), _T("cm_graph_type"),                   true);
+    rTaskbarData.b_show_graph_dashed_box                = ini.GetBool  (L"taskbar",    L"show_graph_dashed_box",            false);
+    rTaskbarData.item_space                             = ini.GetInt   (L"taskbar",    L"item_space",                       4);
+    rTaskbarData.window_offset_top                      = ini.GetInt   (L"taskbar",    L"window_offset_top",                0);
+    rTaskbarData.vertical_margin                        = ini.GetInt   (L"taskbar",    L"vertical_margin",                  0);
     rTaskbarData.ValidItemSpace();
     rTaskbarData.ValidWindowOffsetTop();
 
     if (m_win_version.IsWindows10OrLater())     //只有Win10才支持自动适应系统深色/浅色主题
-        rTaskbarData.auto_adapt_light_theme = ini.GetBool(L"task_bar", L"auto_adapt_light_theme", false);
+        rTaskbarData.auto_adapt_light_theme = ini.GetBool(L"taskbar", L"auto_adapt_light_theme", false);
     else
         rTaskbarData.auto_adapt_light_theme = false;
-    rTaskbarData.dark_default_style = ini.GetInt(L"task_bar", L"dark_default_style", 0);
-    rTaskbarData.light_default_style = ini.GetInt(L"task_bar", L"light_default_style", TASKBAR_DEFAULT_LIGHT_STYLE_INDEX);
+    rTaskbarData.dark_default_style = ini.GetInt(L"taskbar", L"dark_default_style", 0);
+    rTaskbarData.light_default_style = ini.GetInt(L"taskbar", L"light_default_style", TASKBAR_DEFAULT_LIGHT_STYLE_INDEX);
 
     if (m_win_version.IsWindows8OrLater())
-        rTaskbarData.auto_set_background_color = ini.GetBool(L"task_bar", L"auto_set_background_color", false);
+        rTaskbarData.auto_set_background_color = ini.GetBool(L"taskbar", L"auto_set_background_color", false);
     else
         rTaskbarData.auto_set_background_color = false;
 
     //任务栏各监控项显示顺序设置
     rTaskbarData.item_order.Init();
-    rTaskbarData.item_order.FromString(ini.GetString(L"task_bar", L"item_order", L""));
-    rTaskbarData.plugin_display_item.FromString(ini.GetString(L"task_bar", L"plugin_display_item", L""));
-    rTaskbarData.auto_save_taskbar_color_settings_to_preset = ini.GetBool(L"task_bar", L"auto_save_taskbar_color_settings_to_preset", true);
+    rTaskbarData.item_order.FromString(ini.GetString(L"taskbar", L"item_order", L""));
+    rTaskbarData.plugin_display_item.FromString(ini.GetString(L"taskbar", L"plugin_display_item", L""));
+    rTaskbarData.auto_save_taskbar_color_settings_to_preset = ini.GetBool(L"taskbar", L"auto_save_taskbar_color_settings_to_preset", true);
 
-    rTaskbarData.b_show_netspeed_figure         = ini.GetBool(L"task_bar", L"show_netspeed_figure", false);
-    rTaskbarData.netspeed_figure_max_value      = ini.GetInt(L"task_bar", L"netspeed_figure_max_value", 512);
-    rTaskbarData.netspeed_figure_max_value_unit = ini.GetInt(L"task_bar", L"netspeed_figure_max_value_unit", 0);
+    rTaskbarData.b_show_netspeed_figure         = ini.GetBool(L"taskbar", L"show_netspeed_figure", false);
+    rTaskbarData.netspeed_figure_max_value      = ini.GetInt(L"taskbar", L"netspeed_figure_max_value", 512);
+    rTaskbarData.netspeed_figure_max_value_unit = ini.GetInt(L"taskbar", L"netspeed_figure_max_value_unit", 0);
 
     if (CTaskBarDlgDrawCommonSupport::CheckSupport())
-        rTaskbarData.disable_d2d = ini.GetBool(L"task_bar", L"disable_d2d", true);
+        rTaskbarData.disable_d2d = ini.GetBool(L"taskbar", L"disable_d2d", true);
     else
         rTaskbarData.disable_d2d = true;
 
@@ -319,7 +318,7 @@ void CTrafficMonitorApp::LoadConfig()
     m_show_mouse_panetrate_tip = ini.GetBool(L"other", L"show_mouse_panetrate_tip", true);
     m_show_dot_net_notinstalled_tip = ini.GetBool(L"other", L"show_dot_net_notinstalled_tip", true);
 
-    rAppData.taskbar_left_space_win11 = ini.GetInt(L"task_bar", L"taskbar_left_space_win11", 160);
+    rAppData.taskbar_left_space_win11 = ini.GetInt(L"taskbar", L"taskbar_left_space_win11", 160);
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -363,7 +362,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool     (_T("general"), _T("allow_skin_cover_font"),              rGeneralData.allow_skin_cover_font);
     ini.WriteBool     (_T("general"), _T("allow_skin_cover_text"),              rGeneralData.allow_skin_cover_text);
     //(2)鼠标右键中的部分设置
-    ini.WriteBool       (L"config",     L"show_task_bar_wnd",                   rAppData.m_show_task_bar_wnd);
+    ini.WriteBool       (L"config",     L"show_taskbar_wnd",                   rAppData.m_show_taskbar_wnd);
     ini.WriteInt        (L"config",     L"hide_main_window",                    rAppData.m_hide_main_window);
     //网络连接设置
     ini.WriteBool       (L"connection", L"auto_select",                         rAppData.m_auto_select);
@@ -415,7 +414,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt            (L"config",     L"double_click_action",static_cast<int>(rMainWndData.double_click_action));
     ini.WriteString         (L"config",     L"double_click_exe",                rMainWndData.double_click_exe);
     //(2)鼠标右键中的部分设置
-    ini.WriteBool           (L"config",     L"show_cpu_memory",                 rMainWndData.m_show_more_info);
+    ini.WriteBool           (L"config",     L"show_more_info",                  rMainWndData.m_show_more_info);
     ini.WriteInt            (L"config",     L"transparency",                    rMainWndData.m_transparency);
     ini.WriteString       (_T("config"),  _T("skin_selected"),                  rMainWndData.m_skin_name.c_str());
     //(3)其它设置
@@ -426,15 +425,14 @@ void CTrafficMonitorApp::SaveConfig()
     //      (三)保存任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    ini.WriteInt            (L"task_bar", L"task_bar_back_color",       rTaskbarData.back_color, 16);
-    ini.WriteInt            (L"task_bar", L"transparent_color",         rTaskbarData.transparent_color, 16);
-    ini.WriteInt            (L"task_bar", L"status_bar_color",          rTaskbarData.status_bar_color, 16);
-    ini.WriteBool           (L"task_bar", L"specify_each_item_color",   rTaskbarData.specify_each_item_color);
-    //ini.WriteBool         (L"task_bar", L"task_bar_show_cpu_memory",  rAppData.m_tbar_show_cpu_memory);
-    ini.WriteInt            (L"task_bar", L"tbar_display_item",         rTaskbarData.m_tbar_display_item);
+    ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.back_color, 16);
+    ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.transparent_color, 16);
+    ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.status_bar_color, 16);
+    ini.WriteBool           (L"taskbar",    L"specify_each_item_color", rTaskbarData.specify_each_item_color);
+    ini.WriteInt            (L"taskbar",    L"tbar_display_item",       rTaskbarData.m_tbar_display_item);
     //任务栏窗口字体设置
-    ini.SaveFontData(L"task_bar", rTaskbarData.font);
-    //ini.WriteBool(L"task_bar", L"task_bar_swap_up_down", rTaskbarData.swap_up_down);
+    ini.SaveFontData(L"taskbar", rTaskbarData.font);
+    //ini.WriteBool(L"taskbar", L"taskbar_swap_up_down", rTaskbarData.swap_up_down);
     //保存用于任务栏窗口的内置显示项标签设置(当前版本情况：只支持全局性设置)
     ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("up_string"),               rTaskbarData.M_LayoutItems[TDI_UP]);
     ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("down_string"),             rTaskbarData.M_LayoutItems[TDI_DOWN]);
@@ -452,49 +450,49 @@ void CTrafficMonitorApp::SaveConfig()
     ini.SavePluginItemsAttributes(LIAO_TASKBAR, rTaskbarData.M_LayoutItems);
 
     //任务栏选项设置
-    ini.WriteBool(L"task_bar", L"task_bar_wnd_on_left",                 rTaskbarData.tbar_wnd_on_left);
-    ini.WriteBool(L"task_bar", L"task_bar_wnd_snap",                    rTaskbarData.tbar_wnd_snap);
-    ini.WriteBool(L"task_bar", L"task_bar_speed_short_mode",            rTaskbarData.speed_short_mode);
-    ini.WriteBool(L"task_bar", L"unit_byte",                            rTaskbarData.unit_byte);
-    ini.WriteInt(L"task_bar", L"task_bar_speed_unit",  static_cast<int>(rTaskbarData.speed_unit));
-    ini.WriteBool(L"task_bar", L"task_bar_hide_unit",                   rTaskbarData.hide_unit);
-    ini.WriteBool(L"task_bar", L"task_bar_hide_percent",                rTaskbarData.hide_percent);
-    ini.WriteBool(L"task_bar", L"value_right_align",                    rTaskbarData.value_right_align);
-    ini.WriteBool(L"task_bar", L"horizontal_arrange",                   rTaskbarData.horizontal_arrange);
-    ini.WriteBool(L"task_bar", L"show_status_bar",                      rTaskbarData.b_show_resource_figure);
-    ini.WriteBool(L"task_bar", L"separate_value_unit_with_space",       rTaskbarData.separate_value_unit_with_space);
-    ini.WriteBool(L"task_bar", L"show_tool_tip",                        rTaskbarData.show_tool_tip);
-    ini.WriteInt(L"task_bar", L"digits_number",                         rTaskbarData.digits_number);
-    ini.WriteInt(L"task_bar", L"memory_display",       static_cast<int>(rTaskbarData.memory_display));
-    ini.WriteInt(L"task_bar", L"double_click_action",  static_cast<int>(rTaskbarData.double_click_action));
-    ini.WriteString(L"task_bar", L"double_click_exe",                   rTaskbarData.double_click_exe);
-    ini.WriteBool(L"task_bar", L"cm_graph_type",                        rTaskbarData.cm_graph_type);
-    ini.WriteBool(L"task_bar", L"show_graph_dashed_box",                rTaskbarData.b_show_graph_dashed_box);
-    ini.WriteInt(L"task_bar", L"item_space",                            rTaskbarData.item_space);
-    ini.WriteInt(L"task_bar", L"window_offset_top",                     rTaskbarData.window_offset_top);
-    ini.WriteInt(L"task_bar", L"vertical_margin",                       rTaskbarData.vertical_margin);
+    ini.WriteBool(L"taskbar", L"taskbar_wnd_on_left",                   rTaskbarData.tbar_wnd_on_left);
+    ini.WriteBool(L"taskbar", L"taskbar_wnd_snap",                      rTaskbarData.tbar_wnd_snap);
+    ini.WriteBool(L"taskbar", L"taskbar_speed_short_mode",              rTaskbarData.speed_short_mode);
+    ini.WriteBool(L"taskbar", L"unit_byte",                             rTaskbarData.unit_byte);
+    ini.WriteInt (L"taskbar", L"taskbar_speed_unit",   static_cast<int>(rTaskbarData.speed_unit));
+    ini.WriteBool(L"taskbar", L"taskbar_hide_unit",                     rTaskbarData.hide_unit);
+    ini.WriteBool(L"taskbar", L"taskbar_hide_percent",                  rTaskbarData.hide_percent);
+    ini.WriteBool(L"taskbar", L"value_right_align",                     rTaskbarData.value_right_align);
+    ini.WriteBool(L"taskbar", L"horizontal_arrange",                    rTaskbarData.horizontal_arrange);
+    ini.WriteBool(L"taskbar", L"show_status_bar",                       rTaskbarData.b_show_resource_figure);
+    ini.WriteBool(L"taskbar", L"separate_value_unit_with_space",        rTaskbarData.separate_value_unit_with_space);
+    ini.WriteBool(L"taskbar", L"show_tool_tip",                         rTaskbarData.show_tool_tip);
+    ini.WriteInt (L"taskbar", L"digits_number",                         rTaskbarData.digits_number);
+    ini.WriteInt (L"taskbar", L"memory_display",       static_cast<int>(rTaskbarData.memory_display));
+    ini.WriteInt (L"taskbar", L"double_click_action",  static_cast<int>(rTaskbarData.double_click_action));
+    ini.WriteString(L"taskbar", L"double_click_exe",                    rTaskbarData.double_click_exe);
+    ini.WriteBool(L"taskbar", L"cm_graph_type",                         rTaskbarData.cm_graph_type);
+    ini.WriteBool(L"taskbar", L"show_graph_dashed_box",                 rTaskbarData.b_show_graph_dashed_box);
+    ini.WriteInt (L"taskbar", L"item_space",                            rTaskbarData.item_space);
+    ini.WriteInt (L"taskbar", L"window_offset_top",                     rTaskbarData.window_offset_top);
+    ini.WriteInt (L"taskbar", L"vertical_margin",                       rTaskbarData.vertical_margin);
 
-    ini.WriteBool(L"task_bar", L"auto_adapt_light_theme",               rTaskbarData.auto_adapt_light_theme);
-    ini.WriteInt(L"task_bar", L"dark_default_style",                    rTaskbarData.dark_default_style);
-    ini.WriteInt(L"task_bar", L"light_default_style",                   rTaskbarData.light_default_style);
-    ini.WriteBool(L"task_bar", L"auto_set_background_color",            rTaskbarData.auto_set_background_color);
+    ini.WriteBool(L"taskbar", L"auto_adapt_light_theme",                rTaskbarData.auto_adapt_light_theme);
+    ini.WriteInt (L"taskbar", L"dark_default_style",                    rTaskbarData.dark_default_style);
+    ini.WriteInt (L"taskbar", L"light_default_style",                   rTaskbarData.light_default_style);
+    ini.WriteBool(L"taskbar", L"auto_set_background_color",             rTaskbarData.auto_set_background_color);
 
     //任务栏各监控项显示顺序设置
-    ini.WriteString(L"task_bar", L"item_order",                         rTaskbarData.item_order.ToString());
-    ini.WriteString(L"task_bar", L"plugin_display_item",                rTaskbarData.plugin_display_item.ToString());
-    ini.WriteBool(L"task_bar", L"auto_save_taskbar_color_settings_to_preset", rTaskbarData.auto_save_taskbar_color_settings_to_preset);
+    ini.WriteString(L"taskbar", L"item_order",                          rTaskbarData.item_order.ToString());
+    ini.WriteString(L"taskbar", L"plugin_display_item",                 rTaskbarData.plugin_display_item.ToString());
+    ini.WriteBool(L"taskbar", L"auto_save_taskbar_color_settings_to_preset", rTaskbarData.auto_save_taskbar_color_settings_to_preset);
 
-    ini.WriteBool(L"task_bar", L"show_netspeed_figure",                 rTaskbarData.b_show_netspeed_figure);
-    ini.WriteInt(L"task_bar", L"netspeed_figure_max_value",             rTaskbarData.netspeed_figure_max_value);
-    ini.WriteInt(L"task_bar", L"netspeed_figure_max_value_unit",        rTaskbarData.netspeed_figure_max_value_unit);
+    ini.WriteBool(L"taskbar", L"show_netspeed_figure",                  rTaskbarData.b_show_netspeed_figure);
+    ini.WriteInt (L"taskbar", L"netspeed_figure_max_value",             rTaskbarData.netspeed_figure_max_value);
+    ini.WriteInt (L"taskbar", L"netspeed_figure_max_value_unit",        rTaskbarData.netspeed_figure_max_value_unit);
 
-    ini.WriteBool(L"task_bar", L"disable_d2d",                          rTaskbarData.disable_d2d);
+    ini.WriteBool(L"taskbar", L"disable_d2d",                          rTaskbarData.disable_d2d);
 
     //其他设置
     //ini.WriteBool(L"connection_details", L"show_internet_ip",         rAppData.m_show_internet_ip);
     ini.WriteBool(L"histroy_traffic", L"use_log_scale",                 rAppData.m_use_log_scale);
     ini.WriteBool(L"histroy_traffic", L"sunday_first",                  rAppData.m_sunday_first);
-    ini.WriteInt(L"histroy_traffic", L"view_type",     static_cast<int>(rAppData.m_view_type));
+    ini.WriteInt (L"histroy_traffic", L"view_type",     static_cast<int>(rAppData.m_view_type));
 
     ini.WriteBool(_T("other"), _T("no_multistart_warning"), m_no_multistart_warning);
     ini.WriteBool(_T("other"), _T("exit_when_start_by_restart_manager"), m_exit_when_start_by_restart_manager);
@@ -507,7 +505,7 @@ void CTrafficMonitorApp::SaveConfig()
 
     ini.WriteString(L"config", L"plugin_disabled", rAppData.plugin_disabled.ToString());
 
-    ini.WriteInt(L"task_bar", L"taskbar_left_space_win11", rAppData.taskbar_left_space_win11);
+    ini.WriteInt(L"taskbar", L"taskbar_left_space_win11", rAppData.taskbar_left_space_win11);
 
     ini.WriteString(L"app", L"version", VERSION);
 
@@ -876,7 +874,7 @@ void CTrafficMonitorApp::InitMenuResourse()
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_CPU_MEMORY, FALSE, GetMenuIcon(IDI_MORE));
         if (!m_win_version.IsWindows11OrLater())
-            CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TASK_BAR_WND, FALSE, GetMenuIcon(IDI_TASKBAR_WINDOW));
+            CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TASKBAR_WND, FALSE, GetMenuIcon(IDI_TASKBAR_WINDOW));
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_MAIN_WND, FALSE, GetMenuIcon(IDI_MAIN_WINDOW));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_CHANGE_SKIN, FALSE, GetMenuIcon(IDI_SKIN));
@@ -904,7 +902,7 @@ void CTrafficMonitorApp::InitMenuResourse()
         //    CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_NOTIFY_ICON, FALSE, GetMenuIcon(IDI_NOTIFY));
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_MAIN_WND, FALSE, GetMenuIcon(IDI_MAIN_WINDOW));
-        CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TASK_BAR_WND, FALSE, GetMenuIcon(IDI_CLOSE));
+        CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TASKBAR_WND,  FALSE, GetMenuIcon(IDI_CLOSE));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_OPEN_TASK_MANAGER, FALSE, GetMenuIcon(IDI_TASK_MANAGER));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_OPTIONS2, FALSE, GetMenuIcon(IDI_SETTINGS));
         CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), 12, TRUE, GetMenuIcon(IDI_HELP));
@@ -1254,7 +1252,7 @@ void CTrafficMonitorApp::UpdateOpenHardwareMonitorEnableState()
 bool CTrafficMonitorApp::IsForceShowNotifyIcon()
 {
     AppSettingData& rAppData = m_cfg_data;
-    return ((!rAppData.m_show_task_bar_wnd /*|| m_win_version.IsWindows11OrLater()*/)
+    return ((!rAppData.m_show_taskbar_wnd /*|| m_win_version.IsWindows11OrLater()*/)
         && (rAppData.m_hide_main_window || m_main_wnd_data.m_mouse_penetrate));    //如果没有显示任务栏窗口，且隐藏了主窗口或设置了鼠标穿透，则禁用“显示通知区图标”菜单项
 }
 
