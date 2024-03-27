@@ -1,0 +1,24 @@
+﻿<root>
+	<skin>
+		<text_color>3803808</text_color>
+		<skin_author>zy</skin_author>
+	</skin>
+	<layout text_height="20" no_label="0">
+		<layout_l width="220" height="43">
+			<up 	x="6" 	y="2" 	width="108" align="0" show="1"/>
+			<down 	x="114" y="2" 	width="110" align="0" show="1"/>
+			<cpu 	x="6" 	y="21" 	width="108" align="0" show="1"/>
+			<memory x="114" y="21" 	width="110" align="0" show="1"/>
+		</layout_l>
+		<layout_s width="220" height="28">
+			<up 	x="6" 	y="4" 	width="108" align="0" show="1"/>
+			<down 	x="114" y="4" 	width="110" align="0" show="1"/>
+			<cpu 	x="0" 	y="0" 	width="0"  align="0" show="0"/>
+			<memory x="0" 	y="0"   width="0"  align="0" show="0"/>
+		</layout_s>
+	</layout>
+	<preview width="238" height="105">
+		<l x="0" y="47"/>
+		<s x="0" y="0"/>
+	</preview>
+</root>

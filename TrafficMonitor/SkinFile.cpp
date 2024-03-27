@@ -152,11 +152,7 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, C
 void CSkinFile::LoadCfgAndBGImage(const wstring& file_path)
 {
     CFilePathHelper file_path_helper{ file_path };
-    wstring ext = file_path_helper.GetFileExtension();
-    if (ext == L"ini")
-        LoadFromIni(file_path);
-    else
-        LoadFromXml(file_path);
+    LoadFromXml(file_path);
 
     if (m_font.m_hObject)
         m_font.DeleteObject();
@@ -285,97 +281,6 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 }
             });
     }
-}
-
-void CSkinFile::LoadFromIni(const wstring& file_path)
-{
-    m_skin_info         = SkinInfo();
-    m_layout_manager    = LayoutManager();
-    m_preview_info      = PreviewInfo();
-
-    CSkinFile::Layout& rLayout_L = m_layout_manager.layout_l;
-    CSkinFile::Layout& rLayout_S = m_layout_manager.layout_s;
-
-    //获取皮肤信息
-    CIniHelper ini(file_path);
-    //获取皮肤作者
-    m_skin_info.skin_author             = ini.GetString(_T("skin"),   _T("skin_author"),    _T("unknow"));
-    //获取当前皮肤的字体
-    FontInfo default_font{};
-    ini.LoadFontData(L"skin", m_skin_info.font_info, default_font);
-    //获取显示标签
-    rLayout_L.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                _T("")).c_str();
-    rLayout_L.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              _T("")).c_str();
-    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               _T("")).c_str();
-    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            _T("")).c_str();
-    /////////目前只针对皮肤范围配置，所以复制一份。
-    rLayout_S.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                _T("")).c_str();
-    rLayout_S.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              _T("")).c_str();
-    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               _T("")).c_str();
-    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            _T("")).c_str();
-    //获取当前皮肤的文字颜色
-    m_skin_info.specify_each_item_color                     = ini.GetBool  (_T("skin"), _T("specify_each_item_color"),  false);
-    wstring str_text_color                                  = ini.GetString(_T("skin"), _T("text_color"),               _T(""));
-    CCommon::LoadValueColorsFromColorStr(rLayout_L.M_LayoutItems, str_text_color);
-    CCommon::LoadValueColorsFromColorStr(rLayout_S.M_LayoutItems, str_text_color);
-
-    //从ini文件读取皮肤布局，并根据DPI进行缩放
-    m_layout_manager.text_height                            = theApp.DPI(ini.GetInt(_T("layout"), _T("text_height"),    20));
-    m_layout_manager.no_label                                       = ini.GetBool(  _T("layout"), _T("no_text"),        false);
-
-    rLayout_L.width                             =             theApp.DPI(ini.GetInt(_T("layout"), _T("width_l"),        220));
-    rLayout_L.height                            =             theApp.DPI(ini.GetInt(_T("layout"), _T("height_l"),       43));
-    rLayout_L.M_LayoutItems[TDI_UP].x           =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_l"),         6));
-    rLayout_L.M_LayoutItems[TDI_UP].y           =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_l"),         2));
-    rLayout_L.M_LayoutItems[TDI_UP].width       =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_l"),     108));
-    rLayout_L.M_LayoutItems[TDI_UP].align       = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_l"),     0));
-    rLayout_L.M_LayoutItems[TDI_DOWN].x         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_l"),       114));
-    rLayout_L.M_LayoutItems[TDI_DOWN].y         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_l"),       2));
-    rLayout_L.M_LayoutItems[TDI_DOWN].width     =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_l"),   110));
-    rLayout_L.M_LayoutItems[TDI_DOWN].align     = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_l"),   0));
-    rLayout_L.M_LayoutItems[TDI_CPU].x =                       theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_l"),       6));
-    rLayout_L.M_LayoutItems[TDI_CPU].y =                       theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_l"),       21));
-    rLayout_L.M_LayoutItems[TDI_CPU].width      =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_l"),    108));
-    rLayout_L.M_LayoutItems[TDI_CPU].align      = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_l"),    0));
-    rLayout_L.M_LayoutItems[TDI_MEMORY].x       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_l"),     114));
-    rLayout_L.M_LayoutItems[TDI_MEMORY].y       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_l"),     21));
-    rLayout_L.M_LayoutItems[TDI_MEMORY].width   =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_l"), 110));
-    rLayout_L.M_LayoutItems[TDI_MEMORY].align   = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_l"), 0));
-    rLayout_L.M_LayoutItems[TDI_UP].show        =                        ini.GetBool(_T("layout"), _T("show_up_l"),     true);
-    rLayout_L.M_LayoutItems[TDI_DOWN].show      =                        ini.GetBool(_T("layout"), _T("show_down_l"),   true);
-    rLayout_L.M_LayoutItems[TDI_CPU].show       =                        ini.GetBool(_T("layout"), _T("show_cpu_l"),    true);
-    rLayout_L.M_LayoutItems[TDI_MEMORY].show    =                        ini.GetBool(_T("layout"), _T("show_memory_l"), true);
-
-    rLayout_S.width                             =             theApp.DPI(ini.GetInt(_T("layout"), _T("width_s"), 220));
-    rLayout_S.height                            =             theApp.DPI(ini.GetInt(_T("layout"), _T("height_s"), 28));
-    rLayout_S.M_LayoutItems[TDI_UP].x           =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_x_s"), 6));
-    rLayout_S.M_LayoutItems[TDI_UP].y           =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_y_s"), 4));
-    rLayout_S.M_LayoutItems[TDI_UP].width       =             theApp.DPI(ini.GetInt(_T("layout"), _T("up_width_s"), 108));
-    rLayout_S.M_LayoutItems[TDI_UP].align       = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("up_align_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_UP].show        =                       ini.GetBool(_T("layout"), _T("show_up_s"), true);
-    rLayout_S.M_LayoutItems[TDI_DOWN].x         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_x_s"), 114));
-    rLayout_S.M_LayoutItems[TDI_DOWN].y         =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_y_s"), 4));
-    rLayout_S.M_LayoutItems[TDI_DOWN].width     =             theApp.DPI(ini.GetInt(_T("layout"), _T("down_width_s"), 110));
-    rLayout_S.M_LayoutItems[TDI_DOWN].align     = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("down_align_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_DOWN].show      =                       ini.GetBool(_T("layout"), _T("show_down_s"), true);
-    rLayout_S.M_LayoutItems[TDI_CPU].x          =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_x_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_CPU].y          =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_y_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_CPU].width      =             theApp.DPI(ini.GetInt(_T("layout"), _T("cpu_width_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_CPU].align      = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("cpu_align_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_CPU].show       =                       ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
-    rLayout_S.M_LayoutItems[TDI_MEMORY].x       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_x_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_MEMORY].y       =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_y_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_MEMORY].width   =             theApp.DPI(ini.GetInt(_T("layout"), _T("memory_width_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_MEMORY].align   = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("memory_align_s"), 0));
-    rLayout_S.M_LayoutItems[TDI_MEMORY].show    =                       ini.GetBool(_T("layout"), _T("show_memory_s"), false);
-
-    //获取预览区配置
-    m_preview_info.width                        =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_width"), 238));
-    m_preview_info.height                       =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_height"), 105));
-    m_preview_info.l_pos.x                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_l"), 0));
-    m_preview_info.l_pos.y                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_l"), 47));
-    m_preview_info.s_pos.x                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_s"), 0));
-    m_preview_info.s_pos.y                      =             theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_s"), 0));
 }
 
 //只使用皮肤配置文件中的配置数据来显示预览画面(包括大小两个layout)

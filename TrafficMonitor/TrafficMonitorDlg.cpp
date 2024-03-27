@@ -825,8 +825,6 @@ void CTrafficMonitorDlg::SetItemPosition()
 void CTrafficMonitorDlg::LoadSkinLayout()
 {
     wstring skin_cfg_path{ theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.xml" };
-    if (!CCommon::FileExist(skin_cfg_path.c_str()))
-        skin_cfg_path = theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.ini";
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
 
     //接下来是比在皮肤预览窗口切换皮肤预览后，额外要做的事情。

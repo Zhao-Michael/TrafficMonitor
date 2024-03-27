@@ -80,7 +80,6 @@ public:
     void DrawInfo(CDC* pDC, bool show_more_info, CFont& font);
 private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
-    void LoadFromIni(const wstring& file_path);     //从ini文件读取皮肤数据（用于兼容旧版皮肤）
 
 //  void InitLayoutItemAttributes(LayoutItem&   layout_item);
     void LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele);
