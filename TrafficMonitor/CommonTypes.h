@@ -193,7 +193,6 @@ const std::set<EBuiltinDisplayItem> gS_AllBuiltinDisplayItems
 };
 
 #define DEF_CH L'\"'        //写入和读取ini文件字符串时，在字符串前后添加的字符
-#define NONE_STR L"@@@"     //用于指定一个无效字符串
 
 //定义监控时间间隔有效的最大值和最小值
 #define MONITOR_TIME_SPAN_MIN 200

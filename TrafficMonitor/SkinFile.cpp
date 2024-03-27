@@ -304,15 +304,15 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     FontInfo default_font{};
     ini.LoadFontData(L"skin", m_skin_info.font_info, default_font);
     //获取显示标签
-    rLayout_L.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                NONE_STR).c_str();
-    rLayout_L.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              NONE_STR).c_str();
-    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               NONE_STR).c_str();
-    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            NONE_STR).c_str();
+    rLayout_L.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                _T("")).c_str();
+    rLayout_L.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              _T("")).c_str();
+    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               _T("")).c_str();
+    rLayout_L.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            _T("")).c_str();
     /////////目前只针对皮肤范围配置，所以复制一份。
-    rLayout_S.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                NONE_STR).c_str();
-    rLayout_S.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              NONE_STR).c_str();
-    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               NONE_STR).c_str();
-    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            NONE_STR).c_str();
+    rLayout_S.M_LayoutItems[TDI_UP].LabelValueStr.label     = ini.GetString(_T("skin"), _T("up_string"),                _T("")).c_str();
+    rLayout_S.M_LayoutItems[TDI_DOWN].LabelValueStr.label   = ini.GetString(_T("skin"), _T("down_string"),              _T("")).c_str();
+    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("cpu_string"),               _T("")).c_str();
+    rLayout_S.M_LayoutItems[TDI_CPU].LabelValueStr.label    = ini.GetString(_T("skin"), _T("memory_string"),            _T("")).c_str();
     //获取当前皮肤的文字颜色
     m_skin_info.specify_each_item_color                     = ini.GetBool  (_T("skin"), _T("specify_each_item_color"),  false);
     wstring str_text_color                                  = ini.GetString(_T("skin"), _T("text_color"),               _T(""));
@@ -411,9 +411,6 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     ////////////////////////////////////////////////////////////////////////////////////////    
     for (auto iter = gS_AllBuiltinDisplayItems.begin(); iter != gS_AllBuiltinDisplayItems.end(); ++iter)
     {
-        //wstring disp_text = m_skin_info.display_text.Get(*iter);
-        //if (disp_text == NONE_STR)
-        //    disp_text = rMainWndData.disp_str.Get(*iter);
         DrawStr draw_str;
         switch (*iter)
         {
@@ -442,10 +439,6 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             draw_str.value = _T("99");
             break;
         }
-        if (m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
-            m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label = _T("");
-        if (m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
-            m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label = _T("");
         if (!m_layout_manager.no_label)
         {
             /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
