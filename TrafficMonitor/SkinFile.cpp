@@ -429,8 +429,14 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         case TDI_MEMORY:
             draw_str.value = _T("51 %");
             break;
+        case TDI_GPU_USAGE:
+            draw_str.value = _T("52 %");
+            break;
         case TDI_CPU_TEMP: case TDI_GPU_TEMP: case TDI_HDD_TEMP: case TDI_MAIN_BOARD_TEMP:
             draw_str.value = _T("40 °C");
+            break;
+        case TDI_HDD_USAGE:
+            draw_str.value = _T("54 %");
             break;
         case TDI_CPU_FREQ:
             draw_str.value = _T("1.0 GHz");
