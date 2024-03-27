@@ -515,7 +515,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                 {
                     //绘制文本
                     DrawStr draw_str;
-                    draw_str.label = iplugin_item->GetItemLableText();              //这里没有使用皮肤配置文件设置的标签，可能是因为当前的皮肤配置文件中都没有设置插件标签。   //以后还是要使用皮肤配置文件设置的标签，而不是系统缺省值。
+                    draw_str.label = layout_item.LabelValueStr.label;                                   //使用皮肤配置文件里设置的标签，而不是系统缺省值。
                     draw_str.value = iplugin_item->GetItemValueSampleText();
                     DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
                 }
