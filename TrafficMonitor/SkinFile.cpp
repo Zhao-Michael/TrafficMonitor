@@ -443,9 +443,9 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             break;
         }
         if (m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
-            m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label = rMainWndData.M_LayoutItems[*iter].LabelValueStr.label;
+            m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label = _T("");
         if (m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label == NONE_STR)
-            m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label = rMainWndData.M_LayoutItems[*iter].LabelValueStr.label;
+            m_layout_manager.layout_s.M_LayoutItems[*iter].LabelValueStr.label = _T("");
         if (!m_layout_manager.no_label)
         {
             /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
