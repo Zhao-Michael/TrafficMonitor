@@ -29,7 +29,10 @@ void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XML
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
-//    layout_item.Prefix.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
+    if (m_layout_manager.no_label)
+        layout_item.Prefix      = _T("");
+//    else
+//        layout_item.Prefix.Format(_T("%s"),                     CTinyXml2Helper::ElementAttribute(ele, "prefix"));
 //    layout_item.PrefixColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
 //    layout_item.ValueColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
 }
@@ -369,11 +372,9 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             draw_str.value = _T("99");
             break;
         }
-        if (!m_layout_manager.no_label)
-        {
-            /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
-            draw_str.label = m_layout_manager.layout_l.M_LayoutItems[*iter].Prefix;
-        }
+        /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
+        draw_str.label = m_layout_manager.layout_l.M_LayoutItems[*iter].Prefix;
+
         map_builtin_str[*iter] = draw_str;
     }
 
