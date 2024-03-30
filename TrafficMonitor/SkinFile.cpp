@@ -177,11 +177,29 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
     tinyxml2::XMLDocument doc;
     if (CTinyXml2Helper::LoadXmlFile(doc, file_path.c_str()))
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //      皮肤配置文件中各个section的加载是有先后顺序要求的。例如，如果<plugin_map>是最后加载的，则使用了影射的插件项将被忽略。
+        //      加载的先后顺序是：<plugin_map>、<skin>、其它。
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         CTinyXml2Helper::IterateChildNode(doc.FirstChildElement(), [this](tinyxml2::XMLElement* child)
             {
                 string ele_name = CTinyXml2Helper::ElementName(child);
-                //读取皮肤信息
-                if (ele_name == "skin")
+                if (ele_name == "plugin_map")           //插件名称映射
+                {
+                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* plugin_item)
+                        {
+                            string ele_name = CTinyXml2Helper::ElementName(plugin_item);
+                            string ele_text = CTinyXml2Helper::ElementText(plugin_item);
+                            m_plugin_map[ele_name] = ele_text;
+                        }
+                    );
+                }
+            }
+        );
+        CTinyXml2Helper::IterateChildNode(doc.FirstChildElement(), [this](tinyxml2::XMLElement* child)
+            {
+                string ele_name = CTinyXml2Helper::ElementName(child);
+                if (ele_name == "skin")             //读取皮肤信息
                 {
                     CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
                         {
@@ -231,12 +249,17 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                             }
                                         }
                                     }
-                                                                );
+                                );
                             }
-                        });
+                        }
+                    );
                 }
-                //布局信息
-                else if (ele_name == "layout")
+            }
+        );
+        CTinyXml2Helper::IterateChildNode(doc.FirstChildElement(), [this](tinyxml2::XMLElement* child)
+            {
+                string ele_name = CTinyXml2Helper::ElementName(child);
+                if (ele_name == "layout")              //布局信息
                 {
                     m_layout_manager.text_height = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "text_height")));
                     m_layout_manager.no_label = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(child, "no_label"));
@@ -249,8 +272,8 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 LoadLayoutFromXmlNode(m_layout_manager.layout_s, ele_layout);
                         });
                 }
-                //预览图
-                else if (ele_name == "preview")
+                
+                else if (ele_name == "preview")             //预览图
                 {
                     m_preview_info.width = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "width")));
                     m_preview_info.height = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "height")));
@@ -269,17 +292,8 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                             }
                         });
                 }
-                //插件名称映射
-                else if (ele_name == "plugin_map")
-                {
-                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* plugin_item)
-                        {
-                            string ele_name = CTinyXml2Helper::ElementName(plugin_item);
-                            string ele_text = CTinyXml2Helper::ElementText(plugin_item);
-                            m_plugin_map[ele_name] = ele_text;
-                        });
-                }
-            });
+            }
+        );
     }
 }
 
