@@ -29,8 +29,8 @@ void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XML
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
-//    layout_item.LabelValueStr.label.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
-//    layout_item.LabelColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
+//    layout_item.Prefix.Format(_T("%s"),            CTinyXml2Helper::ElementAttribute(ele, "lable"));
+//    layout_item.PrefixColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
 //    layout_item.ValueColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
 }
 
@@ -243,8 +243,8 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                             if (item_name == CCommon::GetDisplayItemXmlNodeName(display_item))
                                             {
                                                 /////////目前只针对皮肤范围配置，所以都复制。
-                                                m_layout_manager.layout_l.M_LayoutItems[display_item].LabelValueStr.label = item_text.c_str();
-                                                m_layout_manager.layout_s.M_LayoutItems[display_item].LabelValueStr.label = item_text.c_str();
+                                                m_layout_manager.layout_l.M_LayoutItems[display_item].Prefix = item_text.c_str();
+                                                m_layout_manager.layout_s.M_LayoutItems[display_item].Prefix = item_text.c_str();
                                                 break;
                                             }
                                         }
@@ -367,7 +367,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
         if (!m_layout_manager.no_label)
         {
             /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
-            draw_str.label = m_layout_manager.layout_l.M_LayoutItems[*iter].LabelValueStr.label;
+            draw_str.label = m_layout_manager.layout_l.M_LayoutItems[*iter].Prefix;
         }
         map_builtin_str[*iter] = draw_str;
     }
@@ -440,7 +440,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                 {
                     //绘制文本
                     DrawStr draw_str;
-                    draw_str.label = layout_item.LabelValueStr.label;                                   //使用皮肤配置文件里设置的标签，而不是系统缺省值。
+                    draw_str.label = layout_item.Prefix;                                   //使用皮肤配置文件里设置的标签，而不是系统缺省值。
                     draw_str.value = iplugin_item->GetItemValueSampleText();
                     DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
                 }
@@ -489,18 +489,18 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     if (!m_layout_manager.no_label)
     {
-        map_builtin_str[TDI_UP].label               = rMainWndData.M_LayoutItems[TDI_UP].LabelValueStr.label;
-        map_builtin_str[TDI_DOWN].label             = rMainWndData.M_LayoutItems[TDI_DOWN].LabelValueStr.label;
-        map_builtin_str[TDI_CPU].label              = rMainWndData.M_LayoutItems[TDI_CPU].LabelValueStr.label;
-        map_builtin_str[TDI_MEMORY].label           = rMainWndData.M_LayoutItems[TDI_MEMORY].LabelValueStr.label;
-        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.M_LayoutItems[TDI_GPU_USAGE].LabelValueStr.label;
-        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_CPU_TEMP].LabelValueStr.label;
-        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_GPU_TEMP].LabelValueStr.label;
-        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.M_LayoutItems[TDI_HDD_TEMP].LabelValueStr.label;
-        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.M_LayoutItems[TDI_MAIN_BOARD_TEMP].LabelValueStr.label;
-        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.M_LayoutItems[TDI_HDD_USAGE].LabelValueStr.label;
-        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.M_LayoutItems[TDI_TOTAL_SPEED].LabelValueStr.label;
-        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.M_LayoutItems[TDI_CPU_FREQ].LabelValueStr.label;
+        map_builtin_str[TDI_UP].label               = rMainWndData.M_LayoutItems[TDI_UP].Prefix;
+        map_builtin_str[TDI_DOWN].label             = rMainWndData.M_LayoutItems[TDI_DOWN].Prefix;
+        map_builtin_str[TDI_CPU].label              = rMainWndData.M_LayoutItems[TDI_CPU].Prefix;
+        map_builtin_str[TDI_MEMORY].label           = rMainWndData.M_LayoutItems[TDI_MEMORY].Prefix;
+        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.M_LayoutItems[TDI_GPU_USAGE].Prefix;
+        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_CPU_TEMP].Prefix;
+        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_GPU_TEMP].Prefix;
+        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.M_LayoutItems[TDI_HDD_TEMP].Prefix;
+        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.M_LayoutItems[TDI_MAIN_BOARD_TEMP].Prefix;
+        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.M_LayoutItems[TDI_HDD_USAGE].Prefix;
+        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.M_LayoutItems[TDI_TOTAL_SPEED].Prefix;
+        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.M_LayoutItems[TDI_CPU_FREQ].Prefix;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -553,7 +553,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     {
         for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
         {
-            label_colors[item] = rMainWndData.M_LayoutItems[item].LabelColor;
+            label_colors[item] = rMainWndData.M_LayoutItems[item].PrefixColor;
             value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
         }
     }
@@ -601,7 +601,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
                 CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
                 //绘制标签和数值
                 DrawStr draw_str;
-                draw_str.label = rMainWndData.M_LayoutItems[iplugin_item].LabelValueStr.label;
+                draw_str.label = rMainWndData.M_LayoutItems[iplugin_item].Prefix;
                 draw_str.value = iplugin_item->GetItemValueText();
                 DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
             }

@@ -1665,7 +1665,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                     log_str += _T("taskbar_text_colors: ");
                     for (const auto& item : theApp.m_taskbar_data.M_LayoutItems)
                     {
-                        log_str += std::to_wstring(item.second.LabelColor).c_str();
+                        log_str += std::to_wstring(item.second.PrefixColor).c_str();
                         log_str += _T('|');
                         log_str += std::to_wstring(item.second.ValueColor).c_str();
                         log_str += _T(", ");
@@ -1721,7 +1721,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
         //当检测到背景色和文字颜色都为黑色写入错误日志
         static bool erro_log_write{ false };
-        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.M_LayoutItems.empty() && theApp.m_taskbar_data.M_LayoutItems.begin()->second.LabelColor == 0)
+        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.M_LayoutItems.empty() && theApp.m_taskbar_data.M_LayoutItems.begin()->second.PrefixColor == 0)
         {
             if (!erro_log_write)
             {
@@ -2417,7 +2417,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
             if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
             {
                 //更换标签
-                rMainWndData.M_LayoutItems[item].LabelValueStr.label = LayoutInUse.M_LayoutItems[item].LabelValueStr.label;
+                rMainWndData.M_LayoutItems[item].Prefix = LayoutInUse.M_LayoutItems[item].Prefix;
             }
         }
         //SetTextColor();

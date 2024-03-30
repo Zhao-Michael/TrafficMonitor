@@ -282,13 +282,13 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     if (0 == ColorsStr_num)                                     //找到了AppName.KeyName =，但后面都是空字符串。我们兼容这种情况。
     {
         //标签值留空，颜色值使用default_color。
-        pLayoutItem->LabelColor = default_color;
+        pLayoutItem->PrefixColor = default_color;
         pLayoutItem->ValueColor = default_color;
         return;
     }
     //去除引号后保存标签
     RemoveSpecialChar(ColorsStr_SplitResult[0]);
-    pLayoutItem->LabelValueStr.label = ColorsStr_SplitResult[0].c_str();     //保存标签
+    pLayoutItem->Prefix = ColorsStr_SplitResult[0].c_str();     //保存标签
 
     size_t index = 1;
     for (; index < LAYOUT_ITEM_ATTRIBUTE_NUM; index++)
@@ -301,9 +301,9 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
                 color_str = ColorsStr_SplitResult[index].c_str();
                 //support Decimal data or Hex data from saved data
                 if (wcslen(color_str) >= 2 && '0' == color_str[0] && 'x' == color_str[1])
-                    pLayoutItem->LabelColor = wcstol(color_str, nullptr, 16);
+                    pLayoutItem->PrefixColor = wcstol(color_str, nullptr, 16);
                 else
-                    pLayoutItem->LabelColor = _wtoi(color_str);
+                    pLayoutItem->PrefixColor = _wtoi(color_str);
             }
             else if (index == 2)        //保存数值颜色
             {
@@ -320,7 +320,7 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
         {
             if (index == 1)             //没找到标签颜色
             {
-                pLayoutItem->LabelColor = default_color;
+                pLayoutItem->PrefixColor = default_color;
                 index++;
             }
             if (index == 2)             //没找到数值颜色
@@ -337,7 +337,7 @@ void CIniHelper::SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     CString str;
 
     CString tmp;
-    tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.LabelValueStr.label, layout_item.LabelColor, layout_item.ValueColor);      //saved as Hex data
+    tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.Prefix, layout_item.PrefixColor, layout_item.ValueColor);      //saved as Hex data
     str += tmp;
 
     wchar_t* AppName = nullptr;

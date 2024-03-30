@@ -31,7 +31,7 @@ bool CTaskBarSettingsDlg::IsStyleModified()
     bool modified{false};
     for (auto iter = m_data.M_LayoutItems.begin(); iter != m_data.M_LayoutItems.end(); ++iter)
     {
-        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].LabelColor != iter->second.LabelColor)
+        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].PrefixColor != iter->second.PrefixColor)
         {
             modified = true;
             break;
@@ -65,7 +65,7 @@ void CTaskBarSettingsDlg::DrawStaticColor()
         m_text_color_static.SetColorNum(color_num);
         for (const auto& item : m_data.M_LayoutItems)
         {
-            m_text_color_static.SetFillColor(i, item.second.LabelColor);
+            m_text_color_static.SetFillColor(i, item.second.PrefixColor);
             m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
             i += 2;
         }
@@ -73,7 +73,7 @@ void CTaskBarSettingsDlg::DrawStaticColor()
     }
     else if (!m_data.M_LayoutItems.empty())
     {
-        m_text_color_static.SetFillColor(m_data.M_LayoutItems.begin()->second.LabelColor);
+        m_text_color_static.SetFillColor(m_data.M_LayoutItems.begin()->second.PrefixColor);
     }
     m_back_color_static.SetFillColor(m_data.back_color);
     //m_trans_color_static.SetFillColor(m_data.transparent_color);
@@ -529,11 +529,11 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         }
         else if (!m_data.M_LayoutItems.empty())
         {
-            CMFCColorDialogEx colorDlg(m_data.M_LayoutItems.begin()->second.LabelColor, 0, this);
+            CMFCColorDialogEx colorDlg(m_data.M_LayoutItems.begin()->second.PrefixColor, 0, this);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.M_LayoutItems.begin()->second.LabelColor = colorDlg.GetColor();
-                if (m_data.back_color == m_data.M_LayoutItems.begin()->second.LabelColor)
+                m_data.M_LayoutItems.begin()->second.PrefixColor = colorDlg.GetColor();
+                if (m_data.back_color == m_data.M_LayoutItems.begin()->second.PrefixColor)
                     MessageBox(CCommon::LoadText(IDS_SAME_TEXT_BACK_COLOR_WARNING), NULL, MB_ICONWARNING);
                 DrawStaticColor();
                 m_style_modified = true;
@@ -549,7 +549,7 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         {
             bool background_transparent = m_data.IsTaskbarTransparent();
             m_data.back_color = colorDlg.GetColor();
-            if (m_data.back_color == m_data.M_LayoutItems.begin()->second.LabelColor)
+            if (m_data.back_color == m_data.M_LayoutItems.begin()->second.PrefixColor)
                 MessageBox(CCommon::LoadText(IDS_SAME_BACK_TEXT_COLOR_WARNING), NULL, MB_ICONWARNING);
             if (background_transparent)
             {

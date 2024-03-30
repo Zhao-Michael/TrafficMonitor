@@ -65,7 +65,7 @@ BOOL CDisplayTextSettingDlg::OnInitDialog()
         {
             int index = m_list_ctrl.GetItemCount();
             m_list_ctrl.InsertItem(index, item_name);
-            m_list_ctrl.SetItemText(index, 1, iter->second.LabelValueStr.label);
+            m_list_ctrl.SetItemText(index, 1, iter->second.Prefix);
             m_list_ctrl.SetItemData(index, (DWORD_PTR)&(iter->first));
         }
     }
@@ -91,7 +91,7 @@ void CDisplayTextSettingDlg::OnOK()
     for (int i{}; i < item_count; i++)
     {
         CommonDisplayItem display_item = GetDisplayItem(i);
-        m_layout_items[display_item].LabelValueStr.label = m_list_ctrl.GetItemText(i, 1).GetString();
+        m_layout_items[display_item].Prefix = m_list_ctrl.GetItemText(i, 1).GetString();
     }
 
     CBaseDialog::OnOK();

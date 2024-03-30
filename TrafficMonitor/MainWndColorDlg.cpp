@@ -77,8 +77,8 @@ BOOL CMainWndColorDlg::OnInitDialog()
         int index = m_list_ctrl.GetItemCount();
         m_list_ctrl.InsertItem(index, item_id.c_str());                 //参数类型为CString
         m_list_ctrl.SetItemText(index, 1, item_name);
-        m_list_ctrl.SetItemText(index, 2, layout_item.LabelValueStr.label);
-        m_list_ctrl.SetItemColor(index, 3, layout_item.LabelColor);
+        m_list_ctrl.SetItemText(index, 2, layout_item.Prefix);
+        m_list_ctrl.SetItemColor(index, 3, layout_item.PrefixColor);
         m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
         m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));    //传递iter->second也行，就是取的时候是LayoutItem类型了。
     }
@@ -105,7 +105,7 @@ void CMainWndColorDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
             m_list_ctrl.SetItemColor(index, col, color);
             CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
             if (col == 3)
-                m_layout_items[*item].LabelColor = color;
+                m_layout_items[*item].PrefixColor = color;
             else
                 m_layout_items[*item].ValueColor = color;
         }

@@ -128,7 +128,7 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
         data.specify_each_item_color    = m_default_style[index].specify_each_item_color;
         for (auto iter = m_default_style[index].M_LayoutItems.begin(); iter != m_default_style[index].M_LayoutItems.end(); ++iter)
         {
-            data.M_LayoutItems[iter->first].LabelColor = iter->second.LabelColor;
+            data.M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;
             data.M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
         }
 		if (data.transparent_color == data.back_color)
@@ -162,7 +162,7 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
 	m_default_style[index].specify_each_item_color = data.specify_each_item_color;
     for (auto iter = data.M_LayoutItems.begin(); iter != data.M_LayoutItems.end(); ++iter)
     {
-        m_default_style[index].M_LayoutItems[iter->first].LabelColor = iter->second.LabelColor;
+        m_default_style[index].M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;
         m_default_style[index].M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
     }
 }
@@ -171,7 +171,7 @@ bool CTaskbarDefaultStyle::IsTaskBarStyleDataValid(const TaskBarStyleData& data)
 {
     for (const auto& item : data.M_LayoutItems)
     {
-        if (item.second.LabelColor != data.back_color || item.second.ValueColor != data.back_color)
+        if (item.second.PrefixColor != data.back_color || item.second.ValueColor != data.back_color)
             return true;
     }
     return false;     //如果文本颜色全部等于背景颜色，则该颜色预设无效

@@ -56,7 +56,7 @@ void CSkinDlg::ShowPreview()
     bool cover_str_setting = false;
     for (auto iter = m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.end(); ++iter)
     {
-        if (!iter->second.LabelValueStr.label.IsEmpty())
+        if (!iter->second.Prefix.IsEmpty())
         {
             cover_str_setting = true;
             break;
@@ -64,7 +64,7 @@ void CSkinDlg::ShowPreview()
     }
     for (auto iter = m_skin_data.GetLayoutManager().layout_s.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_s.M_LayoutItems.end(); ++iter)
     {
-        if (!iter->second.LabelValueStr.label.IsEmpty())
+        if (!iter->second.Prefix.IsEmpty())
         {
             cover_str_setting = true;
             break;

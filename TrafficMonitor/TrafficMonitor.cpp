@@ -220,10 +220,10 @@ void CTrafficMonitorApp::LoadConfig()
 
     //rTaskbarData.swap_up_down = ini.GetBool(_T("taskbar"), _T("taskbar_swap_up_down"), false);
 
-    if (rTaskbarData.back_color == 0 && !rTaskbarData.M_LayoutItems.empty() && rTaskbarData.M_LayoutItems.begin()->second.LabelColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
+    if (rTaskbarData.back_color == 0 && !rTaskbarData.M_LayoutItems.empty() && rTaskbarData.M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
     {
         rTaskbarData.back_color                                 = rTaskbarData.dft_back_color;
-        rTaskbarData.M_LayoutItems.begin()->second.LabelColor  = rTaskbarData.dft_text_colors;
+        rTaskbarData.M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
     }
 
     //任务栏窗口字体设置

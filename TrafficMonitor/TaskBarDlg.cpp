@@ -275,13 +275,13 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     COLORREF text_color{};
     if (rTaskbarData.specify_each_item_color)
     {
-        label_color = rTaskbarData.M_LayoutItems[type].LabelColor;
+        label_color = rTaskbarData.M_LayoutItems[type].PrefixColor;
         text_color  = rTaskbarData.M_LayoutItems[type].ValueColor;
     }
     else if (!rTaskbarData.M_LayoutItems.empty())
     {
-        label_color = rTaskbarData.M_LayoutItems.begin()->second.LabelColor;
-        text_color  = rTaskbarData.M_LayoutItems.begin()->second.LabelColor;       //因为唯一的颜色保存在LabelColor里
+        label_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;
+        text_color  = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;       //因为唯一的颜色保存在PrefixColor里
     }
 
     //设置标签和数值的矩形区域
@@ -364,7 +364,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     //绘制标签
     if (label_width > 0)
     {
-        wstring str_label = rTaskbarData.M_LayoutItems[type].LabelValueStr.label;
+        wstring str_label = rTaskbarData.M_LayoutItems[type].Prefix;
         //if (rTaskbarData.swap_up_down)
         //{
         //    if (type == TDI_UP)
@@ -485,13 +485,13 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
     COLORREF value_text_color{};
     if (rTaskbarData.specify_each_item_color)
     {
-        label_text_color = rTaskbarData.M_LayoutItems[item].LabelColor;
+        label_text_color = rTaskbarData.M_LayoutItems[item].PrefixColor;
         value_text_color = rTaskbarData.M_LayoutItems[item].ValueColor;
     }
     else if (!rTaskbarData.M_LayoutItems.empty())
     {
-        label_text_color = rTaskbarData.M_LayoutItems.begin()->second.LabelColor;
-        value_text_color = rTaskbarData.M_LayoutItems.begin()->second.LabelColor;      //因为唯一的颜色保存在LabelColor里
+        label_text_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;
+        value_text_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;      //因为唯一的颜色保存在PrefixColor里
     }
 
     if (item->IsCustomDraw())
@@ -546,7 +546,7 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
             }
         }
         //画标签
-        CString lable_text = rTaskbarData.M_LayoutItems[item].LabelValueStr.label;
+        CString lable_text = rTaskbarData.M_LayoutItems[item].Prefix;
         lable_text += L' ';
         drawer.DrawWindowText(rect_label, lable_text, label_text_color, (vertical ? Alignment::CENTER : Alignment::LEFT));
         //画数值
@@ -991,7 +991,7 @@ void CTaskBarDlg::CalculateWindowSize()
                 }
                 else
                 {
-                    CString lable_text = rTaskbarData.M_LayoutItems[plugin].LabelValueStr.label;
+                    CString lable_text = rTaskbarData.M_LayoutItems[plugin].Prefix;
                     if (!lable_text.IsEmpty())
                         lable_text += L' ';
                     label_width = m_pDC->GetTextExtent(lable_text).cx;
@@ -1000,7 +1000,7 @@ void CTaskBarDlg::CalculateWindowSize()
         }
         else
         {
-            item_widths[*iter].label_width = m_pDC->GetTextExtent(rTaskbarData.M_LayoutItems[*iter].LabelValueStr.label).cx;
+            item_widths[*iter].label_width = m_pDC->GetTextExtent(rTaskbarData.M_LayoutItems[*iter].Prefix).cx;
         }
     }
 
