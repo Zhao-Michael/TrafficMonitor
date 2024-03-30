@@ -31,8 +31,8 @@ void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XML
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     if (m_layout_manager.no_label)
         layout_item.Prefix      = _T("");
-//    else
-//        layout_item.Prefix.Format(_T("%s"),                     CTinyXml2Helper::ElementAttribute(ele, "prefix"));
+    else
+        layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
 //    layout_item.PrefixColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
 //    layout_item.ValueColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
 }
@@ -239,25 +239,6 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 m_skin_info.font_info.italic = CCommon::GetNumberBit(font_style, 1);
                                 m_skin_info.font_info.underline = CCommon::GetNumberBit(font_style, 2);
                                 m_skin_info.font_info.strike_out = CCommon::GetNumberBit(font_style, 3);
-                            }
-                            else if (skin_item_name == "display_text")      //定义在这里说明是整个皮肤通用，与layout无关。
-                            {
-                                CTinyXml2Helper::IterateChildNode(skin_item, [this](tinyxml2::XMLElement* display_text_item)
-                                    {
-                                        string item_name = CTinyXml2Helper::ElementName(display_text_item);
-                                        wstring item_text = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(display_text_item), true);
-                                        for (auto display_item : gS_AllBuiltinDisplayItems)     //只支持内置项标签，暂时不修改，因为以后标签将作为各监控项的属性来设置。
-                                        {
-                                            if (item_name == CCommon::GetDisplayItemXmlNodeName(display_item))
-                                            {
-                                                /////////目前只针对皮肤范围配置，所以都复制。
-                                                m_layout_manager.layout_l.M_LayoutItems[display_item].Prefix = item_text.c_str();
-                                                m_layout_manager.layout_s.M_LayoutItems[display_item].Prefix = item_text.c_str();
-                                                break;
-                                            }
-                                        }
-                                    }
-                                );
                             }
                         }
                     );
