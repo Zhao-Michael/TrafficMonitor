@@ -193,7 +193,7 @@ public:
     static string GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item);
 
     //此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
-    static void LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color);
+    static void LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color, bool specify_each_item_color);
 
     //在指定位置绘制文本
     static void DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color);

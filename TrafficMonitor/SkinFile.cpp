@@ -70,14 +70,14 @@ void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLEl
         });
 }
 
-void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF label_color, COLORREF value_color, Alignment align)
+void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align)
 {
-    int whole_width = drawer.GetDC()->GetTextExtent(draw_str.GetStr()).cx;
-    int label_width = drawer.GetDC()->GetTextExtent(draw_str.label).cx;
+    int whole_width = drawer.GetDC()->GetTextExtent(label + value).cx;
+    int label_width = drawer.GetDC()->GetTextExtent(label).cx;
     if (label_width == 0)                   //只画数值
     {
         //绘制数值
-        drawer.DrawWindowText(rect, draw_str.value, value_color, align);
+        drawer.DrawWindowText(rect, value, value_color, align);
         return;
     }
 
@@ -86,9 +86,9 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, C
         if (whole_width <= rect.Width())      //只有标签和数值总宽度小于矩形的宽度时才使用两端对齐
         {
             //绘制标签
-            drawer.DrawWindowText(rect, draw_str.label, label_color, Alignment::LEFT);
+            drawer.DrawWindowText(rect, label, label_color, Alignment::LEFT);
             //绘制数值
-            drawer.DrawWindowText(rect, draw_str.value, value_color, Alignment::RIGHT);
+            drawer.DrawWindowText(rect, value, value_color, Alignment::RIGHT);
             return;
         }
         else                                //否则以数值为优先，当右对齐处理。
@@ -109,9 +109,9 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, C
             rect_value.left     = rect_label.right;
             rect_value.right    -= (rect.Width() - whole_width) / 2;
             //画标签
-            drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+            drawer.DrawWindowText(rect_label, label, label_color, align);
             //画数值
-            drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+            drawer.DrawWindowText(rect_value, value, value_color, align);
             return;
         }
         else                                //否则以数值为优先，当右对齐处理。
@@ -128,9 +128,9 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, C
         rect_label.right = rect_label.left + label_width;
         rect_value.left = rect_label.right;
         //画标签
-        drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+        drawer.DrawWindowText(rect_label, label, label_color, align);
         //画数值
-        drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+        drawer.DrawWindowText(rect_value, value, value_color, align);
         
     }
     else if(align == Alignment::RIGHT)              //标签和数值右对齐
@@ -142,9 +142,9 @@ void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, C
         rect_label.right = rect_value.left;
         rect_label.left = rect_label.right - label_width;
         //画标签
-        drawer.DrawWindowText(rect_label, draw_str.label, label_color, align);
+        drawer.DrawWindowText(rect_label, label, label_color, align);
         //画数值
-        drawer.DrawWindowText(rect_value, draw_str.value, value_color, align);
+        drawer.DrawWindowText(rect_value, value, value_color, align);
     }
     else;
 }
@@ -201,28 +201,33 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 string ele_name = CTinyXml2Helper::ElementName(child);
                 if (ele_name == "skin")             //读取皮肤信息
                 {
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    //      这里的加载是有先后顺序要求的。要求specify_each_item_color在text_color之前加载。
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
                         {
                             string skin_item_name = CTinyXml2Helper::ElementName(skin_item);
-                            //文本颜色
-                            if (skin_item_name == "text_color")
-                            {
-                                wstring str_text_color = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item));
-                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color);
-                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color);
-                            }
-                            //指定每个项目的颜色
-                            else if (skin_item_name == "specify_each_item_color")
+                            if (skin_item_name == "specify_each_item_color")       //指定每个项目的颜色
                             {
                                 m_skin_info.specify_each_item_color = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementText(skin_item));
                             }
-                            //皮肤作者
-                            else if (skin_item_name == "skin_author")
+                        }
+                    );
+                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
+                        {
+                            string skin_item_name = CTinyXml2Helper::ElementName(skin_item);
+                            if (skin_item_name == "text_color")                         //文本颜色
+                            {
+                                wstring str_text_color = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item));
+                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
+                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
+                            }
+                            
+                            else if (skin_item_name == "skin_author")                   //皮肤作者
                             {
                                 m_skin_info.skin_author = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item), true);
                             }
-                            //字体
-                            else if (skin_item_name == "font")
+                            else if (skin_item_name == "font")                          //字体
                             {
                                 m_skin_info.font_info.name = CTinyXml2Helper::ElementAttribute(skin_item, "name");
                                 m_skin_info.font_info.size = atoi(CTinyXml2Helper::ElementAttribute(skin_item, "size"));
@@ -375,32 +380,11 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (2)所有显示项目的标签颜色和数值颜色
     ////////////////////////////////////////////////////////////////////////////////////////
-    if (m_skin_info.specify_each_item_color)
+    for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
     {
-        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
-        {
-            /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
-            label_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].ValueColor;      //目前皮肤配置文件中不能配置标签颜色
-            value_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].ValueColor;
-        }
-    }
-    else
-    {
-        if (1)               //if (!m_skin_info.text_color.empty())
-        {
-            for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
-            {
-                if (!m_layout_manager.layout_l.M_LayoutItems.empty())
-                {
-                    /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
-                    label_colors[item]  = m_layout_manager.layout_l.M_LayoutItems.begin()->second.ValueColor;
-                    value_colors[item]  = m_layout_manager.layout_l.M_LayoutItems.begin()->second.ValueColor;
-                }
-            }
-        }
-        else                //目前xml或ini格式的皮肤配置文件里都设置了color，所以不会走这里。这里暂时不加代码，以后补充。
-        {
-        }
+        /////////皮肤的xml配置中目前只针对皮肤范围配置，layout_l和layout_s两个都复制了，所以使用哪个都行。
+        label_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].PrefixColor;
+        value_colors[item]  = m_layout_manager.layout_l.M_LayoutItems[item].ValueColor;
     }
 
     //绘制预览图文本
@@ -418,7 +402,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                 //标签和数值颜色
                 COLORREF label_color    = label_colors[iter->first];
                 COLORREF text_color     = value_colors[iter->first];
-                DrawSkinText(draw, rect, iter->second, label_color, text_color, layout.M_LayoutItems[iter->first].align);
+                DrawSkinText(draw, rect, iter->second.label, iter->second.value, label_color, text_color, layout.M_LayoutItems[iter->first].align);
             }
         }
 
@@ -442,7 +426,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                     DrawStr draw_str;
                     draw_str.label = layout_item.Prefix;                                   //使用皮肤配置文件里设置的标签，而不是系统缺省值。
                     draw_str.value = iplugin_item->GetItemValueSampleText();
-                    DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
+                    DrawSkinText(draw, rect, draw_str.label, draw_str.value, label_color, value_color, layout_item.align);
                 }
                 else           //插件项目自绘
                 {
@@ -581,7 +565,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
             COLORREF label_color = label_colors[iter->first];
             COLORREF value_color = value_colors[iter->first];
             //绘制文本
-            DrawSkinText(draw, rect, iter->second, label_color, value_color, layout_item.align);
+            DrawSkinText(draw, rect, iter->second.label, iter->second.value, label_color, value_color, layout_item.align);
         }
         index++;
     }
@@ -598,12 +582,15 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
             if (!iplugin_item->IsCustomDraw())
             {
                 //矩形区域
-                CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
+                CPoint point;
+                point.SetPoint(layout_item.x, layout_item.y);
+//              point.Offset(pos.x, pos.y);
+                CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
                 //绘制标签和数值
                 DrawStr draw_str;
                 draw_str.label = rMainWndData.M_LayoutItems[iplugin_item].Prefix;
                 draw_str.value = iplugin_item->GetItemValueText();
-                DrawSkinText(draw, rect, draw_str, label_color, value_color, layout_item.align);
+                DrawSkinText(draw, rect, draw_str.label, draw_str.value, label_color, value_color, layout_item.align);
             }
             else               //插件项目自绘
             {

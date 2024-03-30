@@ -85,7 +85,7 @@ private:
     void LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele);
     void LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele);
 
-    static void DrawSkinText(CDrawCommon drawer, CRect rect, DrawStr draw_str, COLORREF label_color, COLORREF value_color, Alignment align);
+    static void DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align);
 
 private:
     SkinInfo        m_skin_info;
