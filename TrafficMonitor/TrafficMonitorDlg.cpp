@@ -2397,7 +2397,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
         //      (2)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
         //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
         ////////////////////////////////////////////////////////////////////////////////////////
-        //丢弃当前GUI配置的数值颜色，切换到皮肤自带的数值颜色。
+        //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
         rMainWndData.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
         CSkinFile::Layout LayoutInUse = {};
         if (rMainWndData.m_show_more_info)
@@ -2411,8 +2411,9 @@ void CTrafficMonitorDlg::OnChangeSkin()
             //           所以不能用引用来接收，编译器报错。使用赋值后，就没有const属性了。
             /////////////////////////////////////////////////////////////////////////////////////
 
-            //更换数值颜色
-            rMainWndData.M_LayoutItems[item].ValueColor = LayoutInUse.M_LayoutItems[item].ValueColor;
+            //更换颜色
+            rMainWndData.M_LayoutItems[item].PrefixColor    = LayoutInUse.M_LayoutItems[item].PrefixColor;
+            rMainWndData.M_LayoutItems[item].ValueColor     = LayoutInUse.M_LayoutItems[item].ValueColor;
             //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
             if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
             {

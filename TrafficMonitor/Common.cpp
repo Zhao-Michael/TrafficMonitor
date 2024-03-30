@@ -590,7 +590,7 @@ string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
     }
 }
 
-//此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
+//此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式。该存储格式只能配置数值颜色，现在我们认为它也设置了前缀颜色。该存储格式即将被淘汰。
 void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color)
 {
     std::vector<wstring>    ColorsStr_SplitResult;
@@ -615,6 +615,8 @@ void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem
             M_LayoutItems[*iter].ValueColor = wcstol(color_str, nullptr, 16);
         else
             M_LayoutItems[*iter].ValueColor = _wtoi(color_str);
+
+        M_LayoutItems[*iter].PrefixColor = M_LayoutItems[*iter].ValueColor;
     }
 }
 
