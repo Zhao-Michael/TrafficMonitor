@@ -22,8 +22,9 @@ void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 }
 */
 
-void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
+    const char* str = nullptr;
     layout_item.x               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
     layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
@@ -33,14 +34,24 @@ void CSkinFile::LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XML
         layout_item.Prefix      = _T("");
     else
         layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
-//    layout_item.PrefixColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "lable_color"));
-//    layout_item.ValueColor      =                          atoi(CTinyXml2Helper::ElementAttribute(ele, "value_color"));
+    str = CTinyXml2Helper::ElementAttribute(ele, "color_p");
+    if (str[0] != '\0')
+        layout_item.PrefixColor = CCommon::GetColorFromStr(CCommon::StrToUnicode(str).c_str());
+    else
+        layout_item.PrefixColor = layout.PrefixColor;
+    str = CTinyXml2Helper::ElementAttribute(ele, "color_v");
+    if (str[0] != '\0')
+        layout_item.ValueColor  = CCommon::GetColorFromStr(CCommon::StrToUnicode(str).c_str());
+    else
+        layout_item.ValueColor  = layout.ValueColor;
 }
 
 void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele)
 {
-    layout.width    = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout.height   = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.width        = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout.height       = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.PrefixColor  = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_p")).c_str());
+    layout.ValueColor   = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
             string layout_item_cfg_name = CTinyXml2Helper::ElementName(ele_layout_item);
@@ -50,7 +61,7 @@ void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLEl
                 {
                     //如果是内置的"UP"等，就找到了。
                     //插件item不能map到内置的"UP"等，否则当内置项处理了。
-                    LoadLayoutItemFromXmlNode(layout.M_LayoutItems[builtin_item], ele_layout_item);
+                    LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[builtin_item], ele_layout_item);
 //                  layout.M_LayoutItems[builtin_item].height       = layout.height;
                     layout.M_LayoutItems[builtin_item].id           = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
                     break;
@@ -63,7 +74,7 @@ void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLEl
                 {
                     if (plugin_id == iplugin_item->GetItemId())
                     {
-                        LoadLayoutItemFromXmlNode(layout.M_LayoutItems[iplugin_item], ele_layout_item);
+                        LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[iplugin_item], ele_layout_item);
 //                      layout.M_LayoutItems[iplugin_item].height   = layout.height;
                         layout.M_LayoutItems[iplugin_item].id       = plugin_id;
                         break;
@@ -204,29 +215,10 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 string ele_name = CTinyXml2Helper::ElementName(child);
                 if (ele_name == "skin")             //读取皮肤信息
                 {
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //      这里的加载是有先后顺序要求的。要求specify_each_item_color在text_color之前加载。
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
                         {
                             string skin_item_name = CTinyXml2Helper::ElementName(skin_item);
-                            if (skin_item_name == "specify_each_item_color")       //指定每个项目的颜色
-                            {
-                                m_skin_info.specify_each_item_color = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementText(skin_item));
-                            }
-                        }
-                    );
-                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
-                        {
-                            string skin_item_name = CTinyXml2Helper::ElementName(skin_item);
-                            if (skin_item_name == "text_color")                         //文本颜色
-                            {
-                                wstring str_text_color = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item));
-                                CCommon::LoadColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
-                                CCommon::LoadColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
-                            }
-                            
-                            else if (skin_item_name == "skin_author")                   //皮肤作者
+                            if (skin_item_name == "skin_author")                   //皮肤作者
                             {
                                 m_skin_info.skin_author = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item), true);
                             }

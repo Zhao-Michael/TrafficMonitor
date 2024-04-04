@@ -2398,7 +2398,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
         //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
         ////////////////////////////////////////////////////////////////////////////////////////
         //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
-        rMainWndData.specify_each_item_color = skinDlg.GetSkinData().GetSkinInfo().specify_each_item_color;
+        rMainWndData.specify_each_item_color = true;
         CSkinFile::Layout LayoutInUse = {};
         if (rMainWndData.m_show_more_info)
             LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_l;

@@ -14,13 +14,13 @@ public:
     {
         wstring                 skin_author;                //皮肤的作者
         FontInfo                font_info;                  //字体信息
-        bool                    specify_each_item_color{};  //是否指定每个项目的颜色
     };
 
     //皮肤布局
     struct Layout
     {
-        int                     width{}, height{};                              //整个Layout的宽度与高度
+        int                     width{}, height{};                              //整个layout的宽度与高度
+        COLORREF                PrefixColor{}, ValueColor{};                    //layout缺省的前缀颜色、数值颜色
 
         //////////////////////////////////////////////////////////////
         //      以后将支持下面这几项
@@ -82,7 +82,7 @@ private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
 
 //  void InitLayoutItemAttributes(LayoutItem&   layout_item);
-    void LoadLayoutItemFromXmlNode(LayoutItem& layout_item, tinyxml2::XMLElement* ele);
+    void LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele);
     void LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele);
 
     static void DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align);
