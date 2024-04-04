@@ -295,6 +295,7 @@
 #define IDS_D2DDRAWCOMMON_ERROR_TIP     386
 #define IDS_PLUGIN_OPTIONS              387
 #define IDS_PLUGIN_DETAILS              388
+#define IDS_PREFIX                      388
 #define IDC_STATIC_INFO                 1001
 #define IDC_STATIC1                     1002
 #define IDC_STATIC_DOWN                 1002
@@ -508,11 +509,10 @@
 #define IDC_OPEN_SKIN_DIR_STATIC        1161
 #define IDC_RESET_AUTO_RUN_BUTTON       1162
 #define IDS_CPU_FREQ                    1163
-#define IDC_WINDOW_OFFSET_TOP_NEGATIVE_CHECK      1166
+#define IDC_WINDOW_OFFSET_TOP_NEGATIVE_CHECK 1166
 #define IDC_WINDOW_OFFSET_TOP_EDIT      1167
-#define IDC_VERTICAL_MARGIN_EDIT      1168
-#define IDC_VERTICAL_MARGIN_NEGATIVE_CHECK      1169
-#define ID_32771                        32771
+#define IDC_VERTICAL_MARGIN_EDIT        1168
+#define IDC_VERTICAL_MARGIN_NEGATIVE_CHECK 1169
 #define IDC_DISABLE_D2D                 1170
 #define IDC_GDI_RADIO                   1171
 #define IDC_D2D_RADIO                   1172
@@ -637,7 +637,6 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        341
 #define _APS_NEXT_COMMAND_VALUE         33665
-
 #define _APS_NEXT_CONTROL_VALUE         1173
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
