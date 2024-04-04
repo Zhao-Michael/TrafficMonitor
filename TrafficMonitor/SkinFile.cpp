@@ -222,8 +222,8 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                             if (skin_item_name == "text_color")                         //文本颜色
                             {
                                 wstring str_text_color = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item));
-                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
-                                CCommon::LoadValueColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
+                                CCommon::LoadColorsFromColorStr(m_layout_manager.layout_l.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
+                                CCommon::LoadColorsFromColorStr(m_layout_manager.layout_s.M_LayoutItems, str_text_color, m_skin_info.specify_each_item_color);
                             }
                             
                             else if (skin_item_name == "skin_author")                   //皮肤作者

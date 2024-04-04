@@ -590,8 +590,19 @@ string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
     }
 }
 
+//从十进制或十六进制保存的颜色字符串得到COLORREF颜色值
+COLORREF CCommon::GetColorFromStr(const wchar_t* color_str)
+{
+    //support Decimal data or Hex data from saved data
+    if (wcslen(color_str) >= 3 && '0' == color_str[0] && 'x' == color_str[1])
+        return wcstol(color_str, nullptr, 16);
+    else
+        return _wtoi(color_str);
+}
+
+
 //此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式。该存储格式只能配置数值颜色，现在我们认为它也设置了前缀颜色。该存储格式即将被淘汰。
-void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color, bool specify_each_item_color)
+void CCommon::LoadColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color, bool specify_each_item_color)
 {
     std::vector<wstring>    ColorsStr_SplitResult;
     CCommon::StringSplit(str_text_color, L',', ColorsStr_SplitResult);
@@ -613,10 +624,7 @@ void CCommon::LoadValueColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem
             color_str = ColorsStr_SplitResult[0].c_str();
 
         //support Decimal data or Hex data from saved data
-        if (wcslen(color_str) >=3  && '0' == color_str[0] && 'x' == color_str[1])
-            M_LayoutItems[item].ValueColor = wcstol(color_str, nullptr, 16);
-        else
-            M_LayoutItems[item].ValueColor = _wtoi(color_str);
+        M_LayoutItems[item].ValueColor = GetColorFromStr(color_str);
 
         M_LayoutItems[item].PrefixColor = M_LayoutItems[item].ValueColor;
         index++;
