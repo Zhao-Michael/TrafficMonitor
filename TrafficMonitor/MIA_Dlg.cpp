@@ -1,47 +1,47 @@
-﻿// MainWndColorDlg.cpp : 实现文件
+﻿// MonitorItemAttributesDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
 #include "TrafficMonitor.h"
-#include "MainWndColorDlg.h"
+#include "MIA_Dlg.h"
 #include "afxdialogex.h"
 #include "CMFCColorDialogEx.h"
 
 
-// CMainWndColorDlg 对话框
+// CMonitorItemAttributesDlg 对话框
 
-IMPLEMENT_DYNAMIC(CMainWndColorDlg, CBaseDialog)
+IMPLEMENT_DYNAMIC(CMonitorItemAttributesDlg, CBaseDialog)
 
-CMainWndColorDlg::CMainWndColorDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent /*=NULL*/)
-	: CBaseDialog(IDD_MAIN_COLOR_DIALOG, pParent), m_layout_items(layoutItems)
+CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent /*=NULL*/)
+	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout_items(layoutItems)
 {
 }
 
-CMainWndColorDlg::~CMainWndColorDlg()
+CMonitorItemAttributesDlg::~CMonitorItemAttributesDlg()
 {
 }
 
-CString CMainWndColorDlg::GetDialogName() const
+CString CMonitorItemAttributesDlg::GetDialogName() const
 {
     return _T("MainWndColorDlg");
 }
 
-void CMainWndColorDlg::DoDataExchange(CDataExchange* pDX)
+void CMonitorItemAttributesDlg::DoDataExchange(CDataExchange* pDX)
 {
     CBaseDialog::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST1, m_list_ctrl);
 }
 
 
-BEGIN_MESSAGE_MAP(CMainWndColorDlg, CBaseDialog)
-    ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMainWndColorDlg::OnNMDblclkList1)
+BEGIN_MESSAGE_MAP(CMonitorItemAttributesDlg, CBaseDialog)
+    ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMonitorItemAttributesDlg::OnNMDblclkList1)
 END_MESSAGE_MAP()
 
 
-// CMainWndColorDlg 消息处理程序
+// CMonitorItemAttributesDlg 消息处理程序
 
 
-BOOL CMainWndColorDlg::OnInitDialog()
+BOOL CMonitorItemAttributesDlg::OnInitDialog()
 {
 	CBaseDialog::OnInitDialog();
 
@@ -78,9 +78,11 @@ BOOL CMainWndColorDlg::OnInitDialog()
         m_list_ctrl.InsertItem(index, item_id.c_str());                 //参数类型为CString
         m_list_ctrl.SetItemText(index, 1, item_name);
         m_list_ctrl.SetItemText(index, 2, layout_item.Prefix);
+        m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));    //传递iter->second也行，就是取的时候是LayoutItem类型了。
+
+        //将颜色数据初始化到ListCtrl的成员变量中
         m_list_ctrl.SetItemColor(index, 3, layout_item.PrefixColor);
         m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
-        m_list_ctrl.SetItemData(index, (DWORD_PTR) & (iter->first));    //传递iter->second也行，就是取的时候是LayoutItem类型了。
     }
 //    m_list_ctrl.SetEditColMethod(CListCtrlEx::EC_SPECIFIED);        //设置列表可编辑
 //    m_list_ctrl.SetEditableCol({ 2 });                              //设置可编辑的列
@@ -89,7 +91,7 @@ BOOL CMainWndColorDlg::OnInitDialog()
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
-void CMainWndColorDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
+void CMonitorItemAttributesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
@@ -102,7 +104,9 @@ void CMainWndColorDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
         if (colorDlg.DoModal() == IDOK)
         {
             color = colorDlg.GetColor();
-            m_list_ctrl.SetItemColor(index, col, color);
+            m_list_ctrl.SetItemColor(index, col, color);        //将设置的单个颜色保存到ListCtrl的成员变量中
+
+            //将设置的单个颜色保存到Dlg的成员变量中
             CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
             if (col == 3)
                 m_layout_items[*item].PrefixColor = color;

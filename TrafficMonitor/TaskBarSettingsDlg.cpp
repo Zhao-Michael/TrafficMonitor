@@ -519,7 +519,7 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         //设置文本颜色
         if (m_data.specify_each_item_color)
         {
-            CTaskbarColorDlg colorDlg(m_data.M_LayoutItems);
+            CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems);
             if (colorDlg.DoModal() == IDOK)
             {
                 m_data.M_LayoutItems = colorDlg.GetLayoutItems();

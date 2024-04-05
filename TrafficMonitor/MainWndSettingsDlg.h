@@ -3,7 +3,7 @@
 #include "afxwin.h"
 #include "SpinEdit.h"
 #include "TabDlg.h"
-#include "MainWndColorDlg.h"
+#include "MIA_Dlg.h"
 #include "ComboBox2.h"
 
 // CMainWndSettingsDlg 对话框

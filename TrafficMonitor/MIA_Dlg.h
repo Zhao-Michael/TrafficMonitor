@@ -4,25 +4,24 @@
 #include "ColorSettingListCtrl.h"
 #include "BaseDialog.h"
 
-// CTaskbarColorDlg 对话框
+// CMonitorItemAttributesDlg 对话框
 
-class CTaskbarColorDlg : public CBaseDialog
+class CMonitorItemAttributesDlg : public CBaseDialog
 {
-	DECLARE_DYNAMIC(CTaskbarColorDlg)
+	DECLARE_DYNAMIC(CMonitorItemAttributesDlg)
 
 public:
-	CTaskbarColorDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent = NULL);   // 标准构造函数
-	virtual ~CTaskbarColorDlg();
+	CMonitorItemAttributesDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent = NULL);   // 标准构造函数
+	virtual ~CMonitorItemAttributesDlg();
 
     const std::map<CommonDisplayItem, LayoutItem>& GetLayoutItems() const { return m_layout_items; }
 
-	// 对话框数据
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_TASKBAR_COLOR_DIALOG };
+	enum { IDD = IDD_MAIN_COLOR_DIALOG };
 #endif
-
 protected:
-	std::map<CommonDisplayItem, LayoutItem> m_layout_items;
+    std::map<CommonDisplayItem, LayoutItem> m_layout_items;
     CColorSettingListCtrl m_list_ctrl;
 
     virtual CString GetDialogName() const override;

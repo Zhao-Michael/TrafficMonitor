@@ -434,7 +434,7 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         MainWndSettingData& rMainWndData = m_data;
         if (rMainWndData.specify_each_item_color)
         {
-            CMainWndColorDlg colorDlg(rMainWndData.M_LayoutItems);
+            CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems);
             if (colorDlg.DoModal() == IDOK)
             {
                 rMainWndData.M_LayoutItems = colorDlg.GetLayoutItems();
@@ -451,28 +451,6 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
             }
         }
         break;
-/*
-        MainWndSettingData& rMainWndData = m_data;
-        if (rMainWndData.specify_each_item_color)
-        {
-            CMainWndColorDlg colorDlg(rMainWndData.M_ValueColors);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                rMainWndData.M_ValueColors = colorDlg.GetColors();
-                DrawStaticColor();
-            }
-        }
-        else if (!rMainWndData.M_ValueColors.empty())
-        {
-            CMFCColorDialogEx colorDlg(rMainWndData.M_ValueColors.begin()->second, 0, this);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                rMainWndData.M_ValueColors.begin()->second = colorDlg.GetColor();
-                DrawStaticColor();
-            }
-        }
-        break;
-*/
     }
     default:
         break;
