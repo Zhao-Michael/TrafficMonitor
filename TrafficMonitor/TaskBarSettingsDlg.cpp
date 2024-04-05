@@ -7,7 +7,6 @@
 #include "afxdialogex.h"
 #include "CMFCColorDialogEx.h"
 #include "CAutoAdaptSettingsDlg.h"
-#include "DisplayTextSettingDlg.h"
 #include "SetItemOrderDlg.h"
 #include "WindowsSettingHelper.h"
 #include "TrafficMonitorDlg.h"
@@ -191,7 +190,6 @@ BEGIN_MESSAGE_MAP(CTaskBarSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_AUTO_ADAPT_SETTINGS_BUTTON, &CTaskBarSettingsDlg::OnBnClickedAutoAdaptSettingsButton)
     ON_BN_CLICKED(IDC_AUTO_ADAPT_LIGHT_THEME_CHECK, &CTaskBarSettingsDlg::OnBnClickedAutoAdaptLightThemeCheck)
     ON_BN_CLICKED(IDC_AUTO_SET_BACK_COLOR_CHECK, &CTaskBarSettingsDlg::OnBnClickedAutoSetBackColorCheck)
-    ON_BN_CLICKED(IDC_DISPLAY_TEXT_SETTING_BUTTON, &CTaskBarSettingsDlg::OnBnClickedDisplayTextSettingButton)
     ON_CBN_SELCHANGE(IDC_MEMORY_DISPLAY_COMBO, &CTaskBarSettingsDlg::OnCbnSelchangeMemoryDisplayCombo)
     ON_BN_CLICKED(IDC_SHOW_DASHED_BOX, &CTaskBarSettingsDlg::OnBnClickedShowDashedBox)
     ON_BN_CLICKED(IDC_SET_ORDER_BUTTON, &CTaskBarSettingsDlg::OnBnClickedSetOrderButton)
@@ -519,10 +517,9 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         //设置文本颜色
         if (m_data.specify_each_item_color)
         {
-            CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems);
+            CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems, false);
             if (colorDlg.DoModal() == IDOK)
             {
-                m_data.M_LayoutItems = colorDlg.GetLayoutItems();
                 DrawStaticColor();
                 m_style_modified = true;
             }
@@ -729,14 +726,6 @@ void CTaskBarSettingsDlg::OnBnClickedAutoSetBackColorCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
     m_data.auto_set_background_color = (m_auto_set_back_color_chk.GetCheck() != 0);
-}
-
-
-void CTaskBarSettingsDlg::OnBnClickedDisplayTextSettingButton()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    CDisplayTextSettingDlg dlg(m_data.M_LayoutItems);
-    dlg.DoModal();
 }
 
 

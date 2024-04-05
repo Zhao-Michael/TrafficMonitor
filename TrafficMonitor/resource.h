@@ -28,7 +28,7 @@
 #define IDI_NOFITY_ICON3                159
 #define IDD_ICON_SELECT_DIALOG          160
 #define IDB_NOTIFY_ICON_PREVIEW         162
-#define IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG        163
+#define IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG 163
 #define IDS_CHECK_UPDATE_FAILD          167
 #define IDS_CHECK_UPDATE_ERROR          168
 #define IDD_HISTORY_TRAFFIC_LIST_DIALOG 168
@@ -223,7 +223,6 @@
 #define IDS_HDD_TEMPERATURE_EXCEED      327
 #define IDI_NOTIFY_ICON5                328
 #define IDS_MBD_TEMPERATURE_EXCEED      328
-#define IDD_DISPLAY_TEXT_SETTINGS_DIALOG 329
 #define IDS_MUSICPLAYER2_DESCRIPTION    329
 #define IDR_COMPILE_TIME                329
 #define IDS_SIMPLENOTEPAD_DESCRIPTION   330
@@ -294,7 +293,7 @@
 #define IDS_D2DDRAWCOMMON_ERROR_TIP     386
 #define IDS_PLUGIN_OPTIONS              387
 #define IDS_PLUGIN_DETAILS              388
-#define IDS_PREFIX                      388
+#define IDS_PREFIX                      389
 #define IDC_STATIC_INFO                 1001
 #define IDC_STATIC1                     1002
 #define IDC_STATIC_DOWN                 1002
@@ -515,6 +514,7 @@
 #define IDC_DISABLE_D2D                 1170
 #define IDC_GDI_RADIO                   1171
 #define IDC_D2D_RADIO                   1172
+#define IDC_ITEM_EDITBOX                1991
 #define ID_32771                        32771
 #define ID_NETWORK_INFO                 32772
 #define ID_32773                        32773

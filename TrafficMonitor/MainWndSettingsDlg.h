@@ -73,7 +73,6 @@ public:
     afx_msg void OnBnClickedUnitBitRadio();
     afx_msg void OnBnClickedShowToolTipChk();
     afx_msg void OnBnClickedBrowseButton();
-    afx_msg void OnBnClickedDisplayTextSettingButton();
     afx_msg void OnCbnSelchangeMemoryDisplayCombo();
     afx_msg void OnBnClickedAlwaysOnTopCheck();
     afx_msg void OnBnClickedMousePenetrateCheck();

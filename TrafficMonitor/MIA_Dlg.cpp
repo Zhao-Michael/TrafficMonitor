@@ -12,8 +12,8 @@
 
 IMPLEMENT_DYNAMIC(CMonitorItemAttributesDlg, CBaseDialog)
 
-CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(const std::map<CommonDisplayItem, LayoutItem>& layoutItems, CWnd* pParent /*=NULL*/)
-	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout_items(layoutItems)
+CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(std::map<CommonDisplayItem, LayoutItem>& layoutItems, bool bMainWnd, CWnd* pParent /*=NULL*/)
+	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout_items(layoutItems), B_MainWnd(bMainWnd)
 {
 }
 
@@ -23,7 +23,7 @@ CMonitorItemAttributesDlg::~CMonitorItemAttributesDlg()
 
 CString CMonitorItemAttributesDlg::GetDialogName() const
 {
-    return _T("MainWndColorDlg");
+    return _T("MonitorItemAttributesDlg");
 }
 
 void CMonitorItemAttributesDlg::DoDataExchange(CDataExchange* pDX)
@@ -32,14 +32,12 @@ void CMonitorItemAttributesDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_LIST1, m_list_ctrl);
 }
 
-
 BEGIN_MESSAGE_MAP(CMonitorItemAttributesDlg, CBaseDialog)
     ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMonitorItemAttributesDlg::OnNMDblclkList1)
+    ON_BN_CLICKED(IDC_RESTORE_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton)
 END_MESSAGE_MAP()
 
-
 // CMonitorItemAttributesDlg 消息处理程序
-
 
 BOOL CMonitorItemAttributesDlg::OnInitDialog()
 {
@@ -84,11 +82,27 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
         m_list_ctrl.SetItemColor(index, 3, layout_item.PrefixColor);
         m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
     }
-//    m_list_ctrl.SetEditColMethod(CListCtrlEx::EC_SPECIFIED);        //设置列表可编辑
-//    m_list_ctrl.SetEditableCol({ 2 });                              //设置可编辑的列
+    m_list_ctrl.SetEditColMethod(CMonitorItemAttributesSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
+    m_list_ctrl.SetEditableCol({ 2 });                                                      //设置可编辑的列
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
+}
+
+void CMonitorItemAttributesDlg::OnOK()
+{
+    // TODO: 在此添加专用代码和/或调用基类
+
+    int item_count = m_list_ctrl.GetItemCount();
+    for (int index{}; index < item_count; index++)
+    {
+        CommonDisplayItem* item             = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
+        m_layout_items[*item].Prefix        = m_list_ctrl.GetItemText(index, 2).GetString();
+        m_layout_items[*item].PrefixColor   = m_list_ctrl.GetItemColor(index, 3);
+        m_layout_items[*item].ValueColor    = m_list_ctrl.GetItemColor(index, 4);
+    }
+
+    CBaseDialog::OnOK();
 }
 
 void CMonitorItemAttributesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
@@ -105,15 +119,74 @@ void CMonitorItemAttributesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
         {
             color = colorDlg.GetColor();
             m_list_ctrl.SetItemColor(index, col, color);        //将设置的单个颜色保存到ListCtrl的成员变量中
-
-            //将设置的单个颜色保存到Dlg的成员变量中
-            CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
-            if (col == 3)
-                m_layout_items[*item].PrefixColor = color;
-            else
-                m_layout_items[*item].ValueColor = color;
         }
     }
 
     *pResult = 0;
+}
+
+void CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int item_count = m_list_ctrl.GetItemCount();
+    for (int index{}; index < item_count; index++)
+    {
+        CommonDisplayItem* item = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
+        CString default_text;
+        if (item->is_plugin)
+        {
+            default_text = item->plugin_item->GetItemLableText();
+        }
+        else
+        {
+            switch (item->item_type)
+            {
+            case TDI_UP:
+                if (B_MainWnd)
+                    default_text = CCommon::LoadText(IDS_UPLOAD_DISP, _T(": "));
+                else
+                    default_text = _T("↑: ");
+                break;
+            case TDI_DOWN:
+                if (B_MainWnd)
+                    default_text = CCommon::LoadText(IDS_DOWNLOAD_DISP, _T(": "));
+                else
+                    default_text = _T("↓: ");
+                break;
+            case TDI_TOTAL_SPEED:
+                default_text = _T("↑↓: ");
+                break;
+            case TDI_CPU:
+                default_text = _T("CPU: ");
+                break;
+            case TDI_CPU_FREQ:
+                default_text = CCommon::LoadText(IDS_CPU_FREQ, _T(": "));
+                break;
+            case TDI_MEMORY:
+                default_text = CCommon::LoadText(IDS_MEMORY_DISP, _T(": "));
+                break;
+            case TDI_GPU_USAGE:
+                default_text = CCommon::LoadText(IDS_GPU_DISP, _T(": "));
+                break;
+            case TDI_CPU_TEMP:
+                default_text = _T("CPU: ");
+                break;
+            case TDI_GPU_TEMP:
+                default_text = CCommon::LoadText(IDS_GPU_DISP, _T(": "));
+                break;
+            case TDI_HDD_TEMP:
+                default_text = CCommon::LoadText(IDS_HDD_DISP, _T(": "));
+                break;
+            case TDI_MAIN_BOARD_TEMP:
+                default_text = CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": "));
+                break;
+            case TDI_HDD_USAGE:
+                default_text = CCommon::LoadText(IDS_HDD_DISP, _T(": "));
+                break;
+            default:
+                break;
+            }
+        }
+        m_list_ctrl.SetItemText(index, 2, default_text);
+    }
 }

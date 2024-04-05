@@ -6,7 +6,6 @@
 #include "MainWndSettingsDlg.h"
 #include "afxdialogex.h"
 #include "CMFCColorDialogEx.h"
-#include "DisplayTextSettingDlg.h"
 
 // CMainWndSettingsDlg 对话框
 
@@ -126,7 +125,6 @@ BEGIN_MESSAGE_MAP(CMainWndSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_UNIT_BIT_RADIO, &CMainWndSettingsDlg::OnBnClickedUnitBitRadio)
     ON_BN_CLICKED(IDC_SHOW_TOOL_TIP_CHK, &CMainWndSettingsDlg::OnBnClickedShowToolTipChk)
     ON_BN_CLICKED(IDC_BROWSE_BUTTON, &CMainWndSettingsDlg::OnBnClickedBrowseButton)
-    ON_BN_CLICKED(IDC_DISPLAY_TEXT_SETTING_BUTTON, &CMainWndSettingsDlg::OnBnClickedDisplayTextSettingButton)
     ON_CBN_SELCHANGE(IDC_MEMORY_DISPLAY_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeMemoryDisplayCombo)
     ON_BN_CLICKED(IDC_ALWAYS_ON_TOP_CHECK, &CMainWndSettingsDlg::OnBnClickedAlwaysOnTopCheck)
     ON_BN_CLICKED(IDC_MOUSE_PENETRATE_CHECK, &CMainWndSettingsDlg::OnBnClickedMousePenetrateCheck)
@@ -193,7 +191,7 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
         //GetDlgItem(IDC_DOWNLOAD_EDIT)->EnableWindow(FALSE);
         //GetDlgItem(IDC_CPU_EDIT)->EnableWindow(FALSE);
         //GetDlgItem(IDC_MEMORY_EDIT)->EnableWindow(FALSE);
-        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
+//        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
         rMainWndData.swap_up_down = false;
         ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(FALSE);
         GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK)->EnableWindow(FALSE);
@@ -434,10 +432,9 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         MainWndSettingData& rMainWndData = m_data;
         if (rMainWndData.specify_each_item_color)
         {
-            CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems);
+            CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems, true);
             if (colorDlg.DoModal() == IDOK)
             {
-                rMainWndData.M_LayoutItems = colorDlg.GetLayoutItems();
                 DrawStaticColor();
             }
         }
@@ -516,14 +513,6 @@ void CMainWndSettingsDlg::OnBnClickedBrowseButton()
         rMainWndData.double_click_exe = fileDlg.GetPathName();
         SetDlgItemText(IDC_EXE_PATH_EDIT, rMainWndData.double_click_exe.c_str());
     }
-}
-
-
-void CMainWndSettingsDlg::OnBnClickedDisplayTextSettingButton()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    CDisplayTextSettingDlg dlg(m_data.M_LayoutItems, true);
-    dlg.DoModal();
 }
 
 

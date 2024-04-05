@@ -136,9 +136,6 @@
     <Filter Include="源文件和头文件\公共的类\WIC">
       <UniqueIdentifier>{2f6c60c6-eed6-4cad-8a1f-8759efb79d1d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件和头文件\对话框类\选项设置对话框\DisplayTextSettingDlg">
-      <UniqueIdentifier>{b6c785d6-4031-46d1-b224-4dd87a34404e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件和头文件\派生的控件类\HistoryTrafficListCtrl">
       <UniqueIdentifier>{74012c97-afb7-4e09-8b11-4e2945c37449}</UniqueIdentifier>
     </Filter>
@@ -156,9 +153,6 @@
     </Filter>
     <Filter Include="源文件和头文件\公共的类\auto_start_helper">
       <UniqueIdentifier>{20b159a6-36ec-4d11-97c3-86e7c1501088}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件和头文件\派生的控件类\ColorSettingListCtrl">
-      <UniqueIdentifier>{68b8c93d-e1b6-4d3d-a8af-5a19d413a96e}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件和头文件\派生的控件类\CComboBox2">
       <UniqueIdentifier>{abe84b35-de18-4853-9545-65354fb3d22f}</UniqueIdentifier>
@@ -225,6 +219,9 @@
     </Filter>
     <Filter Include="源文件和头文件\对话框类\属性设置对话框">
       <UniqueIdentifier>{50898390-4c7a-4f54-93fc-c7b13acf48c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl">
+      <UniqueIdentifier>{68b8c93d-e1b6-4d3d-a8af-5a19d413a96e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -376,9 +373,6 @@
     <ClInclude Include="WIC.h">
       <Filter>源文件和头文件\公共的类\WIC</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayTextSettingDlg.h">
-      <Filter>源文件和头文件\对话框类\选项设置对话框\DisplayTextSettingDlg</Filter>
-    </ClInclude>
     <ClInclude Include="HistoryTrafficListCtrl.h">
       <Filter>源文件和头文件\派生的控件类\HistoryTrafficListCtrl</Filter>
     </ClInclude>
@@ -396,9 +390,6 @@
     </ClInclude>
     <ClInclude Include="auto_start_helper.h">
       <Filter>源文件和头文件\公共的类\auto_start_helper</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorSettingListCtrl.h">
-      <Filter>源文件和头文件\派生的控件类\ColorSettingListCtrl</Filter>
     </ClInclude>
     <ClInclude Include="ComboBox2.h">
       <Filter>源文件和头文件\派生的控件类\CComboBox2</Filter>
@@ -486,6 +477,9 @@
     </ClInclude>
     <ClInclude Include="MIA_Dlg.h">
       <Filter>源文件和头文件\对话框类\属性设置对话框</Filter>
+    </ClInclude>
+    <ClInclude Include="MIA_SettingListCtrl.h">
+      <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -621,9 +615,6 @@
     <ClCompile Include="WIC.cpp">
       <Filter>源文件和头文件\公共的类\WIC</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayTextSettingDlg.cpp">
-      <Filter>源文件和头文件\对话框类\选项设置对话框\DisplayTextSettingDlg</Filter>
-    </ClCompile>
     <ClCompile Include="HistoryTrafficListCtrl.cpp">
       <Filter>源文件和头文件\派生的控件类\HistoryTrafficListCtrl</Filter>
     </ClCompile>
@@ -641,9 +632,6 @@
     </ClCompile>
     <ClCompile Include="auto_start_helper.cpp">
       <Filter>源文件和头文件\公共的类\auto_start_helper</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorSettingListCtrl.cpp">
-      <Filter>源文件和头文件\派生的控件类\ColorSettingListCtrl</Filter>
     </ClCompile>
     <ClCompile Include="ComboBox2.cpp">
       <Filter>源文件和头文件\派生的控件类\CComboBox2</Filter>
@@ -713,6 +701,9 @@
     </ClCompile>
     <ClCompile Include="MIA_Dlg.cpp">
       <Filter>源文件和头文件\对话框类\属性设置对话框</Filter>
+    </ClCompile>
+    <ClCompile Include="MIA_SettingListCtrl.cpp">
+      <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

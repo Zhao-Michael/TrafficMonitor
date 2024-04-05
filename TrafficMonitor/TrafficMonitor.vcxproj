@@ -515,7 +515,6 @@
     <ClInclude Include="CalendarHelper.h" />
     <ClInclude Include="CAutoAdaptSettingsDlg.h" />
     <ClInclude Include="CMFCColorDialogEx.h" />
-    <ClInclude Include="ColorSettingListCtrl.h" />
     <ClInclude Include="ComboBox2.h" />
     <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="CPUUsage.h" />
@@ -525,7 +524,6 @@
     <ClInclude Include="D2D1Support.h" />
     <ClInclude Include="D3D10Support1.h" />
     <ClInclude Include="DCompositionSupport.h" />
-    <ClInclude Include="DisplayTextSettingDlg.h" />
     <ClInclude Include="DllFunctions.h" />
     <ClInclude Include="DrawCommonEx.h" />
     <ClInclude Include="DrawCommonFactory.h" />
@@ -555,6 +553,7 @@
     <ClInclude Include="MainWndSettingsDlg.h" />
     <ClInclude Include="MessageDlg.h" />
     <ClInclude Include="MIA_Dlg.h" />
+    <ClInclude Include="MIA_SettingListCtrl.h" />
     <ClInclude Include="NetworkInfoDlg.h" />
     <ClInclude Include="Nullable.hpp" />
     <ClInclude Include="OptionsDlg.h" />
@@ -599,7 +598,6 @@
     <ClCompile Include="CalendarHelper.cpp" />
     <ClCompile Include="CAutoAdaptSettingsDlg.cpp" />
     <ClCompile Include="CMFCColorDialogEx.cpp" />
-    <ClCompile Include="ColorSettingListCtrl.cpp" />
     <ClCompile Include="ComboBox2.cpp" />
     <ClCompile Include="CommonData.cpp" />
     <ClCompile Include="CPUUsage.cpp" />
@@ -609,7 +607,6 @@
     <ClCompile Include="D2D1Support.cpp" />
     <ClCompile Include="D3D10Support1.cpp" />
     <ClCompile Include="DCompositionSupport.cpp" />
-    <ClCompile Include="DisplayTextSettingDlg.cpp" />
     <ClCompile Include="DllFunctions.cpp" />
     <ClCompile Include="DrawCommonEx.cpp" />
     <ClCompile Include="DrawCommonFactory.cpp" />
@@ -636,6 +633,7 @@
     <ClCompile Include="MainWndSettingsDlg.cpp" />
     <ClCompile Include="MessageDlg.cpp" />
     <ClCompile Include="MIA_Dlg.cpp" />
+    <ClCompile Include="MIA_SettingListCtrl.cpp" />
     <ClCompile Include="NetworkInfoDlg.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="PictureStatic.cpp" />
