@@ -2400,9 +2400,9 @@ void CTrafficMonitorDlg::OnChangeSkin()
         rMainWndData.specify_each_item_color = true;
         CSkinFile::Layout LayoutInUse = {};
         if (rMainWndData.m_show_more_info)
-            LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_l;
+            LayoutInUse = m_skin.GetLayoutManager().layout_l;
         else
-            LayoutInUse = skinDlg.GetSkinData().GetLayoutManager().layout_s;
+            LayoutInUse = m_skin.GetLayoutManager().layout_s;
         for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
             /////////////////////////////////////////////////////////////////////////////////////
@@ -2414,7 +2414,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
             rMainWndData.M_LayoutItems[item].PrefixColor    = LayoutInUse.M_LayoutItems[item].PrefixColor;
             rMainWndData.M_LayoutItems[item].ValueColor     = LayoutInUse.M_LayoutItems[item].ValueColor;
             //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
-            if (theApp.m_general_data.allow_skin_cover_text && !skinDlg.GetSkinData().GetLayoutManager().no_label)
+            if (theApp.m_general_data.allow_skin_cover_text && !m_skin.GetLayoutManager().no_label)
             {
                 //更换标签
                 rMainWndData.M_LayoutItems[item].Prefix = LayoutInUse.M_LayoutItems[item].Prefix;
@@ -2424,17 +2424,17 @@ void CTrafficMonitorDlg::OnChangeSkin()
         //获取皮肤的字体
         if (theApp.m_general_data.allow_skin_cover_font)
         {
-            if (!skinDlg.GetSkinData().GetSkinInfo().font_info.name.IsEmpty())
+            if (!m_skin.GetSkinInfo().font_info.name.IsEmpty())
             {
                 //更换字体
-                rMainWndData.font.name          = skinDlg.GetSkinData().GetSkinInfo().font_info.name;
-                rMainWndData.font.bold          = skinDlg.GetSkinData().GetSkinInfo().font_info.bold;
-                rMainWndData.font.italic        = skinDlg.GetSkinData().GetSkinInfo().font_info.italic;
-                rMainWndData.font.underline     = skinDlg.GetSkinData().GetSkinInfo().font_info.underline;
-                rMainWndData.font.strike_out    = skinDlg.GetSkinData().GetSkinInfo().font_info.strike_out;
+                rMainWndData.font.name          = m_skin.GetSkinInfo().font_info.name;
+                rMainWndData.font.bold          = m_skin.GetSkinInfo().font_info.bold;
+                rMainWndData.font.italic        = m_skin.GetSkinInfo().font_info.italic;
+                rMainWndData.font.underline     = m_skin.GetSkinInfo().font_info.underline;
+                rMainWndData.font.strike_out    = m_skin.GetSkinInfo().font_info.strike_out;
             }
-            if (skinDlg.GetSkinData().GetSkinInfo().font_info.size >= MIN_FONT_SIZE && skinDlg.GetSkinData().GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
-                rMainWndData.font.size = skinDlg.GetSkinData().GetSkinInfo().font_info.size;
+            if (m_skin.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin.GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
+                rMainWndData.font.size = m_skin.GetSkinInfo().font_info.size;
             SetTextFont();
         }
 
