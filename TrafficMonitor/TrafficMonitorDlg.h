@@ -213,6 +213,7 @@ protected:
 public:
     afx_msg void OnShowNotifyIcon();
     afx_msg void OnDestroy();
+    afx_msg void LoadAttributesSettingsWhenLayoutSwitched();
     afx_msg void OnShowCpuMemory();
     afx_msg void OnMousePenetrate();
     //afx_msg void OnTextColor();

@@ -1037,21 +1037,15 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
         if (m_skins[i] == theApp.m_main_wnd_data.m_skin_name)
             m_skin_selected = i;
     }
-
-    //根据当前选择的皮肤获取布局数据
-    LoadSkinLayout();
-
-    //初始化窗口位置
-    SetItemPosition();
+    
+    LoadSkinLayout();       //根据当前选择的皮肤获取布局数据
+    SetItemPosition();      //初始化窗口位置
     if (theApp.m_main_wnd_data.m_position_x != -1 && theApp.m_main_wnd_data.m_position_y != -1)
         SetWindowPos(nullptr, theApp.m_main_wnd_data.m_position_x, theApp.m_main_wnd_data.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
     CheckWindowPos();
+    LoadBackGroundImage();  //载入背景图片
 
-    //载入背景图片
-    LoadBackGroundImage();
-
-    //设置字体
-    SetTextFont();
+    SetTextFont();          //设置字体
 
     //获取启动时的时间
     GetLocalTime(&m_start_time);
@@ -2213,6 +2207,57 @@ void CTrafficMonitorDlg::OnDestroy()
     // TODO: 在此处添加消息处理程序代码
 }
 
+void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
+{
+    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //      切换皮肤布局(包括切换皮肤和皮肤内切换布局两种情况)后需要做些改变：
+    //      (1)切换到皮肤配置文件中此布局中设置的颜色。
+    //      (2)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
+    //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
+    rMainWndData.specify_each_item_color = true;
+    CSkinFile::Layout layout = {};
+    if (rMainWndData.m_show_more_info)
+        layout = m_skin.GetLayoutManager().layout_l;
+    else
+        layout = m_skin.GetLayoutManager().layout_s;
+    for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+    {
+        /////////////////////////////////////////////////////////////////////////////////////
+        //      注意：函数GetSkinData()和GetSkinInfo()都返回了const属性，
+        //           所以不能用引用来接收，编译器报错。使用赋值后，就没有const属性了。
+        /////////////////////////////////////////////////////////////////////////////////////
+
+        //更换颜色
+        rMainWndData.M_LayoutItems[item].PrefixColor    = layout.M_LayoutItems[item].PrefixColor;
+        rMainWndData.M_LayoutItems[item].ValueColor     = layout.M_LayoutItems[item].ValueColor;
+        //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
+        if (theApp.m_general_data.allow_skin_cover_text && !m_skin.GetLayoutManager().no_label)
+        {
+            //更换标签
+            rMainWndData.M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
+        }
+    }
+    //获取皮肤的字体
+    if (theApp.m_general_data.allow_skin_cover_font)
+    {
+        if (!m_skin.GetSkinInfo().font_info.name.IsEmpty())
+        {
+            //更换字体
+            rMainWndData.font.name          = m_skin.GetSkinInfo().font_info.name;
+            rMainWndData.font.bold          = m_skin.GetSkinInfo().font_info.bold;
+            rMainWndData.font.italic        = m_skin.GetSkinInfo().font_info.italic;
+            rMainWndData.font.underline     = m_skin.GetSkinInfo().font_info.underline;
+            rMainWndData.font.strike_out    = m_skin.GetSkinInfo().font_info.strike_out;
+        }
+        if (m_skin.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin.GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
+            rMainWndData.font.size = m_skin.GetSkinInfo().font_info.size;
+        SetTextFont();
+    }
+}
 
 void CTrafficMonitorDlg::OnShowCpuMemory()
 {
@@ -2234,9 +2279,10 @@ void CTrafficMonitorDlg::OnShowCpuMemory()
         MoveWindow(rect);
         CheckWindowPos();
     }
-    LoadBackGroundImage();
-    SetItemPosition();
-    Invalidate(FALSE);
+    SetItemPosition();          //初始化窗口位置
+    LoadBackGroundImage();      //载入背景图片
+//    LoadAttributesSettingsWhenLayoutSwitched();       //暂时不使用，以后要改。
+    Invalidate(FALSE);          //重绘界面
     theApp.SaveConfig();
 }
 
@@ -2385,61 +2431,13 @@ void CTrafficMonitorDlg::OnChangeSkin()
 
         m_skin_selected             = skinDlg.m_skin_selected;
         rMainWndData.m_skin_name    = m_skins[m_skin_selected];             //切换皮肤后主窗口保存新选择的皮肤序号
-        //获取皮肤布局
-        LoadSkinLayout();                                                   //加载新选择的皮肤
-        //载入背景图片
-        LoadBackGroundImage();
 
-        ////////////////////////////////////////////////////////////////////////////////////////
-        //      切换皮肤后需要做些改变：
-        //      (1)切换到皮肤配置文件中设置的颜色
-        //      (2)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
-        //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
-        ////////////////////////////////////////////////////////////////////////////////////////
-        //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
-        rMainWndData.specify_each_item_color = true;
-        CSkinFile::Layout LayoutInUse = {};
-        if (rMainWndData.m_show_more_info)
-            LayoutInUse = m_skin.GetLayoutManager().layout_l;
-        else
-            LayoutInUse = m_skin.GetLayoutManager().layout_s;
-        for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
-        {
-            /////////////////////////////////////////////////////////////////////////////////////
-            //      注意：函数GetSkinData()和GetSkinInfo()都返回了const属性，
-            //           所以不能用引用来接收，编译器报错。使用赋值后，就没有const属性了。
-            /////////////////////////////////////////////////////////////////////////////////////
+        LoadSkinLayout();                               //根据当前选择的皮肤获取布局数据
+        SetItemPosition();                              //初始化窗口位置
+        LoadBackGroundImage();                          //载入背景图片
+        LoadAttributesSettingsWhenLayoutSwitched();
+        Invalidate(FALSE);                              //更换皮肤后立即刷新窗口信息
 
-            //更换颜色
-            rMainWndData.M_LayoutItems[item].PrefixColor    = LayoutInUse.M_LayoutItems[item].PrefixColor;
-            rMainWndData.M_LayoutItems[item].ValueColor     = LayoutInUse.M_LayoutItems[item].ValueColor;
-            //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
-            if (theApp.m_general_data.allow_skin_cover_text && !m_skin.GetLayoutManager().no_label)
-            {
-                //更换标签
-                rMainWndData.M_LayoutItems[item].Prefix = LayoutInUse.M_LayoutItems[item].Prefix;
-            }
-        }
-        //SetTextColor();
-        //获取皮肤的字体
-        if (theApp.m_general_data.allow_skin_cover_font)
-        {
-            if (!m_skin.GetSkinInfo().font_info.name.IsEmpty())
-            {
-                //更换字体
-                rMainWndData.font.name          = m_skin.GetSkinInfo().font_info.name;
-                rMainWndData.font.bold          = m_skin.GetSkinInfo().font_info.bold;
-                rMainWndData.font.italic        = m_skin.GetSkinInfo().font_info.italic;
-                rMainWndData.font.underline     = m_skin.GetSkinInfo().font_info.underline;
-                rMainWndData.font.strike_out    = m_skin.GetSkinInfo().font_info.strike_out;
-            }
-            if (m_skin.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin.GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
-                rMainWndData.font.size = m_skin.GetSkinInfo().font_info.size;
-            SetTextFont();
-        }
-
-        SetItemPosition();
-        Invalidate(FALSE);      //更换皮肤后立即刷新窗口信息
         theApp.SaveConfig();
     }
 }
@@ -2635,11 +2633,12 @@ afx_msg LRESULT CTrafficMonitorDlg::OnDpichanged(WPARAM wParam, LPARAM lParam)
         m_tBarDlg->SetTextFont();
     }
 
-    LoadSkinLayout();   //根据当前选择的皮肤获取布局数据
-    SetItemPosition();  //初始化窗口位置
-    LoadBackGroundImage();
-    SetTextFont();      //重新加载字体
-    Invalidate(FALSE);  //重绘界面
+    LoadSkinLayout();       //根据当前选择的皮肤获取布局数据
+    SetItemPosition();      //初始化窗口位置
+    LoadBackGroundImage();  //载入背景图片
+
+    SetTextFont();          //重新加载字体
+    Invalidate(FALSE);      //重绘界面
 
     return 0;
 }
