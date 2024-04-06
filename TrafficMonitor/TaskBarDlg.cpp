@@ -1027,8 +1027,6 @@ void CTaskBarDlg::CalculateWindowSize()
     }
     if (!hide_unit && rTaskbarData.separate_value_unit_with_space)
         sample_str += _T(' ');
-    if (rTaskbarData.speed_short_mode && !rTaskbarData.unit_byte && !rTaskbarData.hide_unit)
-        sample_str += _T('b');
     value_width = m_pDC->GetTextExtent(sample_str).cx;      //计算使用当前字体显示文本需要的宽度值
     item_widths[TDI_UP].value_width = value_width;
     item_widths[TDI_DOWN].value_width = value_width;

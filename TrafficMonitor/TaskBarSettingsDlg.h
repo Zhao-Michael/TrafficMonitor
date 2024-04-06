@@ -92,8 +92,6 @@ public:
     afx_msg void OnBnClickedHorizontalArrangeCheck();
     afx_msg void OnBnClickedShowStatusBarCheck();
     afx_msg void OnBnClickedSeparateValueUnitCheck();
-    afx_msg void OnBnClickedUnitByteRadio();
-    afx_msg void OnBnClickedUnitBitRadio();
     afx_msg void OnBnClickedShowToolTipChk();
     afx_msg void OnBnClickedDefaultStyleButton();
     afx_msg void OnDestroy();

@@ -63,16 +63,8 @@ void CMainWndSettingsDlg::IniUnitCombo()
     MainWndSettingData& rMainWndData = m_data;
     m_unit_combo.ResetContent();
     m_unit_combo.AddString(CCommon::LoadText(IDS_AUTO));
-    if (rMainWndData.unit_byte)
-    {
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
-    }
-    else
-    {
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Kb/s")));
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Mb/s")));
-    }
+    m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
+    m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
     m_unit_combo.SetCurSel(static_cast<int>(rMainWndData.speed_unit));
 }
 
@@ -120,8 +112,6 @@ BEGIN_MESSAGE_MAP(CMainWndSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, &CMainWndSettingsDlg::OnBnClickedSpecifyEachItemColorCheck)
     ON_CBN_SELCHANGE(IDC_DOUBLE_CLICK_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeDoubleClickCombo)
     ON_BN_CLICKED(IDC_SEPARATE_VALUE_UNIT_CHECK, &CMainWndSettingsDlg::OnBnClickedSeparateValueUnitCheck)
-    ON_BN_CLICKED(IDC_UNIT_BYTE_RADIO, &CMainWndSettingsDlg::OnBnClickedUnitByteRadio)
-    ON_BN_CLICKED(IDC_UNIT_BIT_RADIO, &CMainWndSettingsDlg::OnBnClickedUnitBitRadio)
     ON_BN_CLICKED(IDC_SHOW_TOOL_TIP_CHK, &CMainWndSettingsDlg::OnBnClickedShowToolTipChk)
     ON_BN_CLICKED(IDC_BROWSE_BUTTON, &CMainWndSettingsDlg::OnBnClickedBrowseButton)
     ON_CBN_SELCHANGE(IDC_MEMORY_DISPLAY_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeMemoryDisplayCombo)
@@ -161,11 +151,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_toolTip.Create(this);
     m_toolTip.SetMaxTipWidth(theApp.DPI(300));
     m_toolTip.AddTool(GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2), CCommon::LoadText(IDS_SPEED_SHORT_MODE_TIP));
-
-    if (rMainWndData.unit_byte)
-        ((CButton*)GetDlgItem(IDC_UNIT_BYTE_RADIO))->SetCheck(TRUE);
-    else
-        ((CButton*)GetDlgItem(IDC_UNIT_BIT_RADIO))->SetCheck(TRUE);
 
     IniUnitCombo();
 
@@ -454,22 +439,6 @@ void CMainWndSettingsDlg::OnBnClickedSeparateValueUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
     m_data.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
-}
-
-
-void CMainWndSettingsDlg::OnBnClickedUnitByteRadio()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.unit_byte = true;
-    IniUnitCombo();
-}
-
-
-void CMainWndSettingsDlg::OnBnClickedUnitBitRadio()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.unit_byte = false;
-    IniUnitCombo();
 }
 
 

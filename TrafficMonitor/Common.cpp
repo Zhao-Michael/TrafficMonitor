@@ -80,10 +80,6 @@ CString CCommon::DataSizeToString(unsigned long long size, const PublicSettingDa
 {
     //CString str;
     CString value_str, unit_str;
-    if (!cfg.unit_byte)     //如果使用比特(bit)为单位，则数值乘以8
-    {
-        size *= 8;
-    }
     switch (cfg.speed_unit)
     {
     case SpeedUnit::AUTO:
@@ -174,13 +170,7 @@ CString CCommon::DataSizeToString(unsigned long long size, const PublicSettingDa
         str = value_str + _T(' ') + unit_str;
     else
         str = value_str + unit_str;
-    if (!cfg.unit_byte)
-    {
-        if (cfg.speed_short_mode && !cfg.hide_unit)
-            str += _T('b');     //如果使用比特(bit)为单位，即使设置了网速简洁模式，也将“b”显示出来
-        else
-            str.Replace(_T('B'), _T('b'));  //如果使用比特(bit)为单位，将B替换成b
-    }
+
     return str;
 }
 

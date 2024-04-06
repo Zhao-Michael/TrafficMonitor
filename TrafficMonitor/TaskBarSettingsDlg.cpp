@@ -83,16 +83,8 @@ void CTaskBarSettingsDlg::IniUnitCombo()
 {
     m_unit_combo.ResetContent();
     m_unit_combo.AddString(CCommon::LoadText(IDS_AUTO));
-    if (m_data.unit_byte)
-    {
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
-    }
-    else
-    {
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Kb/s")));
-        m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" Mb/s")));
-    }
+    m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
+    m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
     m_unit_combo.SetCurSel(static_cast<int>(m_data.speed_unit));
 }
 
@@ -178,8 +170,6 @@ BEGIN_MESSAGE_MAP(CTaskBarSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_HORIZONTAL_ARRANGE_CHECK, &CTaskBarSettingsDlg::OnBnClickedHorizontalArrangeCheck)
     ON_BN_CLICKED(IDC_SHOW_STATUS_BAR_CHECK, &CTaskBarSettingsDlg::OnBnClickedShowStatusBarCheck)
     ON_BN_CLICKED(IDC_SEPARATE_VALUE_UNIT_CHECK, &CTaskBarSettingsDlg::OnBnClickedSeparateValueUnitCheck)
-    ON_BN_CLICKED(IDC_UNIT_BYTE_RADIO, &CTaskBarSettingsDlg::OnBnClickedUnitByteRadio)
-    ON_BN_CLICKED(IDC_UNIT_BIT_RADIO, &CTaskBarSettingsDlg::OnBnClickedUnitBitRadio)
     ON_BN_CLICKED(IDC_SHOW_TOOL_TIP_CHK, &CTaskBarSettingsDlg::OnBnClickedShowToolTipChk)
     ON_BN_CLICKED(IDC_DEFAULT_STYLE_BUTTON, &CTaskBarSettingsDlg::OnBnClickedDefaultStyleButton)
     ON_WM_DESTROY()
@@ -260,12 +250,6 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     m_toolTip.AddTool(&m_atuo_adapt_light_theme_chk, CCommon::LoadText(IDS_AUTO_ADAPT_TIP_INFO));
     m_toolTip.AddTool(GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK), CCommon::LoadText(IDS_SHOW_RESOURCE_USAGE_GRAPH_TIP));
     m_toolTip.AddTool(GetDlgItem(IDC_SHOW_NET_SPEED_FIGURE_CHECK), CCommon::LoadText(IDS_SHOW_NET_SPEED_GRAPH_TIP));
-
-
-    if (m_data.unit_byte)
-        ((CButton*)GetDlgItem(IDC_UNIT_BYTE_RADIO))->SetCheck(TRUE);
-    else
-        ((CButton*)GetDlgItem(IDC_UNIT_BIT_RADIO))->SetCheck(TRUE);
 
     IniUnitCombo();
 
@@ -623,22 +607,6 @@ void CTaskBarSettingsDlg::OnBnClickedSeparateValueUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
     m_data.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
-}
-
-
-void CTaskBarSettingsDlg::OnBnClickedUnitByteRadio()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.unit_byte = true;
-    IniUnitCombo();
-}
-
-
-void CTaskBarSettingsDlg::OnBnClickedUnitBitRadio()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.unit_byte = false;
-    IniUnitCombo();
 }
 
 

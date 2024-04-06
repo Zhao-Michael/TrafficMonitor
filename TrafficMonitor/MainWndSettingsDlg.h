@@ -68,8 +68,6 @@ public:
     afx_msg void OnBnClickedSpecifyEachItemColorCheck();
     afx_msg void OnCbnSelchangeDoubleClickCombo();
     afx_msg void OnBnClickedSeparateValueUnitCheck();
-    afx_msg void OnBnClickedUnitByteRadio();
-    afx_msg void OnBnClickedUnitBitRadio();
     afx_msg void OnBnClickedShowToolTipChk();
     afx_msg void OnBnClickedBrowseButton();
     afx_msg void OnCbnSelchangeMemoryDisplayCombo();
