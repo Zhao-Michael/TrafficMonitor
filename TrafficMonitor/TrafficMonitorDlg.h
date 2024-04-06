@@ -40,6 +40,11 @@ public:
     enum { IDD = IDD_TRAFFICMONITOR_DIALOG };
 #endif
 
+    CSkinFile::Layout GetSkinLayout() const
+    {
+        return m_skin.GetLayoutManager().layout_l;      //目前不区分，使用有更多显示项的layout_l。
+    }
+
 protected:
     virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 

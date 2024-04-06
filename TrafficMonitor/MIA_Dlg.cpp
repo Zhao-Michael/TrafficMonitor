@@ -6,7 +6,8 @@
 #include "MIA_Dlg.h"
 #include "afxdialogex.h"
 #include "CMFCColorDialogEx.h"
-
+#include "TrafficMonitorDlg.h"
+#include "SkinFile.h"
 
 // CMonitorItemAttributesDlg 对话框
 
@@ -35,6 +36,7 @@ void CMonitorItemAttributesDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CMonitorItemAttributesDlg, CBaseDialog)
     ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMonitorItemAttributesDlg::OnNMDblclkList1)
     ON_BN_CLICKED(IDC_RESTORE_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton)
+    ON_BN_CLICKED(IDC_RESTORE_SKIN_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton)
 END_MESSAGE_MAP()
 
 // CMonitorItemAttributesDlg 消息处理程序
@@ -58,11 +60,11 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     int width2 = (rect.Width() - width0 - width1 - theApp.DPI(20) - 1) / (num--);
     int width3 = (rect.Width() - width0 - width1 - width2 - theApp.DPI(20) - 1) / (num--);
     int width4 =  rect.Width() - width0 - width1 - width2 - width3 - theApp.DPI(20) - 1;
-    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_DISP_ITEM_ID),LVCFMT_LEFT, width0);
-    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_ITEM),        LVCFMT_LEFT, width1);
-    m_list_ctrl.InsertColumn(2, CCommon::LoadText(IDS_PREFIX),       LVCFMT_LEFT, width2);
-    m_list_ctrl.InsertColumn(3, CCommon::LoadText(IDS_COLOR_PREFIX), LVCFMT_LEFT, width3);
-    m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE), LVCFMT_LEFT, width4);
+    m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_DISP_ITEM_ID),    LVCFMT_LEFT, width0);
+    m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_ITEM),            LVCFMT_LEFT, width1);
+    m_list_ctrl.InsertColumn(2, CCommon::LoadText(IDS_PREFIX),          LVCFMT_LEFT, width2);
+    m_list_ctrl.InsertColumn(3, CCommon::LoadText(IDS_COLOR_PREFIX),    LVCFMT_LEFT, width3);
+    m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE),     LVCFMT_LEFT, width4);
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
     //向列表中插入行
@@ -84,6 +86,9 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     }
     m_list_ctrl.SetEditColMethod(CMonitorItemAttributesSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
     m_list_ctrl.SetEditableCol({ 2 });                                                      //设置可编辑的列
+
+    if (B_MainWnd == false)
+        GetDlgItem(IDC_RESTORE_SKIN_DEFAULT_BUTTON)->ShowWindow(false);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
@@ -189,4 +194,21 @@ void CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton()
         }
         m_list_ctrl.SetItemText(index, 2, default_text);
     }
+}
+
+void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTrafficMonitorDlg* tmDlg           = (CTrafficMonitorDlg*)theApp.m_pMainWnd;
+    CSkinFile::Layout layout            = tmDlg->GetSkinLayout();
+    int item_count = m_list_ctrl.GetItemCount();
+    for (int index{}; index < item_count; index++)
+    {
+        CommonDisplayItem* item     = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
+        LayoutItem& layout_item     = layout.GetItem(*item);
+        m_list_ctrl.SetItemText (index, 2, layout_item.Prefix);
+        m_list_ctrl.SetItemColor(index, 3, layout_item.PrefixColor);
+        m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
+    }
+    m_list_ctrl.Invalidate(false);
 }

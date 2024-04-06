@@ -31,4 +31,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
     afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedRestoreDefaultButton();
+	afx_msg void OnClickedRestoreSkinDefaultButton();
 };
