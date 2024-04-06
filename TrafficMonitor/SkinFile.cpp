@@ -484,11 +484,6 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         }
     }
 
-    if (rMainWndData.swap_up_down) //交换上传和下载位置
-    {
-        std::swap(map_builtin_str[TDI_UP], map_builtin_str[TDI_DOWN]);
-    }
-
     //设置字体。目前不支持每个显示项单独设置字体。
     draw.SetFont(&font);
     //绘制标签和数值

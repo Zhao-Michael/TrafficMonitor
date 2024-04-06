@@ -111,7 +111,6 @@ BEGIN_MESSAGE_MAP(CMainWndSettingsDlg, CTabDlg)
     //ON_BN_CLICKED(IDC_SET_COLOR_BUTTON1, &CMainWndSettingsDlg::OnBnClickedSetColorButton1)
     //ON_BN_CLICKED(IDC_SET_DEFAULT_BUTTON, &CMainWndSettingsDlg::OnBnClickedSetDefaultButton)
     ON_BN_CLICKED(IDC_SET_FONT_BUTTON, &CMainWndSettingsDlg::OnBnClickedSetFontButton)
-    ON_BN_CLICKED(IDC_SWITCH_UP_DOWN_CHECK, &CMainWndSettingsDlg::OnBnClickedSwitchUpDownCheck)
     ON_BN_CLICKED(IDC_FULLSCREEN_HIDE_CHECK, &CMainWndSettingsDlg::OnBnClickedFullscreenHideCheck)
     ON_BN_CLICKED(IDC_SPEED_SHORT_MODE_CHECK2, &CMainWndSettingsDlg::OnBnClickedSpeedShortModeCheck2)
     ON_CBN_SELCHANGE(IDC_UNIT_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeUnitCombo)
@@ -151,12 +150,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_font_size_edit.SetRange(5, 72);
     m_font_size_edit.SetValue(rMainWndData.font.size);
 
-    //SetDlgItemText(IDC_UPLOAD_EDIT, rMainWndData.disp_str.Get(TDI_UP).c_str());
-    //SetDlgItemText(IDC_DOWNLOAD_EDIT, rMainWndData.disp_str.Get(TDI_DOWN).c_str());
-    //SetDlgItemText(IDC_CPU_EDIT, rMainWndData.disp_str.Get(TDI_CPU).c_str());
-    //SetDlgItemText(IDC_MEMORY_EDIT, rMainWndData.disp_str.Get(TDI_MEMORY).c_str());
-
-    ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(     rMainWndData.swap_up_down);
     ((CButton*)GetDlgItem(IDC_FULLSCREEN_HIDE_CHECK))->SetCheck(    rMainWndData.hide_main_wnd_when_fullscreen);
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(  rMainWndData.speed_short_mode);
     ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rMainWndData.separate_value_unit_with_space);
@@ -187,15 +180,7 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 
     if (m_text_disable)
     {
-        //GetDlgItem(IDC_UPLOAD_EDIT)->EnableWindow(FALSE);
-        //GetDlgItem(IDC_DOWNLOAD_EDIT)->EnableWindow(FALSE);
-        //GetDlgItem(IDC_CPU_EDIT)->EnableWindow(FALSE);
-        //GetDlgItem(IDC_MEMORY_EDIT)->EnableWindow(FALSE);
 //        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
-        rMainWndData.swap_up_down = false;
-        ((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->SetCheck(FALSE);
-        GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK)->EnableWindow(FALSE);
-        //GetDlgItem(IDC_SET_DEFAULT_BUTTON)->EnableWindow(FALSE);
     }
 
     CheckDlgButton(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, rMainWndData.specify_each_item_color);
@@ -333,13 +318,6 @@ void CMainWndSettingsDlg::OnBnClickedSetFontButton()
         SetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
         SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rMainWndData.font.size).c_str());
     }
-}
-
-
-void CMainWndSettingsDlg::OnBnClickedSwitchUpDownCheck()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.swap_up_down = (((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK))->GetCheck() != 0);
 }
 
 

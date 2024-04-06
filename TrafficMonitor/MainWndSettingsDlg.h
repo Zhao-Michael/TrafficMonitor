@@ -55,7 +55,6 @@ public:
     //afx_msg void OnEnChangeMemoryEdit();
     //afx_msg void OnBnClickedSetDefaultButton();
     afx_msg void OnBnClickedSetFontButton();
-    afx_msg void OnBnClickedSwitchUpDownCheck();
     afx_msg void OnBnClickedFullscreenHideCheck();
     afx_msg void OnBnClickedSpeedShortModeCheck2();
     afx_msg void OnCbnSelchangeUnitCombo();

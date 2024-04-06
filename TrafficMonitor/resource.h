@@ -228,7 +228,7 @@
 #define IDS_SIMPLENOTEPAD_DESCRIPTION   330
 #define IDD_SELECT_ORDER_DIALOG         330
 #define IDS_COLOR                       331
-#define IDS_COLOR_LABEL                 332
+#define IDS_COLOR_PREFIX                332
 #define IDD_PLUGIN_MANAGER_DIALOG       332
 #define IDS_COLOR_VALUE                 333
 #define IDS_GPU_USAGE                   334
@@ -339,14 +339,11 @@
 #define IDC_MEMORY_EDIT1                1034
 #define IDC_TEXT_COLOR_STATIC2          1035
 #define IDC_TAB1                        1035
-#define IDC_SET_DEFAULT_BUTTON          1036
 #define IDC_TEXT_COLOR_STATIC3          1036
 #define IDC_SET_COLOR_BUTTON2           1037
 #define IDC_TRANSPARENT_COLOR_STATIC    1037
 #define IDC_SET_COLOR_BUTTON1           1038
 #define IDC_SET_COLOR_BUTTON3           1038
-#define IDC_SWITCH_UP_DOWN_CHECK        1039
-#define IDC_SWITCH_UP_DOWN_CHECK1       1040
 #define IDC_SET_DEFAULT_BUTTON1         1041
 #define IDC_FULLSCREEN_HIDE_CHECK       1042
 #define IDC_SWITCH_UP_DOWN_CHECK2       1042
@@ -458,7 +455,7 @@
 #define IDC_HDD_TEMP_TIP_CHECK          1117
 #define IDC_AUTO_SET_BACK_COLOR_CHECK   1117
 #define IDC_RESTORE_DEFAULT_BUTTON      1118
-#define IDC_DISPLAY_TEXT_SETTING_BUTTON 1119
+#define IDC_RESTORE_SKIN_DEFAULT_BUTTON 1119
 #define IDC_CPU_TEMP_TIP_CHECK          1120
 #define IDC_OPENHARDWAREMONITOR_LINK    1122
 #define IDC_TINYXML2_LINK               1123

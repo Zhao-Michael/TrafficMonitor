@@ -151,7 +151,6 @@ void CTrafficMonitorApp::LoadConfig()
     ini.LoadPluginItemsAttributes(LIAO_MAINWND, rMainWndData.M_LayoutItems);
 
     //载入其它设置
-    rMainWndData.swap_up_down                   = ini.GetBool(_T("config"), _T("swap_up_down"),         false);
     rMainWndData.speed_short_mode               = ini.GetBool(_T("config"), _T("speed_short_mode"),     false);
     rMainWndData.separate_value_unit_with_space = ini.GetBool(_T("config"), _T("separate_value_unit_with_space"), true);
     rMainWndData.show_tool_tip                  = ini.GetBool(_T("config"), _T("show_tool_tip"),        true);
@@ -397,7 +396,6 @@ void CTrafficMonitorApp::SaveConfig()
     ini.SavePluginItemsAttributes(LIAO_MAINWND, rMainWndData.M_LayoutItems);
 
     //保存其它设置
-    ini.WriteBool           (L"config",     L"swap_up_down",                    rMainWndData.swap_up_down);
     ini.WriteBool           (L"config",     L"speed_short_mode",                rMainWndData.speed_short_mode);
     ini.WriteBool           (L"config",     L"separate_value_unit_with_space",  rMainWndData.separate_value_unit_with_space);
     ini.WriteBool           (L"config",     L"show_tool_tip",                   rMainWndData.show_tool_tip);

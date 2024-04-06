@@ -61,7 +61,7 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     m_list_ctrl.InsertColumn(0, CCommon::LoadText(IDS_DISP_ITEM_ID),LVCFMT_LEFT, width0);
     m_list_ctrl.InsertColumn(1, CCommon::LoadText(IDS_ITEM),        LVCFMT_LEFT, width1);
     m_list_ctrl.InsertColumn(2, CCommon::LoadText(IDS_PREFIX),       LVCFMT_LEFT, width2);
-    m_list_ctrl.InsertColumn(3, CCommon::LoadText(IDS_COLOR_LABEL), LVCFMT_LEFT, width3);
+    m_list_ctrl.InsertColumn(3, CCommon::LoadText(IDS_COLOR_PREFIX), LVCFMT_LEFT, width3);
     m_list_ctrl.InsertColumn(4, CCommon::LoadText(IDS_COLOR_VALUE), LVCFMT_LEFT, width4);
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 

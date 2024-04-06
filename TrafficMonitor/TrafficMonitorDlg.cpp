@@ -828,8 +828,6 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
 
     //接下来是比在皮肤预览窗口切换皮肤预览后，额外要做的事情。
-    if (m_skin.GetLayoutManager().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
-        theApp.m_main_wnd_data.swap_up_down = false;
 }
 
 void CTrafficMonitorDlg::LoadBackGroundImage()
