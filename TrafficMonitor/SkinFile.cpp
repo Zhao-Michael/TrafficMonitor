@@ -24,16 +24,18 @@ void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 
 void CSkinFile::LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
-    const char* str = nullptr;
+    layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
+    if (!layout_item.show)
+        return;
     layout_item.x               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
     layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
-    layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     if (m_layout_manager.no_label)
         layout_item.Prefix      = _T("");
     else
         layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
+    const char* str = nullptr;
     str = CTinyXml2Helper::ElementAttribute(ele, "color_p");
     if (str[0] != '\0')
         layout_item.PrefixColor = CCommon::GetColorFromStr(CCommon::StrToUnicode(str).c_str());
@@ -81,7 +83,18 @@ void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLEl
                     }
                 }
             }
-        });
+        }
+    );
+
+    //初始化在皮肤配置文件中没有设置的监控项
+    for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
+    {
+        LayoutItem& layout_item = layout.GetItem(item);
+        if (layout_item.show)
+            continue;
+        layout_item.PrefixColor = layout.PrefixColor;
+        layout_item.ValueColor  = layout.ValueColor;
+    }
 }
 
 void CSkinFile::DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align)
@@ -251,9 +264,9 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 LoadLayoutFromXmlNode(m_layout_manager.layout_l, ele_layout);
                             else if (str_layout == "layout_s")
                                 LoadLayoutFromXmlNode(m_layout_manager.layout_s, ele_layout);
-                        });
+                        }
+                    );
                 }
-                
                 else if (ele_name == "preview")             //预览图
                 {
                     m_preview_info.width = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "width")));
@@ -271,7 +284,8 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                                 m_preview_info.s_pos.x = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele_priview_item, "x")));
                                 m_preview_info.s_pos.y = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele_priview_item, "y")));
                             }
-                        });
+                        }
+                    );
                 }
             }
         );
