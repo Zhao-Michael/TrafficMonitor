@@ -133,7 +133,8 @@ CString CTrafficMonitorDlg::GetMouseTipsInfo()
         CCommon::LoadText(IDS_DOWNLOAD), CCommon::KBytesToString(theApp.m_today_down_traffic / 1024u)
     );
     tip_info += temp;
-    const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
+//  const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
+    CSkinFile::Layout skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     if (!skin_layout.GetItem(TDI_UP).show)      //如果主窗口中没有显示上传速度，则在提示信息中显示上传速度
     {
         temp.Format(_T("\r\n%s: %s/s"), CCommon::LoadText(IDS_UPLOAD),

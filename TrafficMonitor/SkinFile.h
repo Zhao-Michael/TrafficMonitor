@@ -31,6 +31,11 @@ public:
 
         //保存皮肤配置文件中单个Layout配置的每一项的布局信息，不包含没有配置的项。   //切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
         std::map<CommonDisplayItem, LayoutItem>             M_LayoutItems{};
+        LayoutItem& GetItem(CommonDisplayItem display_item)
+        {
+            return M_LayoutItems[display_item];
+        }
+/*
         LayoutItem GetItem(CommonDisplayItem display_item) const
         {
             auto iter = M_LayoutItems.find(display_item);
@@ -38,6 +43,7 @@ public:
                 return iter->second;
             return LayoutItem();
         }
+*/
     };
 
     //皮肤布局信息
