@@ -186,7 +186,6 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::TransparentColorConvert(rTaskbarData.transparent_color);
     }
     rTaskbarData.status_bar_color                 = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
-    rTaskbarData.specify_each_item_color          = ini.GetBool (L"taskbar",    L"specify_each_item_color", false);
     rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"tbar_display_item", TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
@@ -419,7 +418,6 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.back_color, 16);
     ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.transparent_color, 16);
     ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.status_bar_color, 16);
-    ini.WriteBool           (L"taskbar",    L"specify_each_item_color", rTaskbarData.specify_each_item_color);
     ini.WriteInt            (L"taskbar",    L"tbar_display_item",       rTaskbarData.m_tbar_display_item);
     //任务栏窗口字体设置
     ini.SaveFontData(L"taskbar", rTaskbarData.font);

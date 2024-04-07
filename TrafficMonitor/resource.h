@@ -377,7 +377,6 @@
 #define IDC_DWON_LABLE_STATIC           1061
 #define IDC_MEMORY_STATIC               1062
 #define IDC_DWON_VALUE_STATIC           1062
-#define IDC_SPECIFY_EACH_ITEM_COLOR_CHECK 1063
 #define IDC_CPU_LABLE_STATIC            1063
 #define IDC_CPU_TEMP_STATIC             1063
 #define IDC_CPU_VALUE_STATIC            1064

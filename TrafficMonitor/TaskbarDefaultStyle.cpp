@@ -125,7 +125,6 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
 		data.back_color                 = m_default_style[index].back_color;
 		data.transparent_color          = m_default_style[index].transparent_color;
 		data.status_bar_color           = m_default_style[index].status_bar_color;
-        data.specify_each_item_color    = m_default_style[index].specify_each_item_color;
         for (auto iter = m_default_style[index].M_LayoutItems.begin(); iter != m_default_style[index].M_LayoutItems.end(); ++iter)
         {
             data.M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;
@@ -159,7 +158,6 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
 	m_default_style[index].back_color = data.back_color;
 	m_default_style[index].transparent_color = data.transparent_color;
 	m_default_style[index].status_bar_color = data.status_bar_color;
-	m_default_style[index].specify_each_item_color = data.specify_each_item_color;
     for (auto iter = data.M_LayoutItems.begin(); iter != data.M_LayoutItems.end(); ++iter)
     {
         m_default_style[index].M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;

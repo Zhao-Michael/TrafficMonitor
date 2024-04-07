@@ -94,7 +94,6 @@ struct PublicSettingData
     FontInfo font;                                  //字体
     bool show_tool_tip{ true };                     //显示鼠标提示
 
-    bool specify_each_item_color{ false };          //是否指定每个项目的颜色
     std::map<CommonDisplayItem, LayoutItem> M_LayoutItems{};                          //存放所有项目的属性配置
 
     //数值属性设置

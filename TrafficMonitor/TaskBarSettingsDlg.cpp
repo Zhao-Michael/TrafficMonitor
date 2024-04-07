@@ -44,7 +44,6 @@ bool CTaskBarSettingsDlg::IsStyleModified()
     modified |= (theApp.m_taskbar_data.back_color != m_data.back_color);
     modified |= (theApp.m_taskbar_data.transparent_color != m_data.transparent_color);
     modified |= (theApp.m_taskbar_data.status_bar_color != m_data.status_bar_color);
-    modified |= (theApp.m_taskbar_data.specify_each_item_color != m_data.specify_each_item_color);
     return modified && m_style_modified;
 }
 
@@ -52,28 +51,21 @@ void CTaskBarSettingsDlg::DrawStaticColor()
 {
     //CCommon::FillStaticColor(m_text_color_static, m_data.text_color);
     //CCommon::FillStaticColor(m_back_color_static, m_data.back_color);
-    if (m_data.specify_each_item_color)
-    {
-        int color_num{};
 #ifdef WITHOUT_TEMPERATURE
-        color_num = 8;
+    int color_num = 8;
 #else
-        color_num = 16;
+    int color_num = 16;
 #endif
-        int i{};
-        m_text_color_static.SetColorNum(color_num);
-        for (const auto& item : m_data.M_LayoutItems)
-        {
-            m_text_color_static.SetFillColor(i, item.second.PrefixColor);
-            m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
-            i += 2;
-        }
-        m_text_color_static.Invalidate();
-    }
-    else if (!m_data.M_LayoutItems.empty())
+    int i{};
+    m_text_color_static.SetColorNum(color_num);
+    for (const auto& item : m_data.M_LayoutItems)
     {
-        m_text_color_static.SetFillColor(m_data.M_LayoutItems.begin()->second.PrefixColor);
+        m_text_color_static.SetFillColor(i, item.second.PrefixColor);
+        m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
+        i += 2;
     }
+    m_text_color_static.Invalidate();
+
     m_back_color_static.SetFillColor(m_data.back_color);
     //m_trans_color_static.SetFillColor(m_data.transparent_color);
     m_status_bar_color_static.SetFillColor(m_data.status_bar_color);
@@ -92,7 +84,6 @@ void CTaskBarSettingsDlg::ApplyDefaultStyle(int index)
 {
     theApp.m_taskbar_default_style.ApplyDefaultStyle(index, m_data);
     DrawStaticColor();
-    ((CButton*)GetDlgItem(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK))->SetCheck(m_data.specify_each_item_color);
     m_background_transparent_chk.SetCheck(m_data.IsTaskbarTransparent());
 }
 
@@ -165,7 +156,6 @@ BEGIN_MESSAGE_MAP(CTaskBarSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_VALUE_RIGHT_ALIGN_CHECK, &CTaskBarSettingsDlg::OnBnClickedValueRightAlignCheck)
     ON_BN_CLICKED(IDC_HIDE_PERCENTAGE_CHECK, &CTaskBarSettingsDlg::OnBnClickedHidePercentageCheck)
     ON_MESSAGE(WM_STATIC_CLICKED, &CTaskBarSettingsDlg::OnStaticClicked)
-    ON_BN_CLICKED(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, &CTaskBarSettingsDlg::OnBnClickedSpecifyEachItemColorCheck)
     ON_CBN_SELCHANGE(IDC_DOUBLE_CLICK_COMBO, &CTaskBarSettingsDlg::OnCbnSelchangeDoubleClickCombo)
     ON_BN_CLICKED(IDC_HORIZONTAL_ARRANGE_CHECK, &CTaskBarSettingsDlg::OnBnClickedHorizontalArrangeCheck)
     ON_BN_CLICKED(IDC_SHOW_STATUS_BAR_CHECK, &CTaskBarSettingsDlg::OnBnClickedShowStatusBarCheck)
@@ -261,7 +251,6 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
         m_hide_unit_chk.EnableWindow(FALSE);
     }
     ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(m_data.hide_percent);
-    ((CButton*)GetDlgItem(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK))->SetCheck(m_data.specify_each_item_color);
     m_background_transparent_chk.SetCheck(m_data.IsTaskbarTransparent());
     m_atuo_adapt_light_theme_chk.SetCheck(m_data.auto_adapt_light_theme);
     m_auto_set_back_color_chk.SetCheck(m_data.auto_set_background_color);
@@ -499,26 +488,11 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     case IDC_TEXT_COLOR_STATIC1:        //点击“文本颜色”时
     {
         //设置文本颜色
-        if (m_data.specify_each_item_color)
+        CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems, false);
+        if (colorDlg.DoModal() == IDOK)
         {
-            CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems, false);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                DrawStaticColor();
-                m_style_modified = true;
-            }
-        }
-        else if (!m_data.M_LayoutItems.empty())
-        {
-            CMFCColorDialogEx colorDlg(m_data.M_LayoutItems.begin()->second.PrefixColor, 0, this);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                m_data.M_LayoutItems.begin()->second.PrefixColor = colorDlg.GetColor();
-                if (m_data.back_color == m_data.M_LayoutItems.begin()->second.PrefixColor)
-                    MessageBox(CCommon::LoadText(IDS_SAME_TEXT_BACK_COLOR_WARNING), NULL, MB_ICONWARNING);
-                DrawStaticColor();
-                m_style_modified = true;
-            }
+            DrawStaticColor();
+            m_style_modified = true;
         }
         break;
     }
@@ -568,15 +542,6 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         break;
     }
     return 0;
-}
-
-
-void CTaskBarSettingsDlg::OnBnClickedSpecifyEachItemColorCheck()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.specify_each_item_color = (((CButton*)GetDlgItem(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK))->GetCheck() != 0);
-    DrawStaticColor();
-    m_style_modified = true;
 }
 
 

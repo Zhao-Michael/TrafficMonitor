@@ -271,18 +271,8 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     m_item_rects[type]                      = rect;
     //设置要绘制的文本颜色
-    COLORREF label_color{};
-    COLORREF text_color{};
-    if (rTaskbarData.specify_each_item_color)
-    {
-        label_color = rTaskbarData.M_LayoutItems[type].PrefixColor;
-        text_color  = rTaskbarData.M_LayoutItems[type].ValueColor;
-    }
-    else if (!rTaskbarData.M_LayoutItems.empty())
-    {
-        label_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;
-        text_color  = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;       //因为唯一的颜色保存在PrefixColor里
-    }
+    COLORREF label_color = rTaskbarData.M_LayoutItems[type].PrefixColor;
+    COLORREF text_color  = rTaskbarData.M_LayoutItems[type].ValueColor;
 
     //设置标签和数值的矩形区域
     CRect rect_label{ rect };
@@ -481,18 +471,8 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     m_item_rects[item] = rect;
     //设置要绘制的文本颜色
-    COLORREF label_text_color{};
-    COLORREF value_text_color{};
-    if (rTaskbarData.specify_each_item_color)
-    {
-        label_text_color = rTaskbarData.M_LayoutItems[item].PrefixColor;
-        value_text_color = rTaskbarData.M_LayoutItems[item].ValueColor;
-    }
-    else if (!rTaskbarData.M_LayoutItems.empty())
-    {
-        label_text_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;
-        value_text_color = rTaskbarData.M_LayoutItems.begin()->second.PrefixColor;      //因为唯一的颜色保存在PrefixColor里
-    }
+    COLORREF label_text_color = rTaskbarData.M_LayoutItems[item].PrefixColor;
+    COLORREF value_text_color = rTaskbarData.M_LayoutItems[item].ValueColor;
 
     if (item->IsCustomDraw())
     {
