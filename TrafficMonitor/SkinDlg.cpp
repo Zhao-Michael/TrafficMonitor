@@ -41,7 +41,7 @@ void CSkinDlg::DoDataExchange(CDataExchange* pDX)
 void CSkinDlg::ShowPreview()
 {
     //载入布局数据
-    wstring cfg_path{ theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.xml" };
+    wstring cfg_path{ theApp.m_skin_dir + m_skins[m_skin_selected] + L"\\skin.xml" };
     m_skin_data.LoadCfgAndBGImage(cfg_path);
     //获取预览区大小
     m_view->SetSize(m_skin_data.GetPreviewInfo().width, m_skin_data.GetPreviewInfo().height);
@@ -171,8 +171,8 @@ afx_msg LRESULT CSkinDlg::OnLinkClicked(WPARAM wParam, LPARAM lParam)
     //点击了“打开皮肤目录”
     if (pCtrl == &m_open_skin_dir_lnk)
     {
-        CreateDirectory(theApp.m_skin_path.c_str(), NULL);       //如果皮肤目录不存在，则创建它
-        ShellExecute(NULL, _T("open"), _T("explorer"), theApp.m_skin_path.c_str(), NULL, SW_SHOWNORMAL);
+        CreateDirectory(theApp.m_skin_dir.c_str(), NULL);       //如果皮肤目录不存在，则创建它
+        ShellExecute(NULL, _T("open"), _T("explorer"), theApp.m_skin_dir.c_str(), NULL, SW_SHOWNORMAL);
     }
     return 0;
 }

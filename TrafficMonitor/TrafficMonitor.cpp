@@ -130,7 +130,7 @@ void CTrafficMonitorApp::LoadConfig()
 
     //判断皮肤是否存在
     std::vector<wstring> skin_files;
-    CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
+    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
     bool is_skin_exist = (!skin_files.empty());
     COLORREF default_color = is_skin_exist ? 16384 : 16777215;
     //载入用于主窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
@@ -186,7 +186,7 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::TransparentColorConvert(rTaskbarData.transparent_color);
     }
     rTaskbarData.status_bar_color                 = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
-    rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"tbar_display_item", TDI_UP | TDI_DOWN);
+    rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"taskbar_display_item", TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
 #ifdef WITHOUT_TEMPERATURE
@@ -418,7 +418,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.back_color, 16);
     ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.transparent_color, 16);
     ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.status_bar_color, 16);
-    ini.WriteInt            (L"taskbar",    L"tbar_display_item",       rTaskbarData.m_tbar_display_item);
+    ini.WriteInt            (L"taskbar",    L"taskbar_display_item",    rTaskbarData.m_tbar_display_item);
     //任务栏窗口字体设置
     ini.SaveFontData(L"taskbar", rTaskbarData.font);
     //ini.WriteBool(L"taskbar", L"taskbar_swap_up_down", rTaskbarData.swap_up_down);
@@ -977,13 +977,13 @@ BOOL CTrafficMonitorApp::InitInstance()
     GeneralSettingData& rGeneralData = m_general_data;
 #ifdef _DEBUG
     m_config_dir = L".\\";
-    m_skin_path = L".\\skins";
+    m_skin_dir = L".\\skins";
 #else
     if (rGeneralData.portable_mode)
         m_config_dir = m_module_dir;
     else
         m_config_dir = m_appdata_dir;
-    m_skin_path = m_module_dir + L"skins";
+    m_skin_dir = m_module_dir + L"skins";
 #endif
     //AppData里面的程序配置文件路径
     m_config_path = m_config_dir + L"config.ini";

@@ -825,7 +825,7 @@ void CTrafficMonitorDlg::SetItemPosition()
 
 void CTrafficMonitorDlg::LoadSkinLayout()
 {
-    wstring skin_cfg_path{ theApp.m_skin_path + m_skins[m_skin_selected] + L"\\skin.xml" };
+    wstring skin_cfg_path{ theApp.m_skin_dir + m_skins[m_skin_selected] + L"\\skin.xml" };
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
 
     //接下来是比在皮肤预览窗口切换皮肤预览后，额外要做的事情。
@@ -849,9 +849,9 @@ void CTrafficMonitorDlg::LoadBackGroundImage()
     CImage img_mask;
     //载入掩码图片
     if (rMainWndData.m_show_more_info)
-        img_tmp.Load((theApp.m_skin_path + m_skins[m_skin_selected] + BACKGROUND_MASK_L).c_str());
+        img_tmp.Load((theApp.m_skin_dir + m_skins[m_skin_selected] + BACKGROUND_MASK_L).c_str());
     else
-        img_tmp.Load((theApp.m_skin_path + m_skins[m_skin_selected] + BACKGROUND_MASK_S).c_str());
+        img_tmp.Load((theApp.m_skin_dir + m_skins[m_skin_selected] + BACKGROUND_MASK_S).c_str());
     CRgn wnd_rgn;
     if (!img_tmp.IsNull())
     {
@@ -1023,10 +1023,10 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
 
 
     //初始化皮肤
-    CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), [&](const wstring& file_name)
+    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), [&](const wstring& file_name)
         {
             wstring file_name1 = L'\\' + file_name;
-            if (CCommon::IsFolder(theApp.m_skin_path + file_name1))
+            if (CCommon::IsFolder(theApp.m_skin_dir + file_name1))
                 m_skins.push_back(file_name1);
         });
     if (m_skins.empty())

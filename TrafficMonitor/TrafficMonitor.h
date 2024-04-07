@@ -31,16 +31,16 @@ class CTrafficMonitorApp : public CWinApp
 public:
     //各种路径
     static CTrafficMonitorApp* self;
+    wstring m_module_path;      //程序exe文件的路径(包含文件名)
+    wstring m_module_path_reg;  //用于作为写入注册表开机自项的exe文件的路径(如果路径中有空格，加上引号)
     wstring m_module_dir;       //程序exe文件的目录
+    wstring m_system_dir;
     wstring m_appdata_dir;
-    wstring m_module_path;      //程序exe文件的路径
-    wstring m_module_path_reg;  //用于作为写入注册表开机自项的exe文件的路径（如果路径中有空格，加上引号）
-    wstring m_config_path;
+    wstring m_config_dir;       //配置文件所在目录
+    wstring m_config_path;      //配置文件路径(包含文件名)
+    wstring m_skin_dir;         //皮肤目录
     wstring m_history_traffic_path;
     wstring m_log_path;
-    wstring m_skin_path;
-    wstring m_system_dir;
-    wstring m_config_dir;
 
     //以下数据定义为App类中的公共成员，以便于在主对话框和任务栏窗口中都能访问
     unsigned __int64    m_in_speed{};                                   //下载速度
