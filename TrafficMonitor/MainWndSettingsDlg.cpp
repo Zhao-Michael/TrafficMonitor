@@ -35,27 +35,20 @@ void CMainWndSettingsDlg::DrawStaticColor()
     //CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
     if (rMainWndData.M_LayoutItems.empty())
         return;
-    if (rMainWndData.specify_each_item_color)
-    {
-        int color_num{};
+
 #ifdef WITHOUT_TEMPERATURE
-        color_num = 4;
+    int color_num = 4;
 #else
-        color_num = 16;
+    int color_num = 16;
 #endif
-        m_color_static.SetColorNum(color_num);
-        int index{};
-        for (const auto& item : rMainWndData.M_LayoutItems)
-        {
-            m_color_static.SetFillColor(index, item.second.ValueColor);
-            index++;
-        }
-        m_color_static.Invalidate();
-    }
-    else
+    m_color_static.SetColorNum(color_num);
+    int index{};
+    for (const auto& item : rMainWndData.M_LayoutItems)
     {
-        m_color_static.SetFillColor(rMainWndData.M_LayoutItems.begin()->second.ValueColor);
+        m_color_static.SetFillColor(index, item.second.ValueColor);
+        index++;
     }
+    m_color_static.Invalidate();
 }
 
 void CMainWndSettingsDlg::IniUnitCombo()
@@ -109,7 +102,6 @@ BEGIN_MESSAGE_MAP(CMainWndSettingsDlg, CTabDlg)
     ON_BN_CLICKED(IDC_HIDE_UNIT_CHECK, &CMainWndSettingsDlg::OnBnClickedHideUnitCheck)
     ON_BN_CLICKED(IDC_HIDE_PERCENTAGE_CHECK, &CMainWndSettingsDlg::OnBnClickedHidePercentageCheck)
     ON_MESSAGE(WM_STATIC_CLICKED, &CMainWndSettingsDlg::OnStaticClicked)
-    ON_BN_CLICKED(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, &CMainWndSettingsDlg::OnBnClickedSpecifyEachItemColorCheck)
     ON_CBN_SELCHANGE(IDC_DOUBLE_CLICK_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeDoubleClickCombo)
     ON_BN_CLICKED(IDC_SEPARATE_VALUE_UNIT_CHECK, &CMainWndSettingsDlg::OnBnClickedSeparateValueUnitCheck)
     ON_BN_CLICKED(IDC_SHOW_TOOL_TIP_CHK, &CMainWndSettingsDlg::OnBnClickedShowToolTipChk)
@@ -167,8 +159,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     {
 //        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
     }
-
-    CheckDlgButton(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK, rMainWndData.specify_each_item_color);
 
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_CONNECTION_DETIAL));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_HISTORICAL_TRAFFIC));
@@ -393,22 +383,10 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     {
         //设置文本颜色
         MainWndSettingData& rMainWndData = m_data;
-        if (rMainWndData.specify_each_item_color)
+        CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems, true);
+        if (colorDlg.DoModal() == IDOK)
         {
-            CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems, true);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                DrawStaticColor();
-            }
-        }
-        else if (!rMainWndData.M_LayoutItems.empty())
-        {
-            CMFCColorDialogEx colorDlg(rMainWndData.M_LayoutItems.begin()->second.ValueColor, 0, this);
-            if (colorDlg.DoModal() == IDOK)
-            {
-                rMainWndData.M_LayoutItems.begin()->second.ValueColor = colorDlg.GetColor();
-                DrawStaticColor();
-            }
+            DrawStaticColor();
         }
         break;
     }
@@ -416,14 +394,6 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         break;
     }
     return 0;
-}
-
-
-void CMainWndSettingsDlg::OnBnClickedSpecifyEachItemColorCheck()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    m_data.specify_each_item_color = (((CButton*)GetDlgItem(IDC_SPECIFY_EACH_ITEM_COLOR_CHECK))->GetCheck() != 0);
-    DrawStaticColor();
 }
 
 

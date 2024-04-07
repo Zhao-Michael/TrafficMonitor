@@ -65,7 +65,6 @@ public:
 protected:
     afx_msg LRESULT OnStaticClicked(WPARAM wParam, LPARAM lParam);
 public:
-    afx_msg void OnBnClickedSpecifyEachItemColorCheck();
     afx_msg void OnCbnSelchangeDoubleClickCombo();
     afx_msg void OnBnClickedSeparateValueUnitCheck();
     afx_msg void OnBnClickedShowToolTipChk();

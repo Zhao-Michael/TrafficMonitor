@@ -133,7 +133,6 @@ void CTrafficMonitorApp::LoadConfig()
     CCommon::GetFiles((theApp.m_skin_path + L"\\*").c_str(), skin_files);
     bool is_skin_exist = (!skin_files.empty());
     COLORREF default_color = is_skin_exist ? 16384 : 16777215;
-    rMainWndData.specify_each_item_color            = ini.GetBool(_T("config"), _T("specify_each_item_color"), false);
     //载入用于主窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
     ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("up_string"),                 rMainWndData.M_LayoutItems, TDI_UP,                 nullptr,    CCommon::LoadText(IDS_UPLOAD_DISP,      _T(": $")), default_color);
     ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("down_string"),               rMainWndData.M_LayoutItems, TDI_DOWN,               nullptr,    CCommon::LoadText(IDS_DOWNLOAD_DISP,    _T(": $")), default_color);
@@ -231,7 +230,6 @@ void CTrafficMonitorApp::LoadConfig()
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
     default_font.size = 9;
     ini.LoadFontData(_T("taskbar"), rTaskbarData.font, default_font);
-    //新增功能代码
     //载入用于任务栏窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)
     ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("up_string"),               rTaskbarData.M_LayoutItems, TDI_UP, nullptr, L"↑: $", default_color);
     ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("down_string"),             rTaskbarData.M_LayoutItems, TDI_DOWN, nullptr, L"↓: $", default_color);
@@ -375,8 +373,6 @@ void CTrafficMonitorApp::SaveConfig()
      //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
      //保存主窗口全局字体设置
     ini.SaveFontData(L"config", rMainWndData.font);
-    ini.WriteBool              (_T("config"),  _T("specify_each_item_color"),        rMainWndData.specify_each_item_color);
-    //新增功能代码
     //保存用于主窗口的内置显示项标签设置(当前版本情况：只支持全局性设置)
     ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("up_string"),                 rMainWndData.M_LayoutItems[TDI_UP]);
     ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("down_string"),               rMainWndData.M_LayoutItems[TDI_DOWN]);

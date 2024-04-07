@@ -481,21 +481,10 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (3)获取所有显示项目的标签颜色和数值颜色
     ////////////////////////////////////////////////////////////////////////////////////////
-    if (rMainWndData.specify_each_item_color)
+    for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
     {
-        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
-        {
-            label_colors[item] = rMainWndData.M_LayoutItems[item].PrefixColor;
-            value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
-        }
-    }
-    else if (!rMainWndData.M_LayoutItems.empty())
-    {
-        for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
-        {
-            label_colors[item] = rMainWndData.M_LayoutItems.begin()->second.ValueColor;     //标签颜色保存在数值颜色里
-            value_colors[item] = rMainWndData.M_LayoutItems.begin()->second.ValueColor;
-        }
+        label_colors[item] = rMainWndData.M_LayoutItems[item].PrefixColor;
+        value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
     }
 
     //设置字体。目前不支持每个显示项单独设置字体。
