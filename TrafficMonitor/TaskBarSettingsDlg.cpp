@@ -198,20 +198,11 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     FontInfo& rFontInfo = m_data.layout.font_info;
     theApp.m_taskbar_default_style.LoadConfig();
 
-    //初始化各控件状态
+    //初始化字体设置相关控件
     SetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
-    //wchar_t buff[16];
-    //swprintf_s(buff, L"%d", m_data.font_size);
-    //SetDlgItemText(IDC_FONT_SIZE_EDIT1, buff);
     m_font_size_edit.SetRange(5, 72);
     m_font_size_edit.SetValue(rFontInfo.size);
 
-    //SetDlgItemText(IDC_UPLOAD_EDIT1, m_data.disp_str.Get(TDI_UP).c_str());
-    //SetDlgItemText(IDC_DOWNLOAD_EDIT1, m_data.disp_str.Get(TDI_DOWN).c_str());
-    //SetDlgItemText(IDC_CPU_EDIT1, m_data.disp_str.Get(TDI_CPU).c_str());
-    //SetDlgItemText(IDC_MEMORY_EDIT1, m_data.disp_str.Get(TDI_MEMORY).c_str());
-
-    //((CButton*)GetDlgItem(IDC_SWITCH_UP_DOWN_CHECK1))->SetCheck(m_data.swap_up_down);
     ((CButton*)GetDlgItem(IDC_TASKBAR_WND_ON_LEFT_CHECK))->SetCheck(m_data.tbar_wnd_on_left);
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->SetCheck(m_data.speed_short_mode);
     ((CButton*)GetDlgItem(IDC_VALUE_RIGHT_ALIGN_CHECK))->SetCheck(m_data.value_right_align);
@@ -243,8 +234,8 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     m_toolTip.AddTool(GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK), CCommon::LoadText(IDS_SHOW_RESOURCE_USAGE_GRAPH_TIP));
     m_toolTip.AddTool(GetDlgItem(IDC_SHOW_NET_SPEED_FIGURE_CHECK), CCommon::LoadText(IDS_SHOW_NET_SPEED_GRAPH_TIP));
 
+    //单位设置
     IniUnitCombo();
-
     m_hide_unit_chk.SetCheck(m_data.hide_unit);
     if (m_data.speed_unit == SpeedUnit::AUTO)
     {
@@ -253,6 +244,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
         m_hide_unit_chk.EnableWindow(FALSE);
     }
     ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(m_data.hide_percent);
+
     m_background_transparent_chk.SetCheck(m_data.IsTaskbarTransparent());
     m_atuo_adapt_light_theme_chk.SetCheck(m_data.auto_adapt_light_theme);
     m_auto_set_back_color_chk.SetCheck(m_data.auto_set_background_color);

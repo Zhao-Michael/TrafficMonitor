@@ -126,28 +126,30 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     MainWndSettingData& rMainWndData    = m_data;
     FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
 
-    //初始化各控件状态
+    //初始化字体设置相关控件
     SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
-    //wchar_t buff[16];
-    //swprintf_s(buff, L"%d", rMainWndData.font_size);
-    //SetDlgItemText(IDC_FONT_SIZE_EDIT, buff);
     m_font_size_edit.SetRange(5, 72);
     m_font_size_edit.SetValue(rFontInfo.size);
 
-    ((CButton*)GetDlgItem(IDC_FULLSCREEN_HIDE_CHECK))->SetCheck(    rMainWndData.hide_main_wnd_when_fullscreen);
+    m_color_static.SetLinkCursor();
+    DrawStaticColor();
+
+    //显示文本
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(  rMainWndData.speed_short_mode);
     ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rMainWndData.separate_value_unit_with_space);
     ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(        rMainWndData.show_tool_tip);
-
-    m_color_static.SetLinkCursor();
-    DrawStaticColor();
+    //初始化内存显示方式下拉列表
+    m_memory_display_combo.AddString(CCommon::LoadText(IDS_USAGE_PERCENTAGE));
+    m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_USED));
+    m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_AVAILABLE));
+    m_memory_display_combo.SetCurSel(static_cast<int>(rMainWndData.memory_display));
 
     m_toolTip.Create(this);
     m_toolTip.SetMaxTipWidth(theApp.DPI(300));
     m_toolTip.AddTool(GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2), CCommon::LoadText(IDS_SPEED_SHORT_MODE_TIP));
 
+    //单位设置
     IniUnitCombo();
-
     m_hide_unit_chk.SetCheck(rMainWndData.hide_unit);
     if (rMainWndData.speed_unit == SpeedUnit::AUTO)
     {
@@ -162,6 +164,13 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 //        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
     }
 
+    CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK,         rMainWndData.m_always_on_top);
+    CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK,       rMainWndData.m_mouse_penetrate);
+    CheckDlgButton(IDC_LOCK_WINDOW_POS_CHECK,       rMainWndData.m_lock_window_pos);
+    CheckDlgButton(IDC_ALOW_OUT_OF_BORDER_CHECK,    rMainWndData.m_alow_out_of_border);
+    CheckDlgButton(IDC_FULLSCREEN_HIDE_CHECK,       rMainWndData.hide_main_wnd_when_fullscreen);
+
+    //双击动作
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_CONNECTION_DETIAL));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_OPEN_HISTORICAL_TRAFFIC));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_SHOW_HIDE_MORE_INFO));
@@ -171,20 +180,8 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     m_double_click_combo.AddString(CCommon::LoadText(IDS_CHANGE_SKIN));
     m_double_click_combo.AddString(CCommon::LoadText(IDS_NONE));
     m_double_click_combo.SetCurSel(static_cast<int>(rMainWndData.double_click_action));
-
     SetDlgItemText(IDC_EXE_PATH_EDIT,               rMainWndData.double_click_exe.c_str());
     EnableControl();
-
-    //初始化内存显示方式下拉列表
-    m_memory_display_combo.AddString(CCommon::LoadText(IDS_USAGE_PERCENTAGE));
-    m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_USED));
-    m_memory_display_combo.AddString(CCommon::LoadText(IDS_MEMORY_AVAILABLE));
-    m_memory_display_combo.SetCurSel(static_cast<int>(rMainWndData.memory_display));
-
-    CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK,         rMainWndData.m_always_on_top);
-    CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK,       rMainWndData.m_mouse_penetrate);
-    CheckDlgButton(IDC_LOCK_WINDOW_POS_CHECK,       rMainWndData.m_lock_window_pos);
-    CheckDlgButton(IDC_ALOW_OUT_OF_BORDER_CHECK,    rMainWndData.m_alow_out_of_border);
 
     ////设置控件不响应鼠标滚轮消息
     //m_unit_combo.SetMouseWheelEnable(false);
