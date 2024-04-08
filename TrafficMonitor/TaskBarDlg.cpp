@@ -268,11 +268,12 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
 
 void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type, CRect rect, int label_width, bool vertical)
 {
-    TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
+    TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
     m_item_rects[type]                      = rect;
     //设置要绘制的文本颜色
-    COLORREF label_color = rTaskbarData.M_LayoutItems[type].PrefixColor;
-    COLORREF text_color  = rTaskbarData.M_LayoutItems[type].ValueColor;
+    COLORREF label_color = rTaskbar_M_LayoutItems[type].PrefixColor;
+    COLORREF text_color  = rTaskbar_M_LayoutItems[type].ValueColor;
 
     //设置标签和数值的矩形区域
     CRect rect_label{ rect };
@@ -354,7 +355,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     //绘制标签
     if (label_width > 0)
     {
-        wstring str_label = rTaskbarData.M_LayoutItems[type].Prefix;
+        wstring str_label = rTaskbar_M_LayoutItems[type].Prefix;
         //if (rTaskbarData.swap_up_down)
         //{
         //    if (type == TDI_UP)
@@ -468,11 +469,12 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
 {
     if (item == nullptr)
         return;
-    TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
+    TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
     m_item_rects[item] = rect;
     //设置要绘制的文本颜色
-    COLORREF label_text_color = rTaskbarData.M_LayoutItems[item].PrefixColor;
-    COLORREF value_text_color = rTaskbarData.M_LayoutItems[item].ValueColor;
+    COLORREF label_text_color = rTaskbar_M_LayoutItems[item].PrefixColor;
+    COLORREF value_text_color = rTaskbar_M_LayoutItems[item].ValueColor;
 
     if (item->IsCustomDraw())
     {
@@ -526,7 +528,7 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
             }
         }
         //画标签
-        CString lable_text = rTaskbarData.M_LayoutItems[item].Prefix;
+        CString lable_text = rTaskbar_M_LayoutItems[item].Prefix;
         lable_text += L' ';
         drawer.DrawWindowText(rect_label, lable_text, label_text_color, (vertical ? Alignment::CENTER : Alignment::LEFT));
         //画数值
@@ -934,7 +936,7 @@ void CTaskBarDlg::SetTextFont()
         m_font.DeleteObject();
     }
     //创建新的字体
-    rTaskbarData.font_info.Create(m_font, GetDPI());
+    rTaskbarData.layout.font_info.Create(m_font, GetDPI());
 }
 
 void CTaskBarDlg::ApplySettings()
@@ -945,7 +947,8 @@ void CTaskBarDlg::ApplySettings()
 
 void CTaskBarDlg::CalculateWindowSize()
 {
-    TaskBarSettingData&     rTaskbarData        = theApp.m_taskbar_data;
+    TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
     bool                    horizontal_arrange  = rTaskbarData.horizontal_arrange && m_taskbar_on_top_or_bottom;
     if (rTaskbarData.m_tbar_display_item == 0)
         rTaskbarData.m_tbar_display_item |= TDI_UP;        //至少显示一项
@@ -971,7 +974,7 @@ void CTaskBarDlg::CalculateWindowSize()
                 }
                 else
                 {
-                    CString lable_text = rTaskbarData.M_LayoutItems[plugin].Prefix;
+                    CString lable_text = rTaskbar_M_LayoutItems[plugin].Prefix;
                     if (!lable_text.IsEmpty())
                         lable_text += L' ';
                     label_width = m_pDC->GetTextExtent(lable_text).cx;
@@ -980,7 +983,7 @@ void CTaskBarDlg::CalculateWindowSize()
         }
         else
         {
-            item_widths[*iter].label_width = m_pDC->GetTextExtent(rTaskbarData.M_LayoutItems[*iter].Prefix).cx;
+            item_widths[*iter].label_width = m_pDC->GetTextExtent(rTaskbar_M_LayoutItems[*iter].Prefix).cx;
         }
     }
 

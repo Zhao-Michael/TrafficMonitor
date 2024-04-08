@@ -422,8 +422,9 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 
 void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
 {
-    MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
-    CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
+    MainWndSettingData&                         rMainWndData            = theApp.m_main_wnd_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
+    CPluginManager&                             rPluginManager          = theApp.m_plugin_manager;
     std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
     std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
     std::map<CommonDisplayItem, COLORREF>   value_colors{};     //存放所有项目的显示数值的颜色
@@ -445,18 +446,18 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     if (!m_layout_manager.no_label)
     {
-        map_builtin_str[TDI_UP].label               = rMainWndData.M_LayoutItems[TDI_UP].Prefix;
-        map_builtin_str[TDI_DOWN].label             = rMainWndData.M_LayoutItems[TDI_DOWN].Prefix;
-        map_builtin_str[TDI_CPU].label              = rMainWndData.M_LayoutItems[TDI_CPU].Prefix;
-        map_builtin_str[TDI_MEMORY].label           = rMainWndData.M_LayoutItems[TDI_MEMORY].Prefix;
-        map_builtin_str[TDI_GPU_USAGE].label        = rMainWndData.M_LayoutItems[TDI_GPU_USAGE].Prefix;
-        map_builtin_str[TDI_CPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_CPU_TEMP].Prefix;
-        map_builtin_str[TDI_GPU_TEMP].label         = rMainWndData.M_LayoutItems[TDI_GPU_TEMP].Prefix;
-        map_builtin_str[TDI_HDD_TEMP].label         = rMainWndData.M_LayoutItems[TDI_HDD_TEMP].Prefix;
-        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWndData.M_LayoutItems[TDI_MAIN_BOARD_TEMP].Prefix;
-        map_builtin_str[TDI_HDD_USAGE].label        = rMainWndData.M_LayoutItems[TDI_HDD_USAGE].Prefix;
-        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWndData.M_LayoutItems[TDI_TOTAL_SPEED].Prefix;
-        map_builtin_str[TDI_CPU_FREQ].label         = rMainWndData.M_LayoutItems[TDI_CPU_FREQ].Prefix;
+        map_builtin_str[TDI_UP].label               = rMainWnd_M_LayoutItems[TDI_UP].Prefix;
+        map_builtin_str[TDI_DOWN].label             = rMainWnd_M_LayoutItems[TDI_DOWN].Prefix;
+        map_builtin_str[TDI_CPU].label              = rMainWnd_M_LayoutItems[TDI_CPU].Prefix;
+        map_builtin_str[TDI_MEMORY].label           = rMainWnd_M_LayoutItems[TDI_MEMORY].Prefix;
+        map_builtin_str[TDI_GPU_USAGE].label        = rMainWnd_M_LayoutItems[TDI_GPU_USAGE].Prefix;
+        map_builtin_str[TDI_CPU_TEMP].label         = rMainWnd_M_LayoutItems[TDI_CPU_TEMP].Prefix;
+        map_builtin_str[TDI_GPU_TEMP].label         = rMainWnd_M_LayoutItems[TDI_GPU_TEMP].Prefix;
+        map_builtin_str[TDI_HDD_TEMP].label         = rMainWnd_M_LayoutItems[TDI_HDD_TEMP].Prefix;
+        map_builtin_str[TDI_MAIN_BOARD_TEMP].label  = rMainWnd_M_LayoutItems[TDI_MAIN_BOARD_TEMP].Prefix;
+        map_builtin_str[TDI_HDD_USAGE].label        = rMainWnd_M_LayoutItems[TDI_HDD_USAGE].Prefix;
+        map_builtin_str[TDI_TOTAL_SPEED].label      = rMainWnd_M_LayoutItems[TDI_TOTAL_SPEED].Prefix;
+        map_builtin_str[TDI_CPU_FREQ].label         = rMainWnd_M_LayoutItems[TDI_CPU_FREQ].Prefix;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -503,8 +504,8 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     for (const auto& item : rPluginManager.AllDisplayItemsWithPlugins())
     {
-        label_colors[item] = rMainWndData.M_LayoutItems[item].PrefixColor;
-        value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
+        label_colors[item] = rMainWnd_M_LayoutItems[item].PrefixColor;
+        value_colors[item] = rMainWnd_M_LayoutItems[item].ValueColor;
     }
 
     //设置字体。目前不支持每个layout单独设置字体。
@@ -545,7 +546,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
                 CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
                 //绘制标签和数值
                 DrawStr draw_str;
-                draw_str.label = rMainWndData.M_LayoutItems[iplugin_item].Prefix;
+                draw_str.label = rMainWnd_M_LayoutItems[iplugin_item].Prefix;
                 draw_str.value = iplugin_item->GetItemValueText();
                 DrawSkinText(draw, rect, draw_str.label, draw_str.value, label_color, value_color, layout_item.align);
             }

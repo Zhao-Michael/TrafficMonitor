@@ -129,8 +129,7 @@ struct PublicSettingData
 {
     bool show_tool_tip{ true };                     //显示鼠标提示
 
-    FontInfo font_info;                             //字体
-    std::map<CommonDisplayItem, LayoutItem> M_LayoutItems{};                          //存放所有项目的属性配置
+    Layout   layout;
 
     //数值属性设置
     bool hide_unit;                                 //隐藏单位

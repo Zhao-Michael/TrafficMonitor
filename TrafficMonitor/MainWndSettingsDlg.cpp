@@ -31,9 +31,10 @@ void CMainWndSettingsDlg::SetControlMouseWheelEnable(bool enable)
 
 void CMainWndSettingsDlg::DrawStaticColor()
 {
-    MainWndSettingData& rMainWndData = m_data;
-    //CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
-    if (rMainWndData.M_LayoutItems.empty())
+    MainWndSettingData&                         rMainWndData            = m_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
+//  CCommon::FillStaticColor(m_color_static, rMainWndData.text_color);
+    if (rMainWnd_M_LayoutItems.empty())
         return;
 
 #ifdef WITHOUT_TEMPERATURE
@@ -43,7 +44,7 @@ void CMainWndSettingsDlg::DrawStaticColor()
 #endif
     m_color_static.SetColorNum(color_num);
     int index{};
-    for (const auto& item : rMainWndData.M_LayoutItems)
+    for (const auto& item : rMainWnd_M_LayoutItems)
     {
         m_color_static.SetFillColor(index, item.second.ValueColor);
         index++;
@@ -123,7 +124,7 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 
     // TODO:  在此添加额外的初始化
     MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.font_info;
+    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
 
     //初始化各控件状态
     SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
@@ -269,7 +270,7 @@ void CMainWndSettingsDlg::OnBnClickedSetFontButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.font_info;
+    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
 
     LOGFONT lf{};
     lf.lfHeight         = FontSizeToLfHeight(rFontInfo.size);
@@ -351,7 +352,7 @@ void CMainWndSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
     MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.font_info;
+    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
     //获取字体设置
     int font_size;
     font_size = m_font_size_edit.GetValue();
@@ -386,7 +387,7 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     {
         //设置文本颜色
         MainWndSettingData& rMainWndData = m_data;
-        CMonitorItemAttributesDlg colorDlg(rMainWndData.M_LayoutItems, true);
+        CMonitorItemAttributesDlg colorDlg(rMainWndData.layout.M_LayoutItems, true);
         if (colorDlg.DoModal() == IDOK)
         {
             DrawStaticColor();

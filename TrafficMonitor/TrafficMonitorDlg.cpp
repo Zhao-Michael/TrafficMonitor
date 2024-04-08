@@ -879,7 +879,7 @@ void CTrafficMonitorDlg::SetTextFont()
 {
     if (m_font.m_hObject)   //如果m_font已经关联了一个字体资源对象，则释放它
         m_font.DeleteObject();
-    theApp.m_main_wnd_data.font_info.Create(m_font, theApp.GetDpi());
+    theApp.m_main_wnd_data.layout.font_info.Create(m_font, theApp.GetDpi());
 }
 
 bool CTrafficMonitorDlg::IsTaskbarWndValid() const
@@ -1656,7 +1656,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                     log_str += std::to_wstring(theApp.m_taskbar_data.transparent_color).c_str();
                     log_str += _T("\n");
                     log_str += _T("taskbar_text_colors: ");
-                    for (const auto& item : theApp.m_taskbar_data.M_LayoutItems)
+                    for (const auto& item : theApp.m_taskbar_data.layout.M_LayoutItems)
                     {
                         log_str += std::to_wstring(item.second.PrefixColor).c_str();
                         log_str += _T('|');
@@ -1714,7 +1714,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
         //当检测到背景色和文字颜色都为黑色写入错误日志
         static bool erro_log_write{ false };
-        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.M_LayoutItems.empty() && theApp.m_taskbar_data.M_LayoutItems.begin()->second.PrefixColor == 0)
+        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.layout.M_LayoutItems.empty() && theApp.m_taskbar_data.layout.M_LayoutItems.begin()->second.PrefixColor == 0)
         {
             if (!erro_log_write)
             {
@@ -2209,7 +2209,8 @@ void CTrafficMonitorDlg::OnDestroy()
 
 void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
 {
-    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
+    MainWndSettingData&                         rMainWndData            = theApp.m_main_wnd_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //      切换皮肤布局(包括切换皮肤和皮肤内切换布局两种情况)后需要做些改变：
@@ -2231,19 +2232,19 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
         /////////////////////////////////////////////////////////////////////////////////////
 
         //更换颜色
-        rMainWndData.M_LayoutItems[item].PrefixColor    = layout.M_LayoutItems[item].PrefixColor;
-        rMainWndData.M_LayoutItems[item].ValueColor     = layout.M_LayoutItems[item].ValueColor;
+        rMainWnd_M_LayoutItems[item].PrefixColor    = layout.M_LayoutItems[item].PrefixColor;
+        rMainWnd_M_LayoutItems[item].ValueColor     = layout.M_LayoutItems[item].ValueColor;
         //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
         if (theApp.m_general_data.allow_skin_cover_text && !m_skin.GetLayoutManager().no_label)
         {
             //更换标签
-            rMainWndData.M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
+            rMainWnd_M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
         }
     }
     //获取皮肤的字体
     if (theApp.m_general_data.allow_skin_cover_font)
     {
-        FontInfo& rFontInfo = rMainWndData.font_info;
+        FontInfo& rFontInfo = rMainWndData.layout.font_info;
         if (!layout.font_info.name.IsEmpty())
         {
             //更换字体

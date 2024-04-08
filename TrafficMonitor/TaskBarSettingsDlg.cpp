@@ -27,15 +27,17 @@ CTaskBarSettingsDlg::~CTaskBarSettingsDlg()
 
 bool CTaskBarSettingsDlg::IsStyleModified()
 {
+    TaskBarSettingData&                         rTaskbarData            = m_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
     bool modified{false};
-    for (auto iter = m_data.M_LayoutItems.begin(); iter != m_data.M_LayoutItems.end(); ++iter)
+    for (auto iter = rTaskbar_M_LayoutItems.begin(); iter != rTaskbar_M_LayoutItems.end(); ++iter)
     {
-        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].PrefixColor != iter->second.PrefixColor)
+        if (theApp.m_taskbar_data.layout.M_LayoutItems[iter->first].PrefixColor != iter->second.PrefixColor)
         {
             modified = true;
             break;
         }
-        if (theApp.m_taskbar_data.M_LayoutItems[iter->first].ValueColor != iter->second.ValueColor)
+        if (theApp.m_taskbar_data.layout.M_LayoutItems[iter->first].ValueColor != iter->second.ValueColor)
         {
             modified = true;
             break;
@@ -58,7 +60,7 @@ void CTaskBarSettingsDlg::DrawStaticColor()
 #endif
     int i{};
     m_text_color_static.SetColorNum(color_num);
-    for (const auto& item : m_data.M_LayoutItems)
+    for (const auto& item : m_data.layout.M_LayoutItems)
     {
         m_text_color_static.SetFillColor(i, item.second.PrefixColor);
         m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
@@ -193,7 +195,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-    FontInfo& rFontInfo = m_data.font_info;
+    FontInfo& rFontInfo = m_data.layout.font_info;
     theApp.m_taskbar_default_style.LoadConfig();
 
     //初始化各控件状态
@@ -349,7 +351,7 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
 void CTaskBarSettingsDlg::OnBnClickedSetFontButton1()
 {
     // TODO: 在此添加控件通知处理程序代码
-    FontInfo& rFontInfo = m_data.font_info;
+    FontInfo& rFontInfo = m_data.layout.font_info;
 
     LOGFONT lf{};
     lf.lfHeight = FontSizeToLfHeight(rFontInfo.size);
@@ -432,7 +434,7 @@ void CTaskBarSettingsDlg::OnBnClickedHideUnitCheck()
 void CTaskBarSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    FontInfo& rFontInfo = m_data.font_info;
+    FontInfo& rFontInfo = m_data.layout.font_info;
     //获取字体设置
     int font_size;
     font_size = m_font_size_edit.GetValue();
@@ -486,12 +488,15 @@ void CTaskBarSettingsDlg::OnBnClickedHidePercentageCheck()
 
 afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lParam)
 {
+    TaskBarSettingData&                         rTaskbarData            = m_data;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+
     switch (::GetDlgCtrlID(((CWnd*)wParam)->m_hWnd))
     {
     case IDC_TEXT_COLOR_STATIC1:        //点击“文本颜色”时
     {
         //设置文本颜色
-        CMonitorItemAttributesDlg colorDlg(m_data.M_LayoutItems, false);
+        CMonitorItemAttributesDlg colorDlg(rTaskbar_M_LayoutItems, false);
         if (colorDlg.DoModal() == IDOK)
         {
             DrawStaticColor();
@@ -507,7 +512,7 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
         {
             bool background_transparent = m_data.IsTaskbarTransparent();
             m_data.back_color = colorDlg.GetColor();
-            if (m_data.back_color == m_data.M_LayoutItems.begin()->second.PrefixColor)
+            if (m_data.back_color == rTaskbar_M_LayoutItems.begin()->second.PrefixColor)
                 MessageBox(CCommon::LoadText(IDS_SAME_BACK_TEXT_COLOR_WARNING), NULL, MB_ICONWARNING);
             if (background_transparent)
             {
