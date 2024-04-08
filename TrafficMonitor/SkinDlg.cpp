@@ -51,8 +51,11 @@ void CSkinDlg::ShowPreview()
     //显示皮肤作者
     SetDlgItemText(IDC_SKIN_INFO, CCommon::LoadText(IDS_SKIN_AUTHOUR, m_skin_data.GetSkinInfo().skin_author.c_str()));
     //设置提示信息
-    bool cover_font_setting{ !m_skin_data.GetSkinInfo().font_info.name.IsEmpty()
-                        || (m_skin_data.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin_data.GetSkinInfo().font_info.size <= MAX_FONT_SIZE) };
+    bool cover_font_setting{ !m_skin_data.GetLayoutManager().layout_l.font_info.name.IsEmpty()
+                        || (m_skin_data.GetLayoutManager().layout_l.font_info.size >= MIN_FONT_SIZE && m_skin_data.GetLayoutManager().layout_l.font_info.size <= MAX_FONT_SIZE) };
+    bool cover_font_setting_s { !m_skin_data.GetLayoutManager().layout_s.font_info.name.IsEmpty()
+                        || (m_skin_data.GetLayoutManager().layout_s.font_info.size >= MIN_FONT_SIZE && m_skin_data.GetLayoutManager().layout_s.font_info.size <= MAX_FONT_SIZE) };
+    cover_font_setting |= cover_font_setting_s;
     bool cover_str_setting = false;
     for (auto iter = m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.begin(); iter != m_skin_data.GetLayoutManager().layout_l.M_LayoutItems.end(); ++iter)
     {

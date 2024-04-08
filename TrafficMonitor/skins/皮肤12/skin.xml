@@ -1,10 +1,10 @@
 ﻿<root>
 	<skin>
 		<skin_author>zy</skin_author>
-		<font name="Microsoft YaHei" size="9" style="0"/>
 	</skin>
 	<layout text_height="20" no_label="0">
 		<layout_l width="232" height="107">
+			<font name="Microsoft YaHei" size="9" style="0"/>
 			<cpu             x="14"  y="3"  width="106" align="0" show="1" prefix="CPU: " color_v="16777215" color_p="16777215"/>
 			<memory          x="88"  y="3"  width="106" align="0" show="1" prefix="内存: " color_v="16777215" color_p="16777215"/>
 			<gpu             x="162" y="3"  width="106" align="0" show="1" prefix="显卡: " color_v="16777215" color_p="16777215"/>
@@ -16,6 +16,7 @@
 			<main_board_temperature x="142" y="83" width="94" align="0" show="1" prefix="主板温度: " color_v="16770992" color_p="16770992"/>
 		</layout_l>
 		<layout_s width="232" height="50">
+			<font name="Microsoft YaHei" size="9" style="0"/>
 			<cpu             x="14"  y="3"  width="106" align="0" show="1" prefix="CPU: " color_v="16777215" color_p="16777215"/>
 			<memory          x="88"  y="3"  width="106" align="0" show="1" prefix="内存: " color_v="16777215" color_p="16777215"/>
 			<gpu             x="162" y="3"  width="106" align="0" show="1" prefix="显卡: " color_v="16777215" color_p="16777215"/>

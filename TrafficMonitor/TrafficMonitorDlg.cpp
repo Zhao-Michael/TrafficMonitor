@@ -716,7 +716,7 @@ void CTrafficMonitorDlg::ApplySettings(COptionsDlg& optionsDlg)
 
     CGeneralSettingsDlg::CheckTaskbarDisplayItem();
 
-    SetTextFont();
+    SetTextFont();          //设置字体
 
     //打开了D2D渲染后自动开启“背景透明”并关闭“根据任务栏颜色自动设置背景色”
     if (d2d_turned_on)
@@ -2243,18 +2243,18 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
     //获取皮肤的字体
     if (theApp.m_general_data.allow_skin_cover_font)
     {
-        if (!m_skin.GetSkinInfo().font_info.name.IsEmpty())
+        if (!layout.font_info.name.IsEmpty())
         {
             //更换字体
-            rMainWndData.font.name          = m_skin.GetSkinInfo().font_info.name;
-            rMainWndData.font.bold          = m_skin.GetSkinInfo().font_info.bold;
-            rMainWndData.font.italic        = m_skin.GetSkinInfo().font_info.italic;
-            rMainWndData.font.underline     = m_skin.GetSkinInfo().font_info.underline;
-            rMainWndData.font.strike_out    = m_skin.GetSkinInfo().font_info.strike_out;
+            rMainWndData.font.name          = layout.font_info.name;
+            rMainWndData.font.bold          = layout.font_info.bold;
+            rMainWndData.font.italic        = layout.font_info.italic;
+            rMainWndData.font.underline     = layout.font_info.underline;
+            rMainWndData.font.strike_out    = layout.font_info.strike_out;
         }
-        if (m_skin.GetSkinInfo().font_info.size >= MIN_FONT_SIZE && m_skin.GetSkinInfo().font_info.size <= MAX_FONT_SIZE)
-            rMainWndData.font.size = m_skin.GetSkinInfo().font_info.size;
-        SetTextFont();
+        if (layout.font_info.size >= MIN_FONT_SIZE && layout.font_info.size <= MAX_FONT_SIZE)
+            rMainWndData.font.size = layout.font_info.size;
+        SetTextFont();          //设置字体
     }
 }
 
@@ -2615,7 +2615,7 @@ void CTrafficMonitorDlg::OnPaint()
     CPaintDC dc(this); // device context for painting
                        // TODO: 在此处添加消息处理程序代码
                        // 不为绘图消息调用 CDialog::OnPaint()
-    m_skin.DrawInfo(&dc, theApp.m_main_wnd_data.m_show_more_info, m_font);
+    m_skin.DrawInfo(&dc, m_font);
 }
 
 

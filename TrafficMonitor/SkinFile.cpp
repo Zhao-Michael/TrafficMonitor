@@ -56,30 +56,50 @@ void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLEl
     layout.ValueColor   = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
+            BOOL bFind = false;
             string layout_item_cfg_name = CTinyXml2Helper::ElementName(ele_layout_item);
-            for (auto builtin_item : gS_AllBuiltinDisplayItems)
+            if (layout_item_cfg_name == "font")                          //字体
             {
-                if (layout_item_cfg_name == CCommon::GetDisplayItemXmlNodeName(builtin_item))
+                layout.font_info.name = CTinyXml2Helper::ElementAttribute(ele_layout_item, "name");
+                layout.font_info.size = atoi(CTinyXml2Helper::ElementAttribute(ele_layout_item, "size"));
+                int font_style = atoi(CTinyXml2Helper::ElementAttribute(ele_layout_item, "style"));
+                layout.font_info.bold = CCommon::GetNumberBit(font_style, 0);
+                layout.font_info.italic = CCommon::GetNumberBit(font_style, 1);
+                layout.font_info.underline = CCommon::GetNumberBit(font_style, 2);
+                layout.font_info.strike_out = CCommon::GetNumberBit(font_style, 3);
+                bFind = true;
+            }
+            if (bFind == false)
+            {
+                for (auto builtin_item : gS_AllBuiltinDisplayItems)
                 {
-                    //如果是内置的"UP"等，就找到了。
-                    //插件item不能map到内置的"UP"等，否则当内置项处理了。
-                    LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[builtin_item], ele_layout_item);
-//                  layout.M_LayoutItems[builtin_item].height       = layout.height;
-                    layout.M_LayoutItems[builtin_item].id           = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
-                    break;
+                    if (layout_item_cfg_name == CCommon::GetDisplayItemXmlNodeName(builtin_item))
+                    {
+                        //如果是内置的"UP"等，就找到了。
+                        //插件item不能map到内置的"UP"等，否则当内置项处理了。
+                        LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[builtin_item], ele_layout_item);
+                        //                  layout.M_LayoutItems[builtin_item].height       = layout.height;
+                        layout.M_LayoutItems[builtin_item].id = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
+                        bFind = true;
+                        break;
+                    }
                 }
             }
-            wstring plugin_id = CCommon::StrToUnicode(m_plugin_map[layout_item_cfg_name].c_str(), true);
-            if (!plugin_id.empty())
+            if (bFind == false)
             {
-                for (const auto& iplugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
+                wstring plugin_id = CCommon::StrToUnicode(m_plugin_map[layout_item_cfg_name].c_str(), true);
+                if (!plugin_id.empty())
                 {
-                    if (plugin_id == iplugin_item->GetItemId())
+                    for (const auto& iplugin_item : theApp.m_plugin_manager.GetAllIPluginItems())
                     {
-                        LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[iplugin_item], ele_layout_item);
-//                      layout.M_LayoutItems[iplugin_item].height   = layout.height;
-                        layout.M_LayoutItems[iplugin_item].id       = plugin_id;
-                        break;
+                        if (plugin_id == iplugin_item->GetItemId())
+                        {
+                            LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[iplugin_item], ele_layout_item);
+                            //                      layout.M_LayoutItems[iplugin_item].height   = layout.height;
+                            layout.M_LayoutItems[iplugin_item].id = plugin_id;
+                            bFind = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -181,12 +201,13 @@ void CSkinFile::LoadCfgAndBGImage(const wstring& file_path)
     CFilePathHelper file_path_helper{ file_path };
     LoadFromXml(file_path);
 
+    //因为每个layout可以单独设置字体，所以这里不再创建用于皮肤预览的字体对象，在函数DrawPreview()里再创建。
+/*
+    //创建字体对象
     if (m_font.m_hObject)
         m_font.DeleteObject();
-
-    //创建字体对象
     m_skin_info.font_info.Create(m_font);
-
+*/
     //载入背景图片
     wstring path_dir = file_path_helper.GetDir();
     m_background_s.Destroy();
@@ -228,22 +249,12 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 string ele_name = CTinyXml2Helper::ElementName(child);
                 if (ele_name == "skin")             //读取皮肤信息
                 {
-                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* skin_item)
+                    CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* ele_skin)
                         {
-                            string skin_item_name = CTinyXml2Helper::ElementName(skin_item);
+                            string skin_item_name = CTinyXml2Helper::ElementName(ele_skin);
                             if (skin_item_name == "skin_author")                   //皮肤作者
                             {
-                                m_skin_info.skin_author = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(skin_item), true);
-                            }
-                            else if (skin_item_name == "font")                          //字体
-                            {
-                                m_skin_info.font_info.name = CTinyXml2Helper::ElementAttribute(skin_item, "name");
-                                m_skin_info.font_info.size = atoi(CTinyXml2Helper::ElementAttribute(skin_item, "size"));
-                                int font_style = atoi(CTinyXml2Helper::ElementAttribute(skin_item, "style"));
-                                m_skin_info.font_info.bold = CCommon::GetNumberBit(font_style, 0);
-                                m_skin_info.font_info.italic = CCommon::GetNumberBit(font_style, 1);
-                                m_skin_info.font_info.underline = CCommon::GetNumberBit(font_style, 2);
-                                m_skin_info.font_info.strike_out = CCommon::GetNumberBit(font_style, 3);
+                                m_skin_info.skin_author = CCommon::StrToUnicode(CTinyXml2Helper::ElementText(ele_skin), true);
                             }
                         }
                     );
@@ -297,10 +308,6 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
 {
     CDrawCommon draw;
     draw.Create(pDC, nullptr);
-    if (!m_skin_info.font_info.name.IsEmpty() && m_skin_info.font_info.size > 0)
-        draw.SetFont(&m_font);
-    else
-        draw.SetFont(theApp.m_pMainWnd->GetFont());
     draw.SetDrawRect(rect);
     draw.FillRect(rect, RGB(255, 255, 255));
     //绘制背景
@@ -366,6 +373,17 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     {
         for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
+            if (!layout.font_info.name.IsEmpty() && layout.font_info.size > 0)
+            {
+                //创建字体对象
+                if (m_font.m_hObject)
+                    m_font.DeleteObject();
+                layout.font_info.Create(m_font);
+                draw.SetFont(&m_font);
+            }
+            else
+                draw.SetFont(theApp.m_pMainWnd->GetFont());
+
             LayoutItem layout_item = layout.GetItem(item);
             if (!layout_item.show)
                 continue;
@@ -402,8 +420,15 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     drawPreviewText(m_layout_manager.layout_l, m_preview_info.l_pos);
 }
 
-void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
+void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
 {
+    MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
+    CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
+    std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
+    std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
+    std::map<CommonDisplayItem, COLORREF>   value_colors{};     //存放所有项目的显示数值的颜色
+    bool show_more_info = rMainWndData.m_show_more_info;
+
     //绘制背景图
     CImage& background_image{ show_more_info ? m_background_l : m_background_s };
     Layout& layoutInUse{ show_more_info ? m_layout_manager.layout_l : m_layout_manager.layout_s };
@@ -414,11 +439,6 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
     draw.Create(draw_double_buffer.GetMemDC(), nullptr);
     draw.DrawBitmap(background_image, CPoint(0, 0), CSize(layoutInUse.width, layoutInUse.height));
 
-    MainWndSettingData&                     rMainWndData     = theApp.m_main_wnd_data;
-    CPluginManager&                         rPluginManager   = theApp.m_plugin_manager;
-    std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
-    std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
-    std::map<CommonDisplayItem, COLORREF>   value_colors{};     //存放所有项目的显示数值的颜色
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (1)获取所有内置项目的显示标签
@@ -487,7 +507,7 @@ void CSkinFile::DrawInfo(CDC* pDC, bool show_more_info, CFont& font)
         value_colors[item] = rMainWndData.M_LayoutItems[item].ValueColor;
     }
 
-    //设置字体。目前不支持每个显示项单独设置字体。
+    //设置字体。目前不支持每个layout单独设置字体。
     draw.SetFont(&font);
     //绘制标签和数值
     int index{};

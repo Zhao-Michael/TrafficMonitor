@@ -13,7 +13,6 @@ public:
     struct SkinInfo
     {
         wstring                 skin_author;                //皮肤的作者
-        FontInfo                font_info;                  //字体信息
     };
 
     //皮肤布局
@@ -25,10 +24,9 @@ public:
         //////////////////////////////////////////////////////////////
         //      以后将支持下面这几项
         //////////////////////////////////////////////////////////////
-//      FontInfo                font_info;                                      //字体信息
+        FontInfo                font_info;                                      //字体信息
 //      int     text_height{};                                                  //皮肤文本的高度，即每个显示项的数值显示高度。
 //      bool    no_label{};                                                     //是否不显示标签
-
         //保存皮肤配置文件中单个Layout配置的每一项的布局信息，不包含没有配置的项。   //切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
         std::map<CommonDisplayItem, LayoutItem>             M_LayoutItems{};
         LayoutItem& GetItem(CommonDisplayItem display_item)
@@ -83,7 +81,7 @@ public:
     //rect: 绘图区域
     void DrawPreview(CDC* pDC, CRect rect);
     //绘制主界面
-    void DrawInfo(CDC* pDC, bool show_more_info, CFont& font);
+    void DrawInfo(CDC* pDC, CFont& font);
 private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
 
@@ -97,9 +95,8 @@ private:
     SkinInfo        m_skin_info;
     LayoutManager   m_layout_manager;
     PreviewInfo     m_preview_info;
-    std::map<std::string, std::string> m_plugin_map;  //插件名称与xml节点名称的映射关系。key是xml节点名称，value是插件ID
-
-    CFont m_font;
+    std::map<std::string, std::string> m_plugin_map;    //插件名称与xml节点名称的映射关系。key是xml节点名称，value是插件ID
+    CFont  m_font;                                      //用于皮肤预览的字体对象
     CImage m_background_s;
     CImage m_background_l;
 

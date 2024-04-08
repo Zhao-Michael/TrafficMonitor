@@ -94,7 +94,7 @@ protected:
     vector<wstring>     m_skins;                //储存皮肤文件的路径                 //皮肤预览窗口也包含一个，因此显示皮肤预览时各不冲突。
     int                 m_skin_selected{};      //选择的皮肤序号
     CSkinFile           m_skin;                 //保存皮肤配置文件中的配置
-    CFont               m_font;                 //字体
+    CFont               m_font;                 //用于主窗口显示的字体对象
 
     //CRect m_screen_rect;                      //屏幕的范围（不包含任务栏）
     vector<CRect>       m_screen_rects;         //所有屏幕的范围（不包含任务栏）

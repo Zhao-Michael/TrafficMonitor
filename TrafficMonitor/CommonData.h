@@ -91,9 +91,9 @@ struct AppSettingData
 //选项设置中“主窗口设置”和“任务栏窗口设置”中公共的数据(不使用此结构体创建对象)
 struct PublicSettingData
 {
-    FontInfo font;                                  //字体
     bool show_tool_tip{ true };                     //显示鼠标提示
 
+    FontInfo font;                                  //字体
     std::map<CommonDisplayItem, LayoutItem> M_LayoutItems{};                          //存放所有项目的属性配置
 
     //数值属性设置
