@@ -15,35 +15,6 @@ public:
         wstring                 skin_author;                //皮肤的作者
     };
 
-    //皮肤布局
-    struct Layout
-    {
-        int                     width{}, height{};                              //整个layout的宽度与高度
-        COLORREF                PrefixColor{}, ValueColor{};                    //layout缺省的前缀颜色、数值颜色
-
-        //////////////////////////////////////////////////////////////
-        //      以后将支持下面这几项
-        //////////////////////////////////////////////////////////////
-        FontInfo                font_info;                                      //字体信息
-//      int     text_height{};                                                  //皮肤文本的高度，即每个显示项的数值显示高度。
-//      bool    no_label{};                                                     //是否不显示标签
-        //保存皮肤配置文件中单个Layout配置的每一项的布局信息，不包含没有配置的项。   //切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
-        std::map<CommonDisplayItem, LayoutItem>             M_LayoutItems{};
-        LayoutItem& GetItem(CommonDisplayItem display_item)
-        {
-            return M_LayoutItems[display_item];
-        }
-/*
-        LayoutItem GetItem(CommonDisplayItem display_item) const
-        {
-            auto iter = M_LayoutItems.find(display_item);
-            if (iter != M_LayoutItems.end())
-                return iter->second;
-            return LayoutItem();
-        }
-*/
-    };
-
     //皮肤布局信息
     struct LayoutManager
     {
@@ -86,8 +57,8 @@ private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
 
 //  void InitLayoutItemAttributes(LayoutItem&   layout_item);
-    void LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele);
-    void LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele);
+    void LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele);
+    void LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele);
 
     static void DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align);
 

@@ -22,7 +22,7 @@ void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 }
 */
 
-void CSkinFile::LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     if (!layout_item.show)
@@ -48,7 +48,7 @@ void CSkinFile::LoadLayoutItemFromXmlNode(CSkinFile::Layout& layout, LayoutItem&
         layout_item.ValueColor  = layout.ValueColor;
 }
 
-void CSkinFile::LoadLayoutFromXmlNode(CSkinFile::Layout& layout, tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
 {
     layout.width        = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout.height       = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));

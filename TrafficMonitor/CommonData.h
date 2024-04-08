@@ -48,6 +48,42 @@ struct FontInfo
     }
 };
 
+//皮肤布局
+struct Layout
+{
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //      只能从皮肤配置文件中定义，GUI无法配置。
+    ////////////////////////////////////////////////////////////////////////////////////////
+    int                     width{}, height{};                              //整个layout的宽度与高度
+    COLORREF                PrefixColor{}, ValueColor{};                    //layout缺省的前缀颜色、数值颜色
+
+    //////////////////////////////////////////////////////////////
+    //      以后将支持下面这几项
+    //////////////////////////////////////////////////////////////
+    FontInfo                font_info;                                      //字体信息
+    //      int     text_height{};                                          //皮肤文本的高度，即每个显示项的数值显示高度。
+    //      bool    no_label{};                                             //是否不显示标签
+    //////////////////////////////////////////////////////////////
+    //      保存单个Layout配置的每一项的布局信息。
+    //      当用于保存皮肤配置文件中的布局配置数据时，切换皮肤(包括重新加载当前皮肤)时存放新数据，否则不改变数据。
+    //      当用于保存GUI配置数据时，保存实时数据。切换皮肤(包括重新加载当前皮肤)或同个皮肤内切换布局时存放新布局的GUI配置数据或皮肤配置文件中的布局配置数据。
+    //////////////////////////////////////////////////////////////
+    std::map<CommonDisplayItem, LayoutItem>             M_LayoutItems{};
+    LayoutItem& GetItem(CommonDisplayItem display_item)
+    {
+        return M_LayoutItems[display_item];
+    }
+/*
+    LayoutItem GetItem(CommonDisplayItem display_item) const
+    {
+        auto iter = M_LayoutItems.find(display_item);
+        if (iter != M_LayoutItems.end())
+            return iter->second;
+        return LayoutItem();
+    }
+*/
+};
+
 struct StringSet
 {
 public:

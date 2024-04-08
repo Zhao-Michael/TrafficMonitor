@@ -200,7 +200,7 @@ void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     CTrafficMonitorDlg* tmDlg           = (CTrafficMonitorDlg*)theApp.m_pMainWnd;
-    CSkinFile::Layout layout            = tmDlg->GetSkinLayout();
+    Layout layout            = tmDlg->GetSkinLayout();
     int item_count = m_list_ctrl.GetItemCount();
     for (int index{}; index < item_count; index++)
     {
