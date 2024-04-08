@@ -2241,7 +2241,7 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
             rMainWnd_M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
         }
     }
-    //获取皮肤的字体
+    //如果允许皮肤覆盖字体设置，则加载皮肤配置中的的字体。
     if (theApp.m_general_data.allow_skin_cover_font)
     {
         FontInfo& rFontInfo = rMainWndData.layout.font_info;
@@ -2253,10 +2253,10 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
             rFontInfo.italic        = layout.font_info.italic;
             rFontInfo.underline     = layout.font_info.underline;
             rFontInfo.strike_out    = layout.font_info.strike_out;
+            if (layout.font_info.size >= MIN_FONT_SIZE && layout.font_info.size <= MAX_FONT_SIZE)
+                rFontInfo.size      = layout.font_info.size;
+            SetTextFont();          //设置字体
         }
-        if (layout.font_info.size >= MIN_FONT_SIZE && layout.font_info.size <= MAX_FONT_SIZE)
-            rFontInfo.size = layout.font_info.size;
-        SetTextFont();          //设置字体
     }
 }
 
