@@ -879,7 +879,7 @@ void CTrafficMonitorDlg::SetTextFont()
 {
     if (m_font.m_hObject)   //如果m_font已经关联了一个字体资源对象，则释放它
         m_font.DeleteObject();
-    theApp.m_main_wnd_data.font.Create(m_font, theApp.GetDpi());
+    theApp.m_main_wnd_data.font_info.Create(m_font, theApp.GetDpi());
 }
 
 bool CTrafficMonitorDlg::IsTaskbarWndValid() const
@@ -2243,17 +2243,18 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
     //获取皮肤的字体
     if (theApp.m_general_data.allow_skin_cover_font)
     {
+        FontInfo& rFontInfo = rMainWndData.font_info;
         if (!layout.font_info.name.IsEmpty())
         {
             //更换字体
-            rMainWndData.font.name          = layout.font_info.name;
-            rMainWndData.font.bold          = layout.font_info.bold;
-            rMainWndData.font.italic        = layout.font_info.italic;
-            rMainWndData.font.underline     = layout.font_info.underline;
-            rMainWndData.font.strike_out    = layout.font_info.strike_out;
+            rFontInfo.name          = layout.font_info.name;
+            rFontInfo.bold          = layout.font_info.bold;
+            rFontInfo.italic        = layout.font_info.italic;
+            rFontInfo.underline     = layout.font_info.underline;
+            rFontInfo.strike_out    = layout.font_info.strike_out;
         }
         if (layout.font_info.size >= MIN_FONT_SIZE && layout.font_info.size <= MAX_FONT_SIZE)
-            rMainWndData.font.size = layout.font_info.size;
+            rFontInfo.size = layout.font_info.size;
         SetTextFont();          //设置字体
     }
 }

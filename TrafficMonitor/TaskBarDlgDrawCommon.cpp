@@ -582,7 +582,7 @@ void CTaskBarDlgDrawCommonWindowSupport::CDWriteHelper::SetFont(HFONT h_font)
             m_last_font.lfItalic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
         ThrowIfFailed<CDWriteException>(
             CDWriteSupport::GetFactory()->CreateTextFormat(
-                theApp.m_taskbar_data.font.name,
+                theApp.m_taskbar_data.font_info.name,
                 NULL,
                 dwrite_font_weight,
                 dwrite_font_style,

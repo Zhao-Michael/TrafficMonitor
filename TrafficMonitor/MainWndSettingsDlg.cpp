@@ -122,15 +122,16 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-    MainWndSettingData& rMainWndData = m_data;
+    MainWndSettingData& rMainWndData    = m_data;
+    FontInfo&           rFontInfo       = rMainWndData.font_info;
 
     //初始化各控件状态
-    SetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
+    SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
     //wchar_t buff[16];
     //swprintf_s(buff, L"%d", rMainWndData.font_size);
     //SetDlgItemText(IDC_FONT_SIZE_EDIT, buff);
     m_font_size_edit.SetRange(5, 72);
-    m_font_size_edit.SetValue(rMainWndData.font.size);
+    m_font_size_edit.SetValue(rFontInfo.size);
 
     ((CButton*)GetDlgItem(IDC_FULLSCREEN_HIDE_CHECK))->SetCheck(    rMainWndData.hide_main_wnd_when_fullscreen);
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(  rMainWndData.speed_short_mode);
@@ -267,31 +268,32 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 void CMainWndSettingsDlg::OnBnClickedSetFontButton()
 {
     // TODO: 在此添加控件通知处理程序代码
-    MainWndSettingData& rMainWndData = m_data;
+    MainWndSettingData& rMainWndData    = m_data;
+    FontInfo&           rFontInfo       = rMainWndData.font_info;
 
     LOGFONT lf{};
-    lf.lfHeight         = FontSizeToLfHeight(rMainWndData.font.size);
-    lf.lfWeight         = (rMainWndData.font.bold ? FW_BOLD : FW_NORMAL);
-    lf.lfItalic         = rMainWndData.font.italic;
-    lf.lfUnderline      = rMainWndData.font.underline;
-    lf.lfStrikeOut      = rMainWndData.font.strike_out;
+    lf.lfHeight         = FontSizeToLfHeight(rFontInfo.size);
+    lf.lfWeight         = (rFontInfo.bold ? FW_BOLD : FW_NORMAL);
+    lf.lfItalic         = rFontInfo.italic;
+    lf.lfUnderline      = rFontInfo.underline;
+    lf.lfStrikeOut      = rFontInfo.strike_out;
     lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
-    //wcsncpy_s(lf.lfFaceName, rMainWndData.font.name.GetString(), 32);
-    CCommon::WStringCopy(lf.lfFaceName, 32, rMainWndData.font.name.GetString());
+    //wcsncpy_s(lf.lfFaceName, rFontInfo.name.GetString(), 32);
+    CCommon::WStringCopy(lf.lfFaceName, 32, rFontInfo.name.GetString());
     CCommon::NormalizeFont(lf);
     CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
     if (IDOK == fontDlg.DoModal())     // 显示字体对话框
     {
         //获取字体信息
-        rMainWndData.font.name = fontDlg.GetFaceName();
-        rMainWndData.font.size = fontDlg.GetSize() / 10;
-        rMainWndData.font.bold = (fontDlg.IsBold() != FALSE);
-        rMainWndData.font.italic = (fontDlg.IsItalic() != FALSE);
-        rMainWndData.font.underline = (fontDlg.IsUnderline() != FALSE);
-        rMainWndData.font.strike_out = (fontDlg.IsStrikeOut() != FALSE);
+        rFontInfo.name = fontDlg.GetFaceName();
+        rFontInfo.size = fontDlg.GetSize() / 10;
+        rFontInfo.bold = (fontDlg.IsBold() != FALSE);
+        rFontInfo.italic = (fontDlg.IsItalic() != FALSE);
+        rFontInfo.underline = (fontDlg.IsUnderline() != FALSE);
+        rFontInfo.strike_out = (fontDlg.IsStrikeOut() != FALSE);
         //将字体信息显示出来
-        SetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
-        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rMainWndData.font.size).c_str());
+        SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
+        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rFontInfo.size).c_str());
     }
 }
 
@@ -348,7 +350,8 @@ BOOL CMainWndSettingsDlg::PreTranslateMessage(MSG* pMsg)
 void CMainWndSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    MainWndSettingData& rMainWndData = m_data;
+    MainWndSettingData& rMainWndData    = m_data;
+    FontInfo&           rFontInfo       = rMainWndData.font_info;
     //获取字体设置
     int font_size;
     font_size = m_font_size_edit.GetValue();
@@ -360,9 +363,9 @@ void CMainWndSettingsDlg::OnOK()
     }
     else
     {
-        rMainWndData.font.size = font_size;
+        rFontInfo.size = font_size;
     }
-    GetDlgItemText(IDC_FONT_NAME_EDIT, rMainWndData.font.name);
+    GetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
 
     CTabDlg::OnOK();
 }

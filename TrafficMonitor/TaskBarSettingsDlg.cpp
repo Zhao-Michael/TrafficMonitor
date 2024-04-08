@@ -193,16 +193,16 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-
+    FontInfo& rFontInfo = m_data.font_info;
     theApp.m_taskbar_default_style.LoadConfig();
 
     //初始化各控件状态
-    SetDlgItemText(IDC_FONT_NAME_EDIT1, m_data.font.name);
+    SetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
     //wchar_t buff[16];
     //swprintf_s(buff, L"%d", m_data.font_size);
     //SetDlgItemText(IDC_FONT_SIZE_EDIT1, buff);
     m_font_size_edit.SetRange(5, 72);
-    m_font_size_edit.SetValue(m_data.font.size);
+    m_font_size_edit.SetValue(rFontInfo.size);
 
     //SetDlgItemText(IDC_UPLOAD_EDIT1, m_data.disp_str.Get(TDI_UP).c_str());
     //SetDlgItemText(IDC_DOWNLOAD_EDIT1, m_data.disp_str.Get(TDI_DOWN).c_str());
@@ -349,30 +349,32 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
 void CTaskBarSettingsDlg::OnBnClickedSetFontButton1()
 {
     // TODO: 在此添加控件通知处理程序代码
+    FontInfo& rFontInfo = m_data.font_info;
+
     LOGFONT lf{};
-    lf.lfHeight = FontSizeToLfHeight(m_data.font.size);
-    lf.lfWeight = (m_data.font.bold ? FW_BOLD : FW_NORMAL);
-    lf.lfItalic = m_data.font.italic;
-    lf.lfUnderline = m_data.font.underline;
-    lf.lfStrikeOut = m_data.font.strike_out;
+    lf.lfHeight = FontSizeToLfHeight(rFontInfo.size);
+    lf.lfWeight = (rFontInfo.bold ? FW_BOLD : FW_NORMAL);
+    lf.lfItalic = rFontInfo.italic;
+    lf.lfUnderline = rFontInfo.underline;
+    lf.lfStrikeOut = rFontInfo.strike_out;
     lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
-    //wcsncpy_s(lf.lfFaceName, m_data.font.name.GetString(), 32);
-    CCommon::WStringCopy(lf.lfFaceName, 32, m_data.font.name.GetString());
+    //wcsncpy_s(lf.lfFaceName, rFontInfo.name.GetString(), 32);
+    CCommon::WStringCopy(lf.lfFaceName, 32, rFontInfo.name.GetString());
     CCommon::NormalizeFont(lf);
     CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
     if (IDOK == fontDlg.DoModal())     // 显示字体对话框
     {
         //获取字体信息
-        m_data.font.name = fontDlg.GetFaceName();
-        m_data.font.size = fontDlg.GetSize() / 10;
-        m_data.font.bold = (fontDlg.IsBold() != FALSE);
-        m_data.font.italic = (fontDlg.IsItalic() != FALSE);
-        m_data.font.underline = (fontDlg.IsUnderline() != FALSE);
-        m_data.font.strike_out = (fontDlg.IsStrikeOut() != FALSE);
+        rFontInfo.name = fontDlg.GetFaceName();
+        rFontInfo.size = fontDlg.GetSize() / 10;
+        rFontInfo.bold = (fontDlg.IsBold() != FALSE);
+        rFontInfo.italic = (fontDlg.IsItalic() != FALSE);
+        rFontInfo.underline = (fontDlg.IsUnderline() != FALSE);
+        rFontInfo.strike_out = (fontDlg.IsStrikeOut() != FALSE);
         //将字体信息显示出来
-        SetDlgItemText(IDC_FONT_NAME_EDIT1, m_data.font.name);
+        SetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
         wchar_t buff[16];
-        swprintf_s(buff, L"%d", m_data.font.size);
+        swprintf_s(buff, L"%d", rFontInfo.size);
         SetDlgItemText(IDC_FONT_SIZE_EDIT1, buff);
     }
 }
@@ -430,6 +432,7 @@ void CTaskBarSettingsDlg::OnBnClickedHideUnitCheck()
 void CTaskBarSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
+    FontInfo& rFontInfo = m_data.font_info;
     //获取字体设置
     int font_size;
     font_size = m_font_size_edit.GetValue();
@@ -441,9 +444,9 @@ void CTaskBarSettingsDlg::OnOK()
     }
     else
     {
-        m_data.font.size = font_size;
+        rFontInfo.size = font_size;
     }
-    GetDlgItemText(IDC_FONT_NAME_EDIT1, m_data.font.name);
+    GetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
 
     //获取数据位数的设置
     m_data.digits_number = m_digit_number_combo.GetCurSel() + 3;

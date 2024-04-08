@@ -934,7 +934,7 @@ void CTaskBarDlg::SetTextFont()
         m_font.DeleteObject();
     }
     //创建新的字体
-    rTaskbarData.font.Create(m_font, GetDPI());
+    rTaskbarData.font_info.Create(m_font, GetDPI());
 }
 
 void CTaskBarDlg::ApplySettings()

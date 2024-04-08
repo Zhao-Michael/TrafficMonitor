@@ -137,7 +137,6 @@
 #define IDS_MAIN_WINDOW_SETTINGS        270
 #define IDS_TASKBAR_WINDOW_SETTINGS     271
 #define IDS_GENERAL_SETTINGS            272
-#define IDS_MICROSOFT_YAHEI             273
 #define IDS_ACQUIRING                   274
 #define IDS_DEFAULT_FONT                275
 #define IDS_LIST_VIEW                   276
