@@ -11,7 +11,7 @@ class CMonitorItemAttributesDlg : public CBaseDialog
 	DECLARE_DYNAMIC(CMonitorItemAttributesDlg)
 
 public:
-	CMonitorItemAttributesDlg(std::map<CommonDisplayItem, LayoutItem>& layoutItems, bool bMainWnd, CWnd* pParent = NULL);   // 标准构造函数
+	CMonitorItemAttributesDlg(Layout& layout, bool bMainWnd, CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CMonitorItemAttributesDlg();
 
 // 对话框数据
@@ -22,7 +22,7 @@ public:
 	virtual void OnOK()					override;
 protected:
 	CMonitorItemAttributesSettingListCtrl		m_list_ctrl;
-    std::map<CommonDisplayItem, LayoutItem>&	m_layout_items;
+	Layout&	m_layout;
 	bool B_MainWnd{ false };							//如果为true，则为主窗口文本设置，否则为任务栏窗口设置
 
     virtual CString GetDialogName() const override;

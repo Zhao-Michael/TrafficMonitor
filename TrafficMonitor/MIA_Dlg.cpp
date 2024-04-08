@@ -13,8 +13,8 @@
 
 IMPLEMENT_DYNAMIC(CMonitorItemAttributesDlg, CBaseDialog)
 
-CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(std::map<CommonDisplayItem, LayoutItem>& layoutItems, bool bMainWnd, CWnd* pParent /*=NULL*/)
-	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout_items(layoutItems), B_MainWnd(bMainWnd)
+CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(Layout& layout, bool bMainWnd, CWnd* pParent /*=NULL*/)
+	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout(layout), B_MainWnd(bMainWnd)
 {
 }
 
@@ -68,7 +68,8 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     m_list_ctrl.SetDrawItemRangMargin(theApp.DPI(2));
 
     //向列表中插入行
-    for (auto iter = m_layout_items.begin(); iter != m_layout_items.end(); ++iter)
+    std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = m_layout.M_LayoutItems;
+    for (auto iter = rM_LayoutItems.begin(); iter != rM_LayoutItems.end(); ++iter)
     {
         LayoutItem& layout_item = iter->second;
         wstring         item_id = layout_item.id;
@@ -97,14 +98,14 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
 void CMonitorItemAttributesDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-
+    std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = m_layout.M_LayoutItems;
     int item_count = m_list_ctrl.GetItemCount();
     for (int index{}; index < item_count; index++)
     {
         CommonDisplayItem* item             = (CommonDisplayItem*)(m_list_ctrl.GetItemData(index));
-        m_layout_items[*item].Prefix        = m_list_ctrl.GetItemText(index, 2).GetString();
-        m_layout_items[*item].PrefixColor   = m_list_ctrl.GetItemColor(index, 3);
-        m_layout_items[*item].ValueColor    = m_list_ctrl.GetItemColor(index, 4);
+        rM_LayoutItems[*item].Prefix        = m_list_ctrl.GetItemText(index, 2).GetString();
+        rM_LayoutItems[*item].PrefixColor   = m_list_ctrl.GetItemColor(index, 3);
+        rM_LayoutItems[*item].ValueColor    = m_list_ctrl.GetItemColor(index, 4);
     }
 
     CBaseDialog::OnOK();

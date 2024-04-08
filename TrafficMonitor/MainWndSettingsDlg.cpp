@@ -387,7 +387,7 @@ afx_msg LRESULT CMainWndSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     {
         //设置文本颜色
         MainWndSettingData& rMainWndData = m_data;
-        CMonitorItemAttributesDlg colorDlg(rMainWndData.layout.M_LayoutItems, true);
+        CMonitorItemAttributesDlg colorDlg(rMainWndData.layout, true);
         if (colorDlg.DoModal() == IDOK)
         {
             DrawStaticColor();

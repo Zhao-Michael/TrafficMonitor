@@ -496,7 +496,7 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     case IDC_TEXT_COLOR_STATIC1:        //点击“文本颜色”时
     {
         //设置文本颜色
-        CMonitorItemAttributesDlg colorDlg(rTaskbar_M_LayoutItems, false);
+        CMonitorItemAttributesDlg colorDlg(rTaskbarData.layout, false);
         if (colorDlg.DoModal() == IDOK)
         {
             DrawStaticColor();
