@@ -689,7 +689,6 @@ void CTrafficMonitorDlg::_OnOptions(int tab)
         optionsDlg.m_tab1_dlg.m_data            = theApp.m_main_wnd_data;
         optionsDlg.m_tab2_dlg.m_data            = theApp.m_taskbar_data;
         optionsDlg.m_tab3_dlg.m_data            = theApp.m_general_data;
-        optionsDlg.m_tab1_dlg.m_text_disable    = m_skin.GetLayoutManager().no_label;
     }
 
     if (optionsDlg.DoModal() == IDOK)
@@ -2234,10 +2233,10 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
         //更换颜色
         rMainWnd_M_LayoutItems[item].PrefixColor    = layout.M_LayoutItems[item].PrefixColor;
         rMainWnd_M_LayoutItems[item].ValueColor     = layout.M_LayoutItems[item].ValueColor;
-        //如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。
-        if (theApp.m_general_data.allow_skin_cover_text && !m_skin.GetLayoutManager().no_label)
+        //如果允许皮肤覆盖显示项前缀设置，则加载皮肤配置中的的显示前缀。
+        if (theApp.m_general_data.allow_skin_cover_text)
         {
-            //更换标签
+            //更换前缀，即使皮肤配置中的前缀为空。
             rMainWnd_M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
         }
     }

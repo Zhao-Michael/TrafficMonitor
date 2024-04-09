@@ -2,7 +2,7 @@
 	<skin>
 		<skin_author>zy</skin_author>
 	</skin>
-	<layout text_height="20" no_label="0">
+	<layout text_height="20">
 		<layout_l width="220" height="43" color_v="16773870">
 			<up 	x="6" 	y="2" 	width="108" align="0" show="1"/>
 			<down 	x="114" y="2" 	width="110" align="0" show="1"/>

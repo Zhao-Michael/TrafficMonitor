@@ -150,11 +150,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     }
     ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(rMainWndData.hide_percent);
 
-    if (m_text_disable)
-    {
-//        EnableDlgCtrl(IDC_DISPLAY_TEXT_SETTING_BUTTON, false);
-    }
-
     CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK,         rMainWndData.m_always_on_top);
     CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK,       rMainWndData.m_mouse_penetrate);
     CheckDlgButton(IDC_LOCK_WINDOW_POS_CHECK,       rMainWndData.m_lock_window_pos);

@@ -31,8 +31,8 @@ void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_ite
     layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
-    if (m_layout_manager.no_label)
-        layout_item.Prefix      = _T("");
+    if (layout.no_label)
+        layout_item.Prefix      = _T("");       //如果不显示前缀，则直接将所有前缀设置为空。
     else
         layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
     const char* str = nullptr;
@@ -50,8 +50,9 @@ void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_ite
 
 void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
 {
-    layout.width        = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout.height       = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.width        = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout.height       = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.no_label     = CTinyXml2Helper::StringToBool(                 CTinyXml2Helper::ElementAttribute(ele, "no_label"));
     layout.PrefixColor  = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_p")).c_str());
     layout.ValueColor   = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
@@ -267,7 +268,6 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 if (ele_name == "layout")              //布局信息
                 {
                     m_layout_manager.text_height = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "text_height")));
-                    m_layout_manager.no_label = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(child, "no_label"));
                     CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* ele_layout)
                         {
                             string str_layout = CTinyXml2Helper::ElementName(ele_layout);
@@ -444,7 +444,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
     ////////////////////////////////////////////////////////////////////////////////////////
     //              (1)获取所有内置项目的显示标签
     ////////////////////////////////////////////////////////////////////////////////////////
-    if (!m_layout_manager.no_label)
+    if (!layoutInUse.no_label)
     {
         map_builtin_str[TDI_UP].label               = rMainWnd_M_LayoutItems[TDI_UP].Prefix;
         map_builtin_str[TDI_DOWN].label             = rMainWnd_M_LayoutItems[TDI_DOWN].Prefix;

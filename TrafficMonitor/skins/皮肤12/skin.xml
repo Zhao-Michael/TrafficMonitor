@@ -2,7 +2,7 @@
 	<skin>
 		<skin_author>zy</skin_author>
 	</skin>
-	<layout text_height="20" no_label="0">
+	<layout text_height="20">
 		<layout_l width="232" height="107">
 			<font name="Microsoft YaHei" size="9" style="0"/>
 			<cpu             x="14"  y="3"  width="106" align="0" show="1" prefix="CPU: " color_v="16777215" color_p="16777215"/>
