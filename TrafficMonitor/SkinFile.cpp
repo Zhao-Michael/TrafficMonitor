@@ -22,7 +22,7 @@ void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 }
 */
 
-void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     if (!layout_item.show)
@@ -49,7 +49,7 @@ void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_ite
         layout_item.ValueColor  = layout.ValueColor;
 }
 
-void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
+void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele)
 {
     layout.width            = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout.height           = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
@@ -368,7 +368,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
     }
 
     //绘制预览图文本
-    auto drawPreviewText = [&](Layout& layout, const PreviewInfo::Pos& pos)
+    auto drawPreviewText = [&](CLayout& layout, const PreviewInfo::Pos& pos)
     {
         for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
         {
@@ -431,7 +431,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
 
     //绘制背景图
     CImage& background_image{ show_more_info ? m_background_l : m_background_s };
-    Layout& layoutInUse{ show_more_info ? m_layout_manager.layout_l : m_layout_manager.layout_s };
+    CLayout& layoutInUse{ show_more_info ? m_layout_manager.layout_l : m_layout_manager.layout_s };
 
     CRect rect(CPoint(0, 0), CSize(layoutInUse.width, layoutInUse.height));
     CDrawDoubleBuffer draw_double_buffer(pDC, rect);

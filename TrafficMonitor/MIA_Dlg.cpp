@@ -13,7 +13,7 @@
 
 IMPLEMENT_DYNAMIC(CMonitorItemAttributesDlg, CBaseDialog)
 
-CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(Layout& layout, bool bMainWnd, CWnd* pParent /*=NULL*/)
+CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(CLayout& layout, bool bMainWnd, CWnd* pParent /*=NULL*/)
 	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout(layout), B_MainWnd(bMainWnd)
 {
 }
@@ -216,7 +216,7 @@ void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     CTrafficMonitorDlg* tmDlg           = (CTrafficMonitorDlg*)theApp.m_pMainWnd;
-    Layout layout            = tmDlg->GetSkinLayout();
+    CLayout layout                      = tmDlg->GetSkinLayout();
     int item_count = m_list_ctrl.GetItemCount();
     for (int index{}; index < item_count; index++)
     {

@@ -49,8 +49,12 @@ struct FontInfo
 };
 
 //皮肤布局
-struct Layout
+class CLayout
 {
+public:
+    CLayout()  {};
+    ~CLayout() {};
+
     ////////////////////////////////////////////////////////////////////////////////////////
     //      只能从皮肤配置文件中定义，GUI无法配置。
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +133,7 @@ struct PublicSettingData
 {
     bool show_tool_tip{ true };                     //显示鼠标提示
 
-    Layout   layout;
+    CLayout   layout;
 
     //数值属性设置
     bool hide_unit;                                 //隐藏单位

@@ -134,7 +134,7 @@ CString CTrafficMonitorDlg::GetMouseTipsInfo()
     );
     tip_info += temp;
 //  const CSkinFile::Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
-    Layout skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
+    CLayout skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     if (!skin_layout.GetItem(TDI_UP).show)      //如果主窗口中没有显示上传速度，则在提示信息中显示上传速度
     {
         temp.Format(_T("\r\n%s: %s/s"), CCommon::LoadText(IDS_UPLOAD),
@@ -906,7 +906,7 @@ void CTrafficMonitorDlg::TaskbarShowHideItem(EBuiltinDisplayItem type)
 
 void CTrafficMonitorDlg::CheckClickedItem(CPoint point)
 {
-    const Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
+    const CLayout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     for (const auto& layout_item : skin_layout.M_LayoutItems)
     {
         CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, layout_item.second.height));
@@ -2218,7 +2218,7 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
     //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
     ////////////////////////////////////////////////////////////////////////////////////////
     //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
-    Layout layout = {};
+    CLayout layout = {};
     if (rMainWndData.m_show_more_info)
         layout = m_skin.GetLayoutManager().layout_l;
     else

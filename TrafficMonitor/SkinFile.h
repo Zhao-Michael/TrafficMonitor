@@ -18,8 +18,8 @@ public:
     //皮肤布局信息
     struct LayoutManager
     {
-        Layout  layout_l;           //“显示更多信息”时的布局
-        Layout  layout_s;           //不“显示更多信息”时的布局
+        CLayout  layout_l;           //“显示更多信息”时的布局
+        CLayout  layout_s;           //不“显示更多信息”时的布局
     };
 
     //皮肤预览图信息
@@ -55,8 +55,8 @@ private:
     void LoadFromXml(const wstring& file_path);     //从xml文件读取皮肤数据
 
 //  void InitLayoutItemAttributes(LayoutItem&   layout_item);
-    void LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele);
-    void LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele);
+    void LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele);
+    void LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele);
 
     static void DrawSkinText(CDrawCommon drawer, CRect rect, CString label, CString value, COLORREF label_color, COLORREF value_color, Alignment align);
 
