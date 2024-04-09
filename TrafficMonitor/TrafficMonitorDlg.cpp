@@ -909,7 +909,7 @@ void CTrafficMonitorDlg::CheckClickedItem(CPoint point)
     const Layout& skin_layout{ theApp.m_main_wnd_data.m_show_more_info ? m_skin.GetLayoutManager().layout_l : m_skin.GetLayoutManager().layout_s }; //当前的皮肤布局
     for (const auto& layout_item : skin_layout.M_LayoutItems)
     {
-        CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, m_skin.GetLayoutManager().text_height));
+        CRect rect(CPoint(layout_item.second.x, layout_item.second.y), CSize(layout_item.second.width, layout_item.second.height));
         if (rect.PtInRect(point))
         {
             m_clicked_item = layout_item.first;

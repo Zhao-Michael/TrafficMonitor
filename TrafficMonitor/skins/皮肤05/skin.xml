@@ -2,14 +2,14 @@
 	<skin>
 		<skin_author>zy</skin_author>
 	</skin>
-	<layout text_height="20">
-		<layout_l width="220" height="43" color_v="335674">
+	<layout>
+		<layout_l width="220" height="43" text_height="20" color_v="335674">
 			<up 	x="6" 	y="2" 	width="108" align="0" show="1"/>
 			<down 	x="114" y="2" 	width="110" align="0" show="1"/>
 			<cpu 	x="6" 	y="21" 	width="108" align="0" show="1"/>
 			<memory x="114" y="21" 	width="110" align="0" show="1"/>
 		</layout_l>
-		<layout_s width="220" height="28" color_v="335674">
+		<layout_s width="220" height="28" text_height="20" color_v="335674">
 			<up 	x="6" 	y="4" 	width="108" align="0" show="1"/>
 			<down 	x="114" y="4" 	width="110" align="0" show="1"/>
 			<cpu 	x="0" 	y="0" 	width="0"  align="0" show="0"/>

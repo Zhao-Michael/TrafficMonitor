@@ -18,7 +18,6 @@ public:
     //皮肤布局信息
     struct LayoutManager
     {
-        int     text_height{};      //皮肤文本的高度，即每个显示项的数值显示高度。
         Layout  layout_l;           //“显示更多信息”时的布局
         Layout  layout_s;           //不“显示更多信息”时的布局
     };

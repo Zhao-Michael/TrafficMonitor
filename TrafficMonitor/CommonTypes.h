@@ -102,7 +102,7 @@ struct LayoutItem
     //      只能从皮肤配置文件中定义，GUI无法配置。
     ////////////////////////////////////////////////////////////////////////////////////////
     int                     x{}, y{}, width{};              //X位置、Y位置、宽度                
-//  int                     height{};                       //目前只能从Layout.height复制。
+    int                     height{};                       //目前只能从Layout.DrawRectHeight复制，因为整个Layout统一这个高度。
     Alignment               align{ Alignment::LEFT };       //对齐方式
     bool                    show { false };                 //是否显示
     ////////////////////////////////////////////////////////////////////////////////////////

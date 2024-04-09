@@ -27,12 +27,13 @@ void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_ite
     layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
     if (!layout_item.show)
         return;
+    layout_item.height          = layout.DrawRectHeight;        //整个Layout统一这个高度
     layout_item.x               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "x")));
     layout_item.y               =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "y")));
     layout_item.width           =               theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout_item.align           =   static_cast<Alignment>(atoi(CTinyXml2Helper::ElementAttribute(ele, "align")));
     if (layout.no_label)
-        layout_item.Prefix      = _T("");       //如果不显示前缀，则直接将所有前缀设置为空。
+        layout_item.Prefix      = _T("");                       //如果不显示前缀，则直接将所有前缀设置为空。
     else
         layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
     const char* str = nullptr;
@@ -50,11 +51,12 @@ void CSkinFile::LoadLayoutItemFromXmlNode(Layout& layout, LayoutItem& layout_ite
 
 void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
 {
-    layout.width        = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
-    layout.height       = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
-    layout.no_label     = CTinyXml2Helper::StringToBool(                 CTinyXml2Helper::ElementAttribute(ele, "no_label"));
-    layout.PrefixColor  = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_p")).c_str());
-    layout.ValueColor   = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
+    layout.width            = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
+    layout.height           = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
+    layout.DrawRectHeight   = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "text_height")));
+    layout.no_label         = CTinyXml2Helper::StringToBool(                 CTinyXml2Helper::ElementAttribute(ele, "no_label"));
+    layout.PrefixColor      = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_p")).c_str());
+    layout.ValueColor       = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
             BOOL bFind = false;
@@ -79,7 +81,6 @@ void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
                         //如果是内置的"UP"等，就找到了。
                         //插件item不能map到内置的"UP"等，否则当内置项处理了。
                         LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[builtin_item], ele_layout_item);
-                        //                  layout.M_LayoutItems[builtin_item].height       = layout.height;
                         layout.M_LayoutItems[builtin_item].id = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
                         bFind = true;
                         break;
@@ -96,7 +97,6 @@ void CSkinFile::LoadLayoutFromXmlNode(Layout& layout, tinyxml2::XMLElement* ele)
                         if (plugin_id == iplugin_item->GetItemId())
                         {
                             LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[iplugin_item], ele_layout_item);
-                            //                      layout.M_LayoutItems[iplugin_item].height   = layout.height;
                             layout.M_LayoutItems[iplugin_item].id = plugin_id;
                             bFind = true;
                             break;
@@ -267,7 +267,6 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
                 string ele_name = CTinyXml2Helper::ElementName(child);
                 if (ele_name == "layout")              //布局信息
                 {
-                    m_layout_manager.text_height = theApp.DPI(atoi(CTinyXml2Helper::ElementAttribute(child, "text_height")));
                     CTinyXml2Helper::IterateChildNode(child, [this](tinyxml2::XMLElement* ele_layout)
                         {
                             string str_layout = CTinyXml2Helper::ElementName(ele_layout);
@@ -391,7 +390,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
             CPoint point;
             point.SetPoint(layout_item.x, layout_item.y);
             point.Offset(pos.x, pos.y);
-            CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
+            CRect rect(point, CSize(layout_item.width, layout_item.height));
             if (item.is_plugin && item.plugin_item->IsCustomDraw())         //插件项目自绘
             {
                 COLORREF value_color = layout.M_LayoutItems[item].ValueColor;
@@ -403,7 +402,7 @@ void CSkinFile::DrawPreview(CDC* pDC, CRect rect)
                 }
                 draw.GetDC()->SetTextColor(value_color);
                 int brightness{ (GetRValue(value_color) + GetGValue(value_color) + GetBValue(value_color)) / 2 };
-                item.plugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), point.x, point.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
+                item.plugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), point.x, point.y, layout_item.width, layout_item.height, brightness >= 128);
             }
             else
             {
@@ -518,7 +517,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
         if (layout_item.show)
         {
             //矩形区域
-            CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, m_layout_manager.text_height));
+            CRect rect(CPoint(layout_item.x, layout_item.y), CSize(layout_item.width, layout_item.height));
             //标签和数值颜色
             COLORREF label_color = label_colors[iter->first];
             COLORREF value_color = value_colors[iter->first];
@@ -543,7 +542,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
                 CPoint point;
                 point.SetPoint(layout_item.x, layout_item.y);
 //              point.Offset(pos.x, pos.y);
-                CRect rect(point, CSize(layout_item.width, m_layout_manager.text_height));
+                CRect rect(point, CSize(layout_item.width, layout_item.height));
                 //绘制标签和数值
                 DrawStr draw_str;
                 draw_str.label = rMainWnd_M_LayoutItems[iplugin_item].Prefix;
@@ -560,7 +559,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
                 }
                 draw.GetDC()->SetTextColor(value_color);
                 int brightness{ (GetRValue(value_color) + GetGValue(value_color) + GetBValue(value_color)) / 2 };
-                iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), layout_item.x, layout_item.y, layout_item.width, m_layout_manager.text_height, brightness >= 128);
+                iplugin_item->DrawItem(draw.GetDC()->GetSafeHdc(), layout_item.x, layout_item.y, layout_item.width, layout_item.height, brightness >= 128);
             }
         }
     }
