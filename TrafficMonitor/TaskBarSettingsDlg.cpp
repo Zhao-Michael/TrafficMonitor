@@ -116,7 +116,6 @@ void CTaskBarSettingsDlg::SetControlMouseWheelEnable(bool enable)
     m_unit_combo.SetMouseWheelEnable(enable);
     m_double_click_combo.SetMouseWheelEnable(enable);
     m_digit_number_combo.SetMouseWheelEnable(enable);
-    m_font_size_edit.SetMouseWheelEnable(enable);
     m_memory_display_combo.SetMouseWheelEnable(enable);
     m_item_space_edit.SetMouseWheelEnable(enable);
     m_window_offset_top_edit.SetMouseWheelEnable(enable);
@@ -133,7 +132,6 @@ void CTaskBarSettingsDlg::DoDataExchange(CDataExchange* pDX)
     CTabDlg::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_UNIT_COMBO, m_unit_combo);
     DDX_Control(pDX, IDC_HIDE_UNIT_CHECK, m_hide_unit_chk);
-    DDX_Control(pDX, IDC_FONT_SIZE_EDIT1, m_font_size_edit);
     DDX_Control(pDX, IDC_DOUBLE_CLICK_COMBO, m_double_click_combo);
     DDX_Control(pDX, IDC_DIGIT_NUMBER_COMBO, m_digit_number_combo);
     //DDX_Control(pDX, IDC_TRANSPARENT_COLOR_STATIC, m_trans_color_static);
@@ -150,7 +148,6 @@ void CTaskBarSettingsDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CTaskBarSettingsDlg, CTabDlg)
-    ON_BN_CLICKED(IDC_SET_FONT_BUTTON1, &CTaskBarSettingsDlg::OnBnClickedSetFontButton1)
     ON_BN_CLICKED(IDC_TASKBAR_WND_ON_LEFT_CHECK, &CTaskBarSettingsDlg::OnBnClickedTaskbarWndOnLeftCheck)
     ON_BN_CLICKED(IDC_SPEED_SHORT_MODE_CHECK, &CTaskBarSettingsDlg::OnBnClickedSpeedShortModeCheck)
     ON_CBN_SELCHANGE(IDC_UNIT_COMBO, &CTaskBarSettingsDlg::OnCbnSelchangeUnitCombo)
@@ -197,11 +194,6 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     FontInfo& rFontInfo = m_data.layout.font_info;
     theApp.m_taskbar_default_style.LoadConfig();
-
-    //初始化字体设置相关控件
-    SetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
-    m_font_size_edit.SetRange(5, 72);
-    m_font_size_edit.SetValue(rFontInfo.size);
 
     ((CButton*)GetDlgItem(IDC_TASKBAR_WND_ON_LEFT_CHECK))->SetCheck(m_data.tbar_wnd_on_left);
     ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->SetCheck(m_data.speed_short_mode);
@@ -340,40 +332,6 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
 }
 
 
-void CTaskBarSettingsDlg::OnBnClickedSetFontButton1()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    FontInfo& rFontInfo = m_data.layout.font_info;
-
-    LOGFONT lf{};
-    lf.lfHeight = FontSizeToLfHeight(rFontInfo.size);
-    lf.lfWeight = (rFontInfo.bold ? FW_BOLD : FW_NORMAL);
-    lf.lfItalic = rFontInfo.italic;
-    lf.lfUnderline = rFontInfo.underline;
-    lf.lfStrikeOut = rFontInfo.strike_out;
-    lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
-    //wcsncpy_s(lf.lfFaceName, rFontInfo.name.GetString(), 32);
-    CCommon::WStringCopy(lf.lfFaceName, 32, rFontInfo.name.GetString());
-    CCommon::NormalizeFont(lf);
-    CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
-    if (IDOK == fontDlg.DoModal())     // 显示字体对话框
-    {
-        //获取字体信息
-        rFontInfo.name = fontDlg.GetFaceName();
-        rFontInfo.size = fontDlg.GetSize() / 10;
-        rFontInfo.bold = (fontDlg.IsBold() != FALSE);
-        rFontInfo.italic = (fontDlg.IsItalic() != FALSE);
-        rFontInfo.underline = (fontDlg.IsUnderline() != FALSE);
-        rFontInfo.strike_out = (fontDlg.IsStrikeOut() != FALSE);
-        //将字体信息显示出来
-        SetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
-        wchar_t buff[16];
-        swprintf_s(buff, L"%d", rFontInfo.size);
-        SetDlgItemText(IDC_FONT_SIZE_EDIT1, buff);
-    }
-}
-
-
 void CTaskBarSettingsDlg::OnBnClickedTaskbarWndOnLeftCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
@@ -426,21 +384,6 @@ void CTaskBarSettingsDlg::OnBnClickedHideUnitCheck()
 void CTaskBarSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    FontInfo& rFontInfo = m_data.layout.font_info;
-    //获取字体设置
-    int font_size;
-    font_size = m_font_size_edit.GetValue();
-    if (font_size > MAX_FONT_SIZE || font_size < MIN_FONT_SIZE)
-    {
-        CString info;
-        info.Format(CCommon::LoadText(IDS_FONT_SIZE_WARNING), MIN_FONT_SIZE, MAX_FONT_SIZE);
-        MessageBox(info, NULL, MB_OK | MB_ICONWARNING);
-    }
-    else
-    {
-        rFontInfo.size = font_size;
-    }
-    GetDlgItemText(IDC_FONT_NAME_EDIT1, rFontInfo.name);
 
     //获取数据位数的设置
     m_data.digits_number = m_digit_number_combo.GetCurSel() + 3;

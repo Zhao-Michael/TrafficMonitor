@@ -40,7 +40,6 @@ protected:
     CToolTipCtrl m_toolTip;
     CComboBox2 m_unit_combo;
     CButton m_hide_unit_chk;
-    CSpinEdit m_font_size_edit;
     CComboBox2 m_double_click_combo;
     CComboBox2 m_digit_number_combo;
     CMenu m_default_style_menu;
@@ -75,7 +74,6 @@ protected:
     DECLARE_MESSAGE_MAP()
 public:
     virtual BOOL OnInitDialog();
-    afx_msg void OnBnClickedSetFontButton1();
     afx_msg void OnBnClickedTaskbarWndOnLeftCheck();
     afx_msg void OnBnClickedSpeedShortModeCheck();
     virtual BOOL PreTranslateMessage(MSG* pMsg);

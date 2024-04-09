@@ -25,7 +25,6 @@ void CMainWndSettingsDlg::SetControlMouseWheelEnable(bool enable)
 {
     m_unit_combo.SetMouseWheelEnable(enable);
     m_double_click_combo.SetMouseWheelEnable(enable);
-    m_font_size_edit.SetMouseWheelEnable(enable);
     m_memory_display_combo.SetMouseWheelEnable(enable);
 }
 
@@ -83,7 +82,6 @@ void CMainWndSettingsDlg::DoDataExchange(CDataExchange* pDX)
     CTabDlg::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_HIDE_UNIT_CHECK, m_hide_unit_chk);
     DDX_Control(pDX, IDC_UNIT_COMBO, m_unit_combo);
-    DDX_Control(pDX, IDC_FONT_SIZE_EDIT, m_font_size_edit);
     DDX_Control(pDX, IDC_DOUBLE_CLICK_COMBO, m_double_click_combo);
     DDX_Control(pDX, IDC_MEMORY_DISPLAY_COMBO, m_memory_display_combo);
 }
@@ -96,7 +94,6 @@ BEGIN_MESSAGE_MAP(CMainWndSettingsDlg, CTabDlg)
     //ON_EN_CHANGE(IDC_MEMORY_EDIT, &CMainWndSettingsDlg::OnEnChangeMemoryEdit)
     //ON_BN_CLICKED(IDC_SET_COLOR_BUTTON1, &CMainWndSettingsDlg::OnBnClickedSetColorButton1)
     //ON_BN_CLICKED(IDC_SET_DEFAULT_BUTTON, &CMainWndSettingsDlg::OnBnClickedSetDefaultButton)
-    ON_BN_CLICKED(IDC_SET_FONT_BUTTON, &CMainWndSettingsDlg::OnBnClickedSetFontButton)
     ON_BN_CLICKED(IDC_FULLSCREEN_HIDE_CHECK, &CMainWndSettingsDlg::OnBnClickedFullscreenHideCheck)
     ON_BN_CLICKED(IDC_SPEED_SHORT_MODE_CHECK2, &CMainWndSettingsDlg::OnBnClickedSpeedShortModeCheck2)
     ON_CBN_SELCHANGE(IDC_UNIT_COMBO, &CMainWndSettingsDlg::OnCbnSelchangeUnitCombo)
@@ -124,12 +121,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 
     // TODO:  在此添加额外的初始化
     MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
-
-    //初始化字体设置相关控件
-    SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
-    m_font_size_edit.SetRange(5, 72);
-    m_font_size_edit.SetValue(rFontInfo.size);
 
     m_color_static.SetLinkCursor();
     DrawStaticColor();
@@ -263,39 +254,6 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 //}
 
 
-void CMainWndSettingsDlg::OnBnClickedSetFontButton()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
-
-    LOGFONT lf{};
-    lf.lfHeight         = FontSizeToLfHeight(rFontInfo.size);
-    lf.lfWeight         = (rFontInfo.bold ? FW_BOLD : FW_NORMAL);
-    lf.lfItalic         = rFontInfo.italic;
-    lf.lfUnderline      = rFontInfo.underline;
-    lf.lfStrikeOut      = rFontInfo.strike_out;
-    lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
-    //wcsncpy_s(lf.lfFaceName, rFontInfo.name.GetString(), 32);
-    CCommon::WStringCopy(lf.lfFaceName, 32, rFontInfo.name.GetString());
-    CCommon::NormalizeFont(lf);
-    CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
-    if (IDOK == fontDlg.DoModal())     // 显示字体对话框
-    {
-        //获取字体信息
-        rFontInfo.name = fontDlg.GetFaceName();
-        rFontInfo.size = fontDlg.GetSize() / 10;
-        rFontInfo.bold = (fontDlg.IsBold() != FALSE);
-        rFontInfo.italic = (fontDlg.IsItalic() != FALSE);
-        rFontInfo.underline = (fontDlg.IsUnderline() != FALSE);
-        rFontInfo.strike_out = (fontDlg.IsStrikeOut() != FALSE);
-        //将字体信息显示出来
-        SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
-        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rFontInfo.size).c_str());
-    }
-}
-
-
 void CMainWndSettingsDlg::OnBnClickedFullscreenHideCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
@@ -348,22 +306,6 @@ BOOL CMainWndSettingsDlg::PreTranslateMessage(MSG* pMsg)
 void CMainWndSettingsDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    MainWndSettingData& rMainWndData    = m_data;
-    FontInfo&           rFontInfo       = rMainWndData.layout.font_info;
-    //获取字体设置
-    int font_size;
-    font_size = m_font_size_edit.GetValue();
-    if (font_size > MAX_FONT_SIZE || font_size < MIN_FONT_SIZE)
-    {
-        CString info;
-        info.Format(CCommon::LoadText(IDS_FONT_SIZE_WARNING), MIN_FONT_SIZE, MAX_FONT_SIZE);
-        MessageBox(info, NULL, MB_OK | MB_ICONWARNING);
-    }
-    else
-    {
-        rFontInfo.size = font_size;
-    }
-    GetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
 
     CTabDlg::OnOK();
 }

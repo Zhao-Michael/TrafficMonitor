@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CMonitorItemAttributesDlg, CBaseDialog)
     ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMonitorItemAttributesDlg::OnNMDblclkList1)
     ON_BN_CLICKED(IDC_RESTORE_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton)
     ON_BN_CLICKED(IDC_RESTORE_SKIN_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton)
+    ON_BN_CLICKED(IDC_SET_FONT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedSetFontButton)
 END_MESSAGE_MAP()
 
 // CMonitorItemAttributesDlg 消息处理程序
@@ -88,6 +89,13 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     m_list_ctrl.SetEditColMethod(CMonitorItemAttributesSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
     m_list_ctrl.SetEditableCol({ 2 });                                                      //设置可编辑的列
 
+    //初始化字体设置相关控件
+    FontInfo& rFontInfo = m_layout.font_info;
+    ((CButton*)GetDlgItem(IDC_FONT_NAME_EDIT))->EnableWindow(false);
+    ((CButton*)GetDlgItem(IDC_FONT_SIZE_EDIT))->EnableWindow(false);
+    SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
+    SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rFontInfo.size).c_str());
+
     if (B_MainWnd == false)
         GetDlgItem(IDC_RESTORE_SKIN_DEFAULT_BUTTON)->ShowWindow(false);
 
@@ -98,7 +106,9 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
 void CMonitorItemAttributesDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = m_layout.M_LayoutItems;
+    std::map<CommonDisplayItem, LayoutItem>&    rM_LayoutItems  = m_layout.M_LayoutItems;
+    FontInfo&                                   rFontInfo       = m_layout.font_info;
+    
     int item_count = m_list_ctrl.GetItemCount();
     for (int index{}; index < item_count; index++)
     {
@@ -107,6 +117,11 @@ void CMonitorItemAttributesDlg::OnOK()
         rM_LayoutItems[*item].PrefixColor   = m_list_ctrl.GetItemColor(index, 3);
         rM_LayoutItems[*item].ValueColor    = m_list_ctrl.GetItemColor(index, 4);
     }
+    //保存字体设置相关数据
+    CString str;
+    GetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
+    GetDlgItemText(IDC_FONT_SIZE_EDIT, str);
+    rFontInfo.size = atoi(CCommon::UnicodeToStr(str).c_str());
 
     CBaseDialog::OnOK();
 }
@@ -212,4 +227,36 @@ void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
         m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
     }
     m_list_ctrl.Invalidate(false);
+}
+
+
+void CMonitorItemAttributesDlg::OnBnClickedSetFontButton()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    FontInfo& rFontInfo = m_layout.font_info;
+
+    LOGFONT lf{};
+    lf.lfHeight = FontSizeToLfHeight(rFontInfo.size);
+    lf.lfWeight = (rFontInfo.bold ? FW_BOLD : FW_NORMAL);
+    lf.lfItalic = rFontInfo.italic;
+    lf.lfUnderline = rFontInfo.underline;
+    lf.lfStrikeOut = rFontInfo.strike_out;
+    lf.lfPitchAndFamily = DEFAULT_PITCH | FF_SWISS;
+    //wcsncpy_s(lf.lfFaceName, rFontInfo.name.GetString(), 32);
+    CCommon::WStringCopy(lf.lfFaceName, 32, rFontInfo.name.GetString());
+    CCommon::NormalizeFont(lf);
+    CFontDialog fontDlg(&lf);   //构造字体对话框，初始选择字体为之前字体
+    if (IDOK == fontDlg.DoModal())     // 显示字体对话框
+    {
+        //获取字体信息
+        rFontInfo.name = fontDlg.GetFaceName();
+        rFontInfo.size = fontDlg.GetSize() / 10;
+        rFontInfo.bold = (fontDlg.IsBold() != FALSE);
+        rFontInfo.italic = (fontDlg.IsItalic() != FALSE);
+        rFontInfo.underline = (fontDlg.IsUnderline() != FALSE);
+        rFontInfo.strike_out = (fontDlg.IsStrikeOut() != FALSE);
+        //将字体信息显示出来
+        SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
+        SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rFontInfo.size).c_str());
+    }
 }

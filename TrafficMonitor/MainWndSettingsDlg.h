@@ -29,13 +29,12 @@ public:
 
 protected:
     //控件变量
-    CColorStatic m_color_static;
-    CToolTipCtrl m_toolTip;
-    CComboBox2 m_unit_combo;
-    CButton m_hide_unit_chk;
-    CSpinEdit m_font_size_edit;
-    CComboBox2 m_double_click_combo;
-    CComboBox2 m_memory_display_combo;
+    CColorStatic    m_color_static;
+    CToolTipCtrl    m_toolTip;
+    CComboBox2      m_unit_combo;
+    CButton         m_hide_unit_chk;
+    CComboBox2      m_memory_display_combo;
+    CComboBox2      m_double_click_combo;
 
 protected:
     void DrawStaticColor();
@@ -54,7 +53,6 @@ public:
     //afx_msg void OnEnChangeCpuEdit();
     //afx_msg void OnEnChangeMemoryEdit();
     //afx_msg void OnBnClickedSetDefaultButton();
-    afx_msg void OnBnClickedSetFontButton();
     afx_msg void OnBnClickedFullscreenHideCheck();
     afx_msg void OnBnClickedSpeedShortModeCheck2();
     afx_msg void OnCbnSelchangeUnitCombo();

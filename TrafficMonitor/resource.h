@@ -137,6 +137,7 @@
 #define IDS_MAIN_WINDOW_SETTINGS        270
 #define IDS_TASKBAR_WINDOW_SETTINGS     271
 #define IDS_GENERAL_SETTINGS            272
+#define IDS_MICROSOFT_YAHEI             273
 #define IDS_ACQUIRING                   274
 #define IDS_DEFAULT_FONT                275
 #define IDS_LIST_VIEW                   276
@@ -629,7 +630,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        341
 #define _APS_NEXT_COMMAND_VALUE         33665
-#define _APS_NEXT_CONTROL_VALUE         1173
+#define _APS_NEXT_CONTROL_VALUE         1174
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

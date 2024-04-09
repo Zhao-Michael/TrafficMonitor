@@ -32,4 +32,6 @@ protected:
     afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedRestoreDefaultButton();
 	afx_msg void OnClickedRestoreSkinDefaultButton();
+public:
+	afx_msg void OnBnClickedSetFontButton();
 };
