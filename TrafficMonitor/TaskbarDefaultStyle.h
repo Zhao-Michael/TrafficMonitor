@@ -12,7 +12,6 @@ public:
 		COLORREF back_color{};
 		COLORREF transparent_color{};
 		COLORREF status_bar_color{};
-		bool specify_each_item_color{};
 		std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems{};                          //存放所有项目的属性配置
 	};
 
