@@ -590,37 +590,6 @@ COLORREF CCommon::GetColorFromStr(const wchar_t* color_str)
         return _wtoi(color_str);
 }
 
-
-//此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式。该存储格式只能配置数值颜色，现在我们认为它也设置了前缀颜色。该存储格式即将被淘汰。
-void CCommon::LoadColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color, bool specify_each_item_color)
-{
-    std::vector<wstring>    ColorsStr_SplitResult;
-    CCommon::StringSplit(str_text_color, L',', ColorsStr_SplitResult);
-    size_t ColorsStr_num = ColorsStr_SplitResult.size();
-    if (0 == ColorsStr_num)
-    {
-        return;
-    }
-
-    size_t index = 0;
-    for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
-    {
-        const wchar_t* color_str = nullptr;
-        if (!specify_each_item_color)
-            color_str = ColorsStr_SplitResult[0].c_str();               //在加载时就设置好颜色
-        else if (index < ColorsStr_num)
-            color_str = ColorsStr_SplitResult[index].c_str();
-        else
-            color_str = ColorsStr_SplitResult[0].c_str();
-
-        //support Decimal data or Hex data from saved data
-        M_LayoutItems[item].ValueColor = GetColorFromStr(color_str);
-
-        M_LayoutItems[item].PrefixColor = M_LayoutItems[item].ValueColor;
-        index++;
-    }
-}
-
 void CCommon::DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color)
 {
     pDC->SetTextColor(color);

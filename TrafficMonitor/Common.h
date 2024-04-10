@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "CommonTypes.h"
-#include "TaskbarItemOrderHelper.h"
 #include "CVariant.h"
 #include <set>
 #include <map>
@@ -196,9 +195,6 @@ public:
 
     //从十进制或十六进制保存的颜色字符串得到COLORREF颜色值
     static COLORREF CCommon::GetColorFromStr(const wchar_t* color_str);
-
-    //此函数用于兼容当前版本皮肤配置文件(xml或ini)中的数值颜色存储格式
-    static void LoadColorsFromColorStr(std::map<CommonDisplayItem, LayoutItem>& M_LayoutItems, const wstring str_text_color, bool specify_each_item_color);
 
     //在指定位置绘制文本
     static void DrawWindowText(CDC* pDC, CRect rect, LPCTSTR lpszString, COLORREF color, COLORREF back_color);
