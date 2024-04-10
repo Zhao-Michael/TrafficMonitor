@@ -77,11 +77,13 @@ void CTaskBarSettingsDlg::DrawStaticColor()
 
 void CTaskBarSettingsDlg::IniUnitCombo()
 {
+    LayoutItemValueAttributes& rLIVA = m_data.layout_item_value_attributes;
+
     m_unit_combo.ResetContent();
     m_unit_combo.AddString(CCommon::LoadText(IDS_AUTO));
     m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
     m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
-    m_unit_combo.SetCurSel(static_cast<int>(m_data.speed_unit));
+    m_unit_combo.SetCurSel(static_cast<int>(rLIVA.speed_unit));
 }
 
 void CTaskBarSettingsDlg::ApplyDefaultStyle(int index)
@@ -194,15 +196,17 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-    FontInfo& rFontInfo = m_data.layout.font_info;
+    FontInfo&                   rFontInfo   = m_data.layout.font_info;
+    LayoutItemValueAttributes&  rLIVA       = m_data.layout_item_value_attributes;
+
     theApp.m_taskbar_default_style.LoadConfig();
 
     ((CButton*)GetDlgItem(IDC_TASKBAR_WND_ON_LEFT_CHECK))->SetCheck(m_data.tbar_wnd_on_left);
-    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->SetCheck(m_data.speed_short_mode);
+    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->SetCheck(rLIVA.speed_short_mode);
     ((CButton*)GetDlgItem(IDC_VALUE_RIGHT_ALIGN_CHECK))->SetCheck(m_data.value_right_align);
     ((CButton*)GetDlgItem(IDC_HORIZONTAL_ARRANGE_CHECK))->SetCheck(m_data.horizontal_arrange);
     ((CButton*)GetDlgItem(IDC_SHOW_STATUS_BAR_CHECK))->SetCheck(m_data.b_show_resource_figure);
-    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(m_data.separate_value_unit_with_space);
+    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rLIVA.separate_value_unit_with_space);
     ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(m_data.show_tool_tip);
 
     EnableDlgCtrl(IDC_TASKBAR_WND_SNAP_CHECK, theApp.m_win_version.IsWindows11OrLater());
@@ -230,14 +234,14 @@ BOOL CTaskBarSettingsDlg::OnInitDialog()
 
     //单位设置
     IniUnitCombo();
-    m_hide_unit_chk.SetCheck(m_data.hide_unit);
-    if (m_data.speed_unit == SpeedUnit::AUTO)
+    m_hide_unit_chk.SetCheck(rLIVA.hide_unit);
+    if (rLIVA.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        m_data.hide_unit = false;
+        rLIVA.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
-    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(m_data.hide_percent);
+    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(rLIVA.hide_percent);
 
     m_background_transparent_chk.SetCheck(m_data.IsTaskbarTransparent());
     m_atuo_adapt_light_theme_chk.SetCheck(m_data.auto_adapt_light_theme);
@@ -345,7 +349,9 @@ void CTaskBarSettingsDlg::OnBnClickedTaskbarWndOnLeftCheck()
 void CTaskBarSettingsDlg::OnBnClickedSpeedShortModeCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.speed_short_mode = (((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->GetCheck() != 0);
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_data.layout_item_value_attributes;
+
+    rTaskbar_LIVA.speed_short_mode = (((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK))->GetCheck() != 0);
 }
 
 
@@ -362,11 +368,13 @@ BOOL CTaskBarSettingsDlg::PreTranslateMessage(MSG* pMsg)
 void CTaskBarSettingsDlg::OnCbnSelchangeUnitCombo()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
-    if (m_data.speed_unit == SpeedUnit::AUTO)
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_data.layout_item_value_attributes;
+
+    rTaskbar_LIVA.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
+    if (rTaskbar_LIVA.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        m_data.hide_unit = false;
+        rTaskbar_LIVA.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
     else
@@ -379,7 +387,9 @@ void CTaskBarSettingsDlg::OnCbnSelchangeUnitCombo()
 void CTaskBarSettingsDlg::OnBnClickedHideUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.hide_unit = (m_hide_unit_chk.GetCheck() != 0);
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_data.layout_item_value_attributes;
+
+    rTaskbar_LIVA.hide_unit = (m_hide_unit_chk.GetCheck() != 0);
 }
 
 
@@ -419,7 +429,9 @@ void CTaskBarSettingsDlg::OnBnClickedValueRightAlignCheck()
 void CTaskBarSettingsDlg::OnBnClickedHidePercentageCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.hide_percent = (((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->GetCheck() != 0);
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_data.layout_item_value_attributes;
+
+    rTaskbar_LIVA.hide_percent = (((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->GetCheck() != 0);
 }
 
 
@@ -517,7 +529,9 @@ void CTaskBarSettingsDlg::OnBnClickedShowStatusBarCheck()
 void CTaskBarSettingsDlg::OnBnClickedSeparateValueUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_data.layout_item_value_attributes;
+
+    rTaskbar_LIVA.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
 }
 
 

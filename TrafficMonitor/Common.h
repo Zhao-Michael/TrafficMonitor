@@ -1,7 +1,9 @@
 ﻿#pragma once
-#include "CommonData.h"
+#include "CommonTypes.h"
+#include "TaskbarItemOrderHelper.h"
 #include "CVariant.h"
 #include <set>
+#include <map>
 #include <functional>
 
 class CCommon
@@ -119,7 +121,7 @@ public:
     size：数据的字节数
     返回值：转换后的字符串
     */
-    static CString DataSizeToString(unsigned long long size, const PublicSettingData& cfg);
+    static CString DataSizeToString(unsigned long long size, const LayoutItemValueAttributes& cfg);
 
     /*根据数据的大小转换成以KB、MB、GB为单位的字符串
     size：数据的字节数
@@ -129,11 +131,11 @@ public:
     static CString DataSizeToString(unsigned long long size, bool with_space = true);
 
     //将温度信息转换成字符串
-    static CString TemperatureToString(float temperature, const PublicSettingData& cfg);
+    static CString TemperatureToString(float temperature, const LayoutItemValueAttributes& cfg);
 
     //将使用率转换成字符串
-    static CString UsageToString(float usage, const PublicSettingData& cfg);
-    static CString FreqToString(float usage, const PublicSettingData& cfg);
+    static CString UsageToString(float usage, const LayoutItemValueAttributes& cfg);
+    static CString FreqToString(float usage, const LayoutItemValueAttributes& cfg);
     //static CString KBytesToString(unsigned int kb_size);
     static CString KBytesToString(unsigned __int64 kb_size);
 

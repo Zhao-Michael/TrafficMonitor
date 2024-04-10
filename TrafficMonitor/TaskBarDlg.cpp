@@ -272,6 +272,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
 {
     TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
     std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
     m_item_rects[type]                      = rect;
     //设置要绘制的文本颜色
     COLORREF label_color = rTaskbar_M_LayoutItems[type].PrefixColor;
@@ -377,13 +378,13 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     if (type == TDI_UP || type == TDI_DOWN || type == TDI_TOTAL_SPEED)
     {
         CString format_str;
-        if (rTaskbarData.hide_unit && rTaskbarData.speed_unit != SpeedUnit::AUTO)
+        if (rTaskbar_LIVA.hide_unit && rTaskbar_LIVA.speed_unit != SpeedUnit::AUTO)
             format_str = _T("%s");
         else
             format_str = _T("%s/s");
-        CString str_in_speed = CCommon::DataSizeToString(theApp.m_in_speed, rTaskbarData);
-        CString str_out_speed = CCommon::DataSizeToString(theApp.m_out_speed, rTaskbarData);
-        CString str_total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, rTaskbarData);
+        CString str_in_speed = CCommon::DataSizeToString(theApp.m_in_speed, rTaskbar_LIVA);
+        CString str_out_speed = CCommon::DataSizeToString(theApp.m_out_speed, rTaskbar_LIVA);
+        CString str_total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, rTaskbar_LIVA);
         //if (rTaskbarData.swap_up_down)
         //    std::swap(str_in_speed, str_out_speed);
         if (type == TDI_UP)
@@ -404,9 +405,11 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
     if (type == TDI_MEMORY && (rTaskbarData.memory_display == MemoryDisplay::MEMORY_USED || rTaskbarData.memory_display == MemoryDisplay::MEMORY_AVAILABLE))
     {
         if (rTaskbarData.memory_display == MemoryDisplay::MEMORY_USED)
-            str_value = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rTaskbarData.separate_value_unit_with_space);
+            str_value = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024,
+                rTaskbar_LIVA.separate_value_unit_with_space);
         else
-            str_value = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, rTaskbarData.separate_value_unit_with_space);
+            str_value = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024,
+                rTaskbar_LIVA.separate_value_unit_with_space);
     }
     //绘制CPU或内存利用率
     else if (type == TDI_CPU || type == TDI_MEMORY || type == TDI_GPU_USAGE || type == TDI_HDD_USAGE)
@@ -429,7 +432,7 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
         default:
             break;
         }
-        str_value = CCommon::UsageToString(usage, rTaskbarData);
+        str_value = CCommon::UsageToString(usage, rTaskbar_LIVA);
 
         //如果CPU或内存利用率达到100%，会导致显示不全，此时将绘图区域向右扩展一些
         int text_width = m_pDC->GetTextExtent(str_value).cx;
@@ -458,10 +461,10 @@ void CTaskBarDlg::DrawDisplayItem(IDrawCommon& drawer, EBuiltinDisplayItem type,
         default:
             break;
         }
-        str_value = CCommon::TemperatureToString(temperature, rTaskbarData);
+        str_value = CCommon::TemperatureToString(temperature, rTaskbar_LIVA);
     }
     else if (type == TDI_CPU_FREQ) {
-        str_value = CCommon::FreqToString(theApp.m_cpu_freq, rTaskbarData);
+        str_value = CCommon::FreqToString(theApp.m_cpu_freq, rTaskbar_LIVA);
     }
 
     drawer.DrawWindowText(rect_value, str_value, text_color, value_alignment);
@@ -832,6 +835,11 @@ void CTaskBarDlg::CheckTaskbarOnTopOrBottom()
 
 CString CTaskBarDlg::GetMouseTipsInfo()
 {
+    MainWndSettingData&         rMainWndData    = theApp.m_main_wnd_data;
+    TaskBarSettingData&         rTaskbarData    = theApp.m_taskbar_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+    LayoutItemValueAttributes&  rTaskbar_LIVA   = rTaskbarData.layout_item_value_attributes;
+
     CString tip_info;
     CString temp;
     temp.Format(_T("%s: %s\r\n (%s: %s/%s: %s)"), 
@@ -843,13 +851,13 @@ CString CTaskBarDlg::GetMouseTipsInfo()
     if (!IsItemShow(TDI_UP))
     {
         temp.Format(_T("\r\n%s: %s/s"), 
-            CCommon::LoadText(IDS_UPLOAD),          CCommon::DataSizeToString(theApp.m_out_speed, theApp.m_main_wnd_data));
+            CCommon::LoadText(IDS_UPLOAD),          CCommon::DataSizeToString(theApp.m_out_speed, rMainWnd_LIVA));
         tip_info += temp;
     }
     if (!IsItemShow(TDI_DOWN))
     {
         temp.Format(_T("\r\n%s: %s/s"),
-            CCommon::LoadText(IDS_DOWNLOAD),        CCommon::DataSizeToString(theApp.m_in_speed, theApp.m_main_wnd_data));
+            CCommon::LoadText(IDS_DOWNLOAD),        CCommon::DataSizeToString(theApp.m_in_speed, rMainWnd_LIVA));
         tip_info += temp;
     }
     if (!IsItemShow(TDI_CPU))
@@ -877,7 +885,6 @@ CString CTaskBarDlg::GetMouseTipsInfo()
     }
 #ifndef WITHOUT_TEMPERATURE
     CTrafficMonitorDlg*     pMainWnd        = dynamic_cast<CTrafficMonitorDlg*>(theApp.m_pMainWnd);
-    TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
     if (pMainWnd->IsTemperatureNeeded())
     {
         if (!IsItemShow(TDI_GPU_USAGE) && theApp.m_gpu_usage >= 0)
@@ -889,31 +896,31 @@ CString CTaskBarDlg::GetMouseTipsInfo()
         if (!IsItemShow(TDI_CPU_TEMP) && theApp.m_cpu_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"),
-                CCommon::LoadText(IDS_CPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_cpu_temperature, rTaskbarData));
+                CCommon::LoadText(IDS_CPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_cpu_temperature, rTaskbar_LIVA));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_CPU_FREQ) && theApp.m_cpu_freq > 0)
         {
             temp.Format(_T("\r\n%s: %s"),
-                CCommon::LoadText(IDS_CPU_FREQ),            CCommon::FreqToString(theApp.m_cpu_freq, rTaskbarData));
+                CCommon::LoadText(IDS_CPU_FREQ),            CCommon::FreqToString(theApp.m_cpu_freq, rTaskbar_LIVA));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_GPU_TEMP) && theApp.m_gpu_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"),
-                CCommon::LoadText(IDS_GPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_gpu_temperature, rTaskbarData));
+                CCommon::LoadText(IDS_GPU_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_gpu_temperature, rTaskbar_LIVA));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_HDD_TEMP) && theApp.m_hdd_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"),
-                CCommon::LoadText(IDS_HDD_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_hdd_temperature, rTaskbarData));
+                CCommon::LoadText(IDS_HDD_TEMPERATURE),     CCommon::TemperatureToString(theApp.m_hdd_temperature, rTaskbar_LIVA));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_MAIN_BOARD_TEMP) && theApp.m_main_board_temperature > 0)
         {
             temp.Format(_T("\r\n%s: %s"),
-                CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_main_board_temperature, rTaskbarData));
+                CCommon::LoadText(IDS_MAINBOARD_TEMPERATURE), CCommon::TemperatureToString(theApp.m_main_board_temperature, rTaskbar_LIVA));
             tip_info += temp;
         }
         if (!IsItemShow(TDI_HDD_USAGE) && theApp.m_hdd_usage >= 0)
@@ -953,6 +960,8 @@ void CTaskBarDlg::CalculateWindowSize()
 {
     TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
     std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
+
     bool                    horizontal_arrange  = rTaskbarData.horizontal_arrange && m_taskbar_on_top_or_bottom;
     if (rTaskbarData.m_tbar_display_item == 0)
         rTaskbarData.m_tbar_display_item |= TDI_UP;        //至少显示一项
@@ -997,8 +1006,8 @@ void CTaskBarDlg::CalculateWindowSize()
     CString sample_str;
     int value_width{};
     wstring digits(rTaskbarData.digits_number, L'8');      //根据数据位数生成指定个数的“8”
-    bool hide_unit{ rTaskbarData.hide_unit && rTaskbarData.speed_unit != SpeedUnit::AUTO };
-    if (rTaskbarData.speed_short_mode)
+    bool hide_unit{ rTaskbar_LIVA.hide_unit && rTaskbar_LIVA.speed_unit != SpeedUnit::AUTO };
+    if (rTaskbar_LIVA.speed_short_mode)
     {
         if (hide_unit)
             sample_str.Format(_T("%s."), digits.c_str());
@@ -1012,7 +1021,7 @@ void CTaskBarDlg::CalculateWindowSize()
         else
             sample_str.Format(_T("%s.8MB/s"), digits.c_str());
     }
-    if (!hide_unit && rTaskbarData.separate_value_unit_with_space)
+    if (!hide_unit && rTaskbar_LIVA.separate_value_unit_with_space)
         sample_str += _T(' ');
     value_width = m_pDC->GetTextExtent(sample_str).cx;      //计算使用当前字体显示文本需要的宽度值
     item_widths[TDI_UP].value_width = value_width;
@@ -1021,11 +1030,11 @@ void CTaskBarDlg::CalculateWindowSize()
 
     //计算显示CPU、内存部分所需要的宽度
     CString str;
-    if (rTaskbarData.hide_percent)
+    if (rTaskbar_LIVA.hide_percent)
     {
         str = _T("99");
     }
-    else if (rTaskbarData.separate_value_unit_with_space)
+    else if (rTaskbar_LIVA.separate_value_unit_with_space)
     {
         str = _T("99 %");
     }
@@ -1038,7 +1047,7 @@ void CTaskBarDlg::CalculateWindowSize()
     int memory_width{ value_width };
     if (rTaskbarData.memory_display == MemoryDisplay::MEMORY_USED || rTaskbarData.memory_display == MemoryDisplay::MEMORY_AVAILABLE)
     {
-        if (rTaskbarData.separate_value_unit_with_space)
+        if (rTaskbar_LIVA.separate_value_unit_with_space)
             str = _T("19.99 GB");
         else
             str = _T("19.99GB");
@@ -1052,7 +1061,7 @@ void CTaskBarDlg::CalculateWindowSize()
     item_widths[TDI_CPU_FREQ].value_width = m_pDC->GetTextExtent(_T("1.00 GHz")).cx;
 
     //计算温度显示的宽度
-    if (rTaskbarData.separate_value_unit_with_space)
+    if (rTaskbar_LIVA.separate_value_unit_with_space)
         str = _T("99 °C");
     else
         str = _T("99°C");

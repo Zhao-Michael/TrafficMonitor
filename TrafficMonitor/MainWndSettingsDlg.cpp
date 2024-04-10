@@ -53,12 +53,13 @@ void CMainWndSettingsDlg::DrawStaticColor()
 
 void CMainWndSettingsDlg::IniUnitCombo()
 {
-    MainWndSettingData& rMainWndData = m_data;
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
     m_unit_combo.ResetContent();
     m_unit_combo.AddString(CCommon::LoadText(IDS_AUTO));
     m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" KB/s")));
     m_unit_combo.AddString(CCommon::LoadText(IDS_FIXED_AS, _T(" MB/s")));
-    m_unit_combo.SetCurSel(static_cast<int>(rMainWndData.speed_unit));
+    m_unit_combo.SetCurSel(static_cast<int>(rMainWnd_LIVA.speed_unit));
 }
 
 void CMainWndSettingsDlg::EnableControl()
@@ -120,14 +121,15 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
     CTabDlg::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-    MainWndSettingData& rMainWndData    = m_data;
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
 
     m_color_static.SetLinkCursor();
     DrawStaticColor();
 
     //显示文本
-    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(  rMainWndData.speed_short_mode);
-    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rMainWndData.separate_value_unit_with_space);
+    ((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->SetCheck(rMainWnd_LIVA.speed_short_mode);
+    ((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->SetCheck(rMainWnd_LIVA.separate_value_unit_with_space);
     ((CButton*)GetDlgItem(IDC_SHOW_TOOL_TIP_CHK))->SetCheck(        rMainWndData.show_tool_tip);
     //初始化内存显示方式下拉列表
     m_memory_display_combo.AddString(CCommon::LoadText(IDS_USAGE_PERCENTAGE));
@@ -141,14 +143,14 @@ BOOL CMainWndSettingsDlg::OnInitDialog()
 
     //单位设置
     IniUnitCombo();
-    m_hide_unit_chk.SetCheck(rMainWndData.hide_unit);
-    if (rMainWndData.speed_unit == SpeedUnit::AUTO)
+    m_hide_unit_chk.SetCheck(rMainWnd_LIVA.hide_unit);
+    if (rMainWnd_LIVA.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        rMainWndData.hide_unit = false;
+        rMainWnd_LIVA.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
-    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(rMainWndData.hide_percent);
+    ((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->SetCheck(rMainWnd_LIVA.hide_percent);
 
     CheckDlgButton(IDC_ALWAYS_ON_TOP_CHECK,         rMainWndData.m_always_on_top);
     CheckDlgButton(IDC_MOUSE_PENETRATE_CHECK,       rMainWndData.m_mouse_penetrate);
@@ -259,19 +261,24 @@ void CMainWndSettingsDlg::OnBnClickedFullscreenHideCheck()
 void CMainWndSettingsDlg::OnBnClickedSpeedShortModeCheck2()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.speed_short_mode = (((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->GetCheck() != 0);
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+
+    rMainWnd_LIVA.speed_short_mode = (((CButton*)GetDlgItem(IDC_SPEED_SHORT_MODE_CHECK2))->GetCheck() != 0);
 }
 
 
 void CMainWndSettingsDlg::OnCbnSelchangeUnitCombo()
 {
     // TODO: 在此添加控件通知处理程序代码
-    MainWndSettingData& rMainWndData = m_data;
-    rMainWndData.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
-    if (rMainWndData.speed_unit == SpeedUnit::AUTO)
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+
+    rMainWnd_LIVA.speed_unit = static_cast<SpeedUnit>(m_unit_combo.GetCurSel());
+    if (rMainWnd_LIVA.speed_unit == SpeedUnit::AUTO)
     {
         m_hide_unit_chk.SetCheck(FALSE);
-        rMainWndData.hide_unit = false;
+        rMainWnd_LIVA.hide_unit = false;
         m_hide_unit_chk.EnableWindow(FALSE);
     }
     else
@@ -284,7 +291,10 @@ void CMainWndSettingsDlg::OnCbnSelchangeUnitCombo()
 void CMainWndSettingsDlg::OnBnClickedHideUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.hide_unit = (m_hide_unit_chk.GetCheck() != 0);
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+
+    rMainWnd_LIVA.hide_unit = (m_hide_unit_chk.GetCheck() != 0);
 }
 
 
@@ -309,7 +319,10 @@ void CMainWndSettingsDlg::OnOK()
 void CMainWndSettingsDlg::OnBnClickedHidePercentageCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.hide_percent = (((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->GetCheck() != 0);
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+
+    rMainWnd_LIVA.hide_percent = (((CButton*)GetDlgItem(IDC_HIDE_PERCENTAGE_CHECK))->GetCheck() != 0);
 }
 
 
@@ -346,7 +359,10 @@ void CMainWndSettingsDlg::OnCbnSelchangeDoubleClickCombo()
 void CMainWndSettingsDlg::OnBnClickedSeparateValueUnitCheck()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_data.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
+    MainWndSettingData&         rMainWndData    = m_data;
+    LayoutItemValueAttributes&  rMainWnd_LIVA   = rMainWndData.layout_item_value_attributes;
+
+    rMainWnd_LIVA.separate_value_unit_with_space = (((CButton*)GetDlgItem(IDC_SEPARATE_VALUE_UNIT_CHECK))->GetCheck() != 0);
 }
 
 

@@ -423,6 +423,7 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
 {
     MainWndSettingData&                         rMainWndData            = theApp.m_main_wnd_data;
     std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
+    LayoutItemValueAttributes&                  rMainWnd_LIVA           = rMainWndData.layout_item_value_attributes;
     CPluginManager&                             rPluginManager          = theApp.m_plugin_manager;
     std::map<EBuiltinDisplayItem, DrawStr>  map_builtin_str;    //存放所有内置项目的显示标签和数值
     std::map<CommonDisplayItem, COLORREF>   label_colors{};     //存放所有项目的显示标签的颜色
@@ -463,10 +464,10 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
     //              (2)获取所有内置项目的显示数值
     ////////////////////////////////////////////////////////////////////////////////////////
     //上传/下载
-    CString in_speed    = CCommon::DataSizeToString(theApp.m_in_speed,                      rMainWndData);
-    CString out_speed   = CCommon::DataSizeToString(theApp.m_out_speed,                     rMainWndData);
-    CString total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, rMainWndData);
-    if (!rMainWndData.hide_unit || rMainWndData.speed_unit == SpeedUnit::AUTO)
+    CString in_speed    = CCommon::DataSizeToString(theApp.m_in_speed,                      rMainWnd_LIVA);
+    CString out_speed   = CCommon::DataSizeToString(theApp.m_out_speed,                     rMainWnd_LIVA);
+    CString total_speed = CCommon::DataSizeToString(theApp.m_in_speed + theApp.m_out_speed, rMainWnd_LIVA);
+    if (!rMainWnd_LIVA.hide_unit || rMainWnd_LIVA.speed_unit == SpeedUnit::AUTO)
     {
         in_speed += _T("/s");
         out_speed += _T("/s");
@@ -476,23 +477,23 @@ void CSkinFile::DrawInfo(CDC* pDC, CFont& font)
     map_builtin_str[TDI_DOWN].value         = in_speed.GetString();
     map_builtin_str[TDI_TOTAL_SPEED].value  = total_speed.GetString();
     //CPU/内存/显卡利用率
-    map_builtin_str[TDI_CPU].value          = CCommon::UsageToString(theApp.m_cpu_usage, rMainWndData);
-    map_builtin_str[TDI_CPU_FREQ].value     = CCommon::FreqToString (theApp.m_cpu_freq,  rMainWndData);
+    map_builtin_str[TDI_CPU].value          = CCommon::UsageToString(theApp.m_cpu_usage, rMainWnd_LIVA);
+    map_builtin_str[TDI_CPU_FREQ].value     = CCommon::FreqToString (theApp.m_cpu_freq, rMainWnd_LIVA);
     CString str_memory_value;
     if (rMainWndData.memory_display == MemoryDisplay::MEMORY_USED)
-        str_memory_value            = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWndData.separate_value_unit_with_space);
+        str_memory_value            = CCommon::DataSizeToString(static_cast<unsigned long long>(theApp.m_used_memory) * 1024, rMainWnd_LIVA.separate_value_unit_with_space);
     else if (rMainWndData.memory_display == MemoryDisplay::MEMORY_AVAILABLE)
         str_memory_value            = CCommon::DataSizeToString((static_cast<unsigned long long>(theApp.m_total_memory) - static_cast<unsigned long long>(theApp.m_used_memory)) * 1024, 
-                                                                    rMainWndData.separate_value_unit_with_space);
+            rMainWnd_LIVA.separate_value_unit_with_space);
     else
-        str_memory_value            = CCommon::UsageToString(theApp.m_memory_usage, rMainWndData);
+        str_memory_value            = CCommon::UsageToString(theApp.m_memory_usage, rMainWnd_LIVA);
     map_builtin_str[TDI_MEMORY].value       = str_memory_value;
-    map_builtin_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWndData);
-    map_builtin_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWndData);
+    map_builtin_str[TDI_GPU_USAGE].value    = CCommon::UsageToString(theApp.m_gpu_usage, rMainWnd_LIVA);
+    map_builtin_str[TDI_HDD_USAGE].value    = CCommon::UsageToString(theApp.m_hdd_usage, rMainWnd_LIVA);
     //4个温度
     auto getTemperatureStr = [&](EBuiltinDisplayItem display_item, float temperature)
     {
-        map_builtin_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWndData);
+        map_builtin_str[display_item].value = CCommon::TemperatureToString(temperature, rMainWnd_LIVA);
     };
     getTemperatureStr(TDI_CPU_TEMP,         theApp.m_cpu_temperature);
     getTemperatureStr(TDI_GPU_TEMP,         theApp.m_gpu_temperature);

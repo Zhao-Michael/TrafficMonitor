@@ -52,8 +52,10 @@ void CTrafficMonitorApp::LoadConfig()
     MainWndSettingData&                         rMainWndData    = m_main_wnd_data;
     TaskBarSettingData&                         rTaskbarData    = m_taskbar_data;
     AppSettingData&                             rAppData        = m_cfg_data;
-    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems = rMainWndData.layout.M_LayoutItems;
-    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems = rTaskbarData.layout.M_LayoutItems;
+    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    LayoutItemValueAttributes&                  rMainWnd_LIVA           = rMainWndData.layout_item_value_attributes;
+    LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //      (一)载入APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
@@ -150,13 +152,13 @@ void CTrafficMonitorApp::LoadConfig()
     ini.LoadPluginItemsAttributes(LIAO_MAINWND, rMainWnd_M_LayoutItems);
 
     //载入其它设置
-    rMainWndData.speed_short_mode               = ini.GetBool(_T("config"), _T("speed_short_mode"),     false);
-    rMainWndData.separate_value_unit_with_space = ini.GetBool(_T("config"), _T("separate_value_unit_with_space"), true);
+    rMainWnd_LIVA.hide_unit                     = ini.GetBool(_T("config"), _T("hide_unit"),            false);
+    rMainWnd_LIVA.hide_percent                  = ini.GetBool(_T("config"), _T("hide_percent"),         false);
+    rMainWnd_LIVA.separate_value_unit_with_space= ini.GetBool(_T("config"), _T("separate_value_unit_with_space"), true);
+    rMainWnd_LIVA.speed_short_mode              = ini.GetBool(_T("config"), _T("speed_short_mode"),     false);
+    rMainWnd_LIVA.speed_unit = static_cast<SpeedUnit>(ini.GetInt(_T("config"), _T("speed_unit"),         0));
     rMainWndData.show_tool_tip                  = ini.GetBool(_T("config"), _T("show_tool_tip"),        true);
     rMainWndData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"config", L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
-    rMainWndData.speed_unit = static_cast<SpeedUnit>(ini.GetInt(_T("config"), _T("speed_unit"),         0));
-    rMainWndData.hide_unit                      = ini.GetBool(_T("config"), _T("hide_unit"),            false);
-    rMainWndData.hide_percent                   = ini.GetBool(_T("config"), _T("hide_percent"),         false);
     rMainWndData.m_always_on_top                = ini.GetBool(_T("config"), _T("always_on_top"),        true);
     rMainWndData.m_lock_window_pos              = ini.GetBool(_T("config"), _T("lock_window_pos"),      false);
     rMainWndData.m_mouse_penetrate              = ini.GetBool(_T("config"), _T("mouse_penetrate"),      false);
@@ -244,16 +246,16 @@ void CTrafficMonitorApp::LoadConfig()
     ini.LoadPluginItemsAttributes(LIAO_TASKBAR, rTaskbar_M_LayoutItems);
 
     //任务栏选项设置
+    rTaskbar_LIVA.hide_unit                              = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
+    rTaskbar_LIVA.hide_percent                           = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
+    rTaskbar_LIVA.separate_value_unit_with_space         = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
+    rTaskbar_LIVA.speed_short_mode                       = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
+    rTaskbar_LIVA.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),              0));
     rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_on_left"),             false);
-    rTaskbarData.speed_short_mode                       = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
     rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_snap"),                false);
-    rTaskbarData.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),              0));
-    rTaskbarData.hide_unit                              = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
-    rTaskbarData.hide_percent                           = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
     rTaskbarData.value_right_align                      = ini.GetBool(_T("taskbar"), _T("value_right_align"),               false);
     rTaskbarData.horizontal_arrange                     = ini.GetBool(_T("taskbar"), _T("horizontal_arrange"),              false);
     rTaskbarData.b_show_resource_figure                 = ini.GetBool(_T("taskbar"), _T("show_status_bar"),                 false);
-    rTaskbarData.separate_value_unit_with_space         = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
     rTaskbarData.show_tool_tip                          = ini.GetBool(_T("taskbar"), _T("show_tool_tip"),                   true);
     rTaskbarData.digits_number                          = ini.GetInt (_T("taskbar"), _T("digits_number"),                   4);
     rTaskbarData.memory_display = static_cast<MemoryDisplay>(ini.GetInt(L"taskbar",    L"memory_display", static_cast<int>(MemoryDisplay::USAGE_PERCENTAGE)));
@@ -352,8 +354,10 @@ void CTrafficMonitorApp::SaveConfig()
     MainWndSettingData& rMainWndData    = m_main_wnd_data;
     TaskBarSettingData& rTaskbarData    = m_taskbar_data;
     AppSettingData&     rAppData        = m_cfg_data;
-    std::map<CommonDisplayItem, LayoutItem>& rMainWnd_M_LayoutItems = rMainWndData.layout.M_LayoutItems;
-    std::map<CommonDisplayItem, LayoutItem>& rTaskbar_M_LayoutItems = rTaskbarData.layout.M_LayoutItems;
+    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    LayoutItemValueAttributes&                  rMainWnd_LIVA           = rMainWndData.layout_item_value_attributes;
+    LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //      (一)保存APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
@@ -423,13 +427,13 @@ void CTrafficMonitorApp::SaveConfig()
 //    SaveConfig_layout();
 
     //保存其它设置
-    ini.WriteBool           (L"config",     L"speed_short_mode",                rMainWndData.speed_short_mode);
-    ini.WriteBool           (L"config",     L"separate_value_unit_with_space",  rMainWndData.separate_value_unit_with_space);
+    ini.WriteBool           (L"config",     L"hide_unit",                       rMainWnd_LIVA.hide_unit);
+    ini.WriteBool           (L"config",     L"hide_percent",                    rMainWnd_LIVA.hide_percent);
+    ini.WriteBool           (L"config",     L"separate_value_unit_with_space",  rMainWnd_LIVA.separate_value_unit_with_space);
+    ini.WriteBool           (L"config",     L"speed_short_mode",                rMainWnd_LIVA.speed_short_mode);
+    ini.WriteInt            (L"config",     L"speed_unit",     static_cast<int>(rMainWnd_LIVA.speed_unit));
     ini.WriteBool           (L"config",     L"show_tool_tip",                   rMainWndData.show_tool_tip);
     ini.WriteInt            (L"config",     L"memory_display", static_cast<int>(rMainWndData.memory_display));
-    ini.WriteInt            (L"config",     L"speed_unit",     static_cast<int>(rMainWndData.speed_unit));
-    ini.WriteBool           (L"config",     L"hide_unit",                       rMainWndData.hide_unit);
-    ini.WriteBool           (L"config",     L"hide_percent",                    rMainWndData.hide_percent);
     ini.WriteBool           (L"config",     L"always_on_top",                   rMainWndData.m_always_on_top);
     ini.WriteBool           (L"config",     L"lock_window_pos",                 rMainWndData.m_lock_window_pos);
     ini.WriteBool           (L"config",     L"mouse_penetrate",                 rMainWndData.m_mouse_penetrate);
@@ -473,16 +477,16 @@ void CTrafficMonitorApp::SaveConfig()
     ini.SavePluginItemsAttributes(LIAO_TASKBAR, rTaskbar_M_LayoutItems);
 
     //任务栏选项设置
+    ini.WriteBool(L"taskbar", L"taskbar_hide_unit",                     rTaskbar_LIVA.hide_unit);
+    ini.WriteBool(L"taskbar", L"taskbar_hide_percent",                  rTaskbar_LIVA.hide_percent);
+    ini.WriteBool(L"taskbar", L"separate_value_unit_with_space",        rTaskbar_LIVA.separate_value_unit_with_space);
+    ini.WriteBool(L"taskbar", L"taskbar_speed_short_mode",              rTaskbar_LIVA.speed_short_mode);
+    ini.WriteInt (L"taskbar", L"taskbar_speed_unit",   static_cast<int>(rTaskbar_LIVA.speed_unit));
     ini.WriteBool(L"taskbar", L"taskbar_wnd_on_left",                   rTaskbarData.tbar_wnd_on_left);
     ini.WriteBool(L"taskbar", L"taskbar_wnd_snap",                      rTaskbarData.tbar_wnd_snap);
-    ini.WriteBool(L"taskbar", L"taskbar_speed_short_mode",              rTaskbarData.speed_short_mode);
-    ini.WriteInt (L"taskbar", L"taskbar_speed_unit",   static_cast<int>(rTaskbarData.speed_unit));
-    ini.WriteBool(L"taskbar", L"taskbar_hide_unit",                     rTaskbarData.hide_unit);
-    ini.WriteBool(L"taskbar", L"taskbar_hide_percent",                  rTaskbarData.hide_percent);
     ini.WriteBool(L"taskbar", L"value_right_align",                     rTaskbarData.value_right_align);
     ini.WriteBool(L"taskbar", L"horizontal_arrange",                    rTaskbarData.horizontal_arrange);
     ini.WriteBool(L"taskbar", L"show_status_bar",                       rTaskbarData.b_show_resource_figure);
-    ini.WriteBool(L"taskbar", L"separate_value_unit_with_space",        rTaskbarData.separate_value_unit_with_space);
     ini.WriteBool(L"taskbar", L"show_tool_tip",                         rTaskbarData.show_tool_tip);
     ini.WriteInt (L"taskbar", L"digits_number",                         rTaskbarData.digits_number);
     ini.WriteInt (L"taskbar", L"memory_display",       static_cast<int>(rTaskbarData.memory_display));
@@ -1314,25 +1318,28 @@ bool CTrafficMonitorApp::IsTaksbarItemDisplayed(CommonDisplayItem item) const
 
 void CTrafficMonitorApp::SendSettingsToPlugin()
 {
+    LayoutItemValueAttributes& rMainWnd_LIVA = m_main_wnd_data.layout_item_value_attributes;
+    LayoutItemValueAttributes& rTaskbar_LIVA = m_taskbar_data.layout_item_value_attributes;
+
     for (const auto& pluginManageUnit : m_plugin_manager.GetAllPluginManageUnit())
     {
         if (pluginManageUnit.plugin != nullptr && pluginManageUnit.plugin->GetAPIVersion() >= 2)
         {
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_NAIN_WND_NET_SPEED_SHORT_MODE,     std::to_wstring(m_main_wnd_data.speed_short_mode).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_SPERATE_WITH_SPACE,       std::to_wstring(m_main_wnd_data.separate_value_unit_with_space).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_NAIN_WND_NET_SPEED_SHORT_MODE,     std::to_wstring(rMainWnd_LIVA.speed_short_mode).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_SPERATE_WITH_SPACE,       std::to_wstring(rMainWnd_LIVA.separate_value_unit_with_space).c_str());
             pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_UNIT_BYTE,                std::to_wstring(true).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_UNIT_SELECT,              std::to_wstring(static_cast<int>(m_main_wnd_data.speed_unit)).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_NOT_SHOW_UNIT,            std::to_wstring(m_main_wnd_data.hide_unit).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_NOT_SHOW_PERCENT,         std::to_wstring(m_main_wnd_data.hide_percent).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_UNIT_SELECT,              std::to_wstring(static_cast<int>(rMainWnd_LIVA.speed_unit)).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_NOT_SHOW_UNIT,            std::to_wstring(rMainWnd_LIVA.hide_unit).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_MAIN_WND_NOT_SHOW_PERCENT,         std::to_wstring(rMainWnd_LIVA.hide_percent).c_str());
 
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NET_SPEED_SHORT_MODE,  std::to_wstring(m_taskbar_data.speed_short_mode).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_SPERATE_WITH_SPACE,    std::to_wstring(m_taskbar_data.separate_value_unit_with_space).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NET_SPEED_SHORT_MODE,  std::to_wstring(rTaskbar_LIVA.speed_short_mode).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_SPERATE_WITH_SPACE,    std::to_wstring(rTaskbar_LIVA.separate_value_unit_with_space).c_str());
             pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_VALUE_RIGHT_ALIGN,     std::to_wstring(m_taskbar_data.value_right_align).c_str());
             pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NET_SPEED_WIDTH,       std::to_wstring(m_taskbar_data.digits_number).c_str());
             pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_UNIT_BYTE,             std::to_wstring(true).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_UNIT_SELECT,           std::to_wstring(static_cast<int>(m_taskbar_data.speed_unit)).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NOT_SHOW_UNIT,         std::to_wstring(m_taskbar_data.hide_unit).c_str());
-            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NOT_SHOW_PERCENT,      std::to_wstring(m_taskbar_data.hide_percent).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_UNIT_SELECT,           std::to_wstring(static_cast<int>(rTaskbar_LIVA.speed_unit)).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NOT_SHOW_UNIT,         std::to_wstring(rTaskbar_LIVA.hide_unit).c_str());
+            pluginManageUnit.plugin->OnExtenedInfo(ITMPlugin::EI_TASKBAR_WND_NOT_SHOW_PERCENT,      std::to_wstring(rTaskbar_LIVA.hide_percent).c_str());
         }
     }
 }

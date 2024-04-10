@@ -39,12 +39,8 @@ struct PublicSettingData
     CLayout   layout;
 
     //数值属性设置
-    bool hide_unit;                                 //隐藏单位
-    bool hide_percent;                              //隐藏百分号
-//    bool hide_degree;                             //隐藏温度度数                                            //暂不支持，以后会支持。
-    bool separate_value_unit_with_space{ true };    //网速数值和单位用空格分隔                                //以后改名为：数值和单位用空格分隔(不再只限于网速)
-    bool speed_short_mode{ false };                 //网速显示简洁模式（减少小数点的位数，单位不显示“B”）
-    SpeedUnit speed_unit;                           //网速的单位
+    struct LayoutItemValueAttributes    layout_item_value_attributes;
+
     MemoryDisplay memory_display{ MemoryDisplay::USAGE_PERCENTAGE };    //内存显示方式
 
     //鼠标双击设置

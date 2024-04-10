@@ -76,7 +76,7 @@ const char* CCommon::GetFileContent(const wchar_t* file_path, size_t& length, bo
     return buff;
 }
 
-CString CCommon::DataSizeToString(unsigned long long size, const PublicSettingData& cfg)
+CString CCommon::DataSizeToString(unsigned long long size, const LayoutItemValueAttributes& cfg)
 {
     //CString str;
     CString value_str, unit_str;
@@ -192,7 +192,7 @@ CString CCommon::DataSizeToString(unsigned long long size, bool with_space)     
     return str;
 }
 
-CString CCommon::TemperatureToString(float temperature, const PublicSettingData& cfg)
+CString CCommon::TemperatureToString(float temperature, const LayoutItemValueAttributes& cfg)
 {
     CString str_val;
     if (temperature <= 0)
@@ -205,7 +205,7 @@ CString CCommon::TemperatureToString(float temperature, const PublicSettingData&
     return str_val;
 }
 
-CString CCommon::UsageToString(float usage, const PublicSettingData& cfg)
+CString CCommon::UsageToString(float usage, const LayoutItemValueAttributes& cfg)
 {
     CString str_val;
     if (usage < 0)
@@ -221,7 +221,7 @@ CString CCommon::UsageToString(float usage, const PublicSettingData& cfg)
     return str_val;
 }
 
-CString CCommon::FreqToString(float freq, const PublicSettingData& cfg)
+CString CCommon::FreqToString(float freq, const LayoutItemValueAttributes& cfg)
 {
     CString str_val;
     if (freq < 0)
