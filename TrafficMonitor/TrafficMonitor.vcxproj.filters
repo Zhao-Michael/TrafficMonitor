@@ -142,9 +142,6 @@
     <Filter Include="源文件和头文件\派生的控件类\ListCtrlEx">
       <UniqueIdentifier>{44872bda-27ce-407a-b5a7-fa9524bfb83c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件和头文件\公共的类\SkinFile">
-      <UniqueIdentifier>{f2a40ca2-c391-46a6-8508-b2f8c30c68a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件和头文件\公共的类\TinyXml2Helper">
       <UniqueIdentifier>{ece2a796-fdd6-49e1-987e-11968b3f56a6}</UniqueIdentifier>
     </Filter>
@@ -222,6 +219,15 @@
     </Filter>
     <Filter Include="源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl">
       <UniqueIdentifier>{68b8c93d-e1b6-4d3d-a8af-5a19d413a96e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\皮肤与布局类">
+      <UniqueIdentifier>{e75d1708-8d35-4b7d-bfa4-89714e9115f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\皮肤与布局类\SkinFile">
+      <UniqueIdentifier>{f2a40ca2-c391-46a6-8508-b2f8c30c68a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\皮肤与布局类\Layout">
+      <UniqueIdentifier>{518365ee-3cd4-4fff-ac88-eafb5ffd3604}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -380,7 +386,7 @@
       <Filter>源文件和头文件\派生的控件类\ListCtrlEx</Filter>
     </ClInclude>
     <ClInclude Include="SkinFile.h">
-      <Filter>源文件和头文件\公共的类\SkinFile</Filter>
+      <Filter>源文件和头文件\皮肤与布局类\SkinFile</Filter>
     </ClInclude>
     <ClInclude Include="TinyXml2Helper.h">
       <Filter>源文件和头文件\公共的类\TinyXml2Helper</Filter>
@@ -480,6 +486,9 @@
     </ClInclude>
     <ClInclude Include="MIA_SettingListCtrl.h">
       <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout.h">
+      <Filter>源文件和头文件\皮肤与布局类\Layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -622,7 +631,7 @@
       <Filter>源文件和头文件\派生的控件类\ListCtrlEx</Filter>
     </ClCompile>
     <ClCompile Include="SkinFile.cpp">
-      <Filter>源文件和头文件\公共的类\SkinFile</Filter>
+      <Filter>源文件和头文件\皮肤与布局类\SkinFile</Filter>
     </ClCompile>
     <ClCompile Include="TinyXml2Helper.cpp">
       <Filter>源文件和头文件\公共的类\TinyXml2Helper</Filter>
@@ -704,6 +713,9 @@
     </ClCompile>
     <ClCompile Include="MIA_SettingListCtrl.cpp">
       <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.cpp">
+      <Filter>源文件和头文件\皮肤与布局类\Layout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

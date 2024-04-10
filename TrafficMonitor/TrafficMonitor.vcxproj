@@ -537,6 +537,7 @@
     <ClInclude Include="HResultException.h" />
     <ClInclude Include="IDrawCommon.h" />
     <ClInclude Include="Image2DEffect.h" />
+    <ClInclude Include="Layout.h" />
     <ClInclude Include="LinkStatic.h" />
     <ClInclude Include="ColorStatic.h" />
     <ClInclude Include="Common.h" />
@@ -618,6 +619,7 @@
     <ClCompile Include="HistoryTrafficListDlg.cpp" />
     <ClCompile Include="HResultException.cpp" />
     <ClCompile Include="Image2DEffect.cpp" />
+    <ClCompile Include="Layout.cpp" />
     <ClCompile Include="LinkStatic.cpp" />
     <ClCompile Include="ColorStatic.cpp" />
     <ClCompile Include="Common.cpp" />

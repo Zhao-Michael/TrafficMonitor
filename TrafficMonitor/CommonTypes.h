@@ -191,6 +191,64 @@ const std::set<EBuiltinDisplayItem> gS_AllBuiltinDisplayItems
     , TDI_TOTAL_SPEED
 };
 
+//将字号转成LOGFONT结构中的lfHeight
+inline int FontSizeToLfHeight(int font_size, int dpi = 0)
+{
+    if (dpi == 0)
+    {
+        HDC hDC = ::GetDC(HWND_DESKTOP);
+        dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+        ::ReleaseDC(HWND_DESKTOP, hDC);
+    }
+    int lfHeight = -MulDiv(font_size, dpi, 72);
+    return lfHeight;
+}
+
+//字体
+struct FontInfo
+{
+    CString name;           //字体名称
+    int size;               //字体大小
+    bool bold;              //粗体
+    bool italic;            //斜体
+    bool underline;         //下划线
+    bool strike_out;        //删除线
+
+    //创建一个CFont对象
+    void Create(CFont& font, int dpi = 0)
+    {
+        font.CreateFont(
+            FontSizeToLfHeight(size, dpi),  // nHeight
+            0,                              // nWidth
+            0, // nEscapement
+            0, // nOrientation
+            (bold ? FW_BOLD : FW_NORMAL), // nWeight
+            italic, // bItalic
+            underline, // bUnderline
+            strike_out, // cStrikeOut
+            DEFAULT_CHARSET, // nCharSet
+            OUT_DEFAULT_PRECIS, // nOutPrecision
+            CLIP_DEFAULT_PRECIS, // nClipPrecision
+            DEFAULT_QUALITY, // nQuality
+            DEFAULT_PITCH | FF_SWISS, // nPitchAndFamily
+            name);
+    }
+};
+
+struct StringSet
+{
+public:
+    bool                        Contains(const std::wstring& str) const;
+    void                        SetStrContained(const std::wstring& str, bool contained);
+    void                        FromString(const std::wstring& str);
+    std::wstring                ToString() const;
+    void                        FromVector(const std::vector<std::wstring>& vec);
+    std::vector<std::wstring>   ToVector() const;
+    std::set<std::wstring>& data();
+private:
+    std::set<std::wstring> string_set;
+};
+
 #define DEF_CH L'\"'        //写入和读取ini文件字符串时，在字符串前后添加的字符
 
 //定义监控时间间隔有效的最大值和最小值
