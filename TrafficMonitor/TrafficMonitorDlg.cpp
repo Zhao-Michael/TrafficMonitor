@@ -1649,10 +1649,10 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
                     log_str += std::to_wstring(is_taskbar_transparent).c_str();
                     log_str += _T("\n");
                     log_str += _T("taskbar_back_color: ");
-                    log_str += std::to_wstring(theApp.m_taskbar_data.back_color).c_str();
+                    log_str += std::to_wstring(theApp.m_taskbar_data.layout.back_color).c_str();
                     log_str += _T("\n");
                     log_str += _T("taskbar_transparent_color: ");
-                    log_str += std::to_wstring(theApp.m_taskbar_data.transparent_color).c_str();
+                    log_str += std::to_wstring(theApp.m_taskbar_data.layout.transparent_color).c_str();
                     log_str += _T("\n");
                     log_str += _T("taskbar_text_colors: ");
                     for (const auto& item : theApp.m_taskbar_data.layout.M_LayoutItems)
@@ -1687,7 +1687,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
         //根据任务栏颜色自动设置任务栏窗口背景色
         if (theApp.m_taskbar_data.auto_set_background_color && theApp.m_win_version.IsWindows8OrLater()
-            && IsTaskbarWndValid() && theApp.m_taskbar_data.transparent_color != 0
+            && IsTaskbarWndValid() && theApp.m_taskbar_data.layout.transparent_color != 0
             && !m_is_foreground_fullscreen)
         {
             CRect rect;
@@ -1701,10 +1701,10 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
             if (pointy < 0) pointy = 0;
             if (pointy >= m_screen_size.cy) pointy = m_screen_size.cy - 1;
             COLORREF color = ::GetPixel(m_desktop_dc, pointx, pointy);        //取任务栏窗口左侧1像素处的颜色作为背景色
-            if (!CCommon::IsColorSimilar(color, theApp.m_taskbar_data.back_color) && (/*CWindowsSettingHelper::IsWindows10LightTheme() ||*/ color != 0))
+            if (!CCommon::IsColorSimilar(color, theApp.m_taskbar_data.layout.back_color) && (/*CWindowsSettingHelper::IsWindows10LightTheme() ||*/ color != 0))
             {
                 bool is_taskbar_transparent{ theApp.m_taskbar_data.IsTaskbarTransparent()};
-                theApp.m_taskbar_data.back_color = color;
+                theApp.m_taskbar_data.layout.back_color = color;
                 theApp.m_taskbar_data.SetTaskabrTransparent(is_taskbar_transparent);
                 if (is_taskbar_transparent)
                     m_tBarDlg->ApplyWindowTransparentColor();
@@ -1713,7 +1713,7 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
 
         //当检测到背景色和文字颜色都为黑色写入错误日志
         static bool erro_log_write{ false };
-        if (theApp.m_taskbar_data.back_color == 0 && !theApp.m_taskbar_data.layout.M_LayoutItems.empty() && theApp.m_taskbar_data.layout.M_LayoutItems.begin()->second.PrefixColor == 0)
+        if (theApp.m_taskbar_data.layout.back_color == 0 && !theApp.m_taskbar_data.layout.M_LayoutItems.empty() && theApp.m_taskbar_data.layout.M_LayoutItems.begin()->second.PrefixColor == 0)
         {
             if (!erro_log_write)
             {

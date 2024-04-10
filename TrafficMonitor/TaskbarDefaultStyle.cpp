@@ -114,8 +114,8 @@ void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
 
 void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & data) //const  //使用map后不能用const
 {
-    TaskBarSettingData&                         rTaskbarData            = data;
-    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    CLayout&                                    rLayout                 = data.layout;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rLayout.M_LayoutItems;
 
     /*if (index == TASKBAR_DEFAULT_LIGHT_STYLE_INDEX)
     {
@@ -126,18 +126,18 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
         if (!IsTaskBarStyleDataValid(m_default_style[index]))
             return;
 
-		data.back_color                 = m_default_style[index].back_color;
-		data.transparent_color          = m_default_style[index].transparent_color;
-		data.status_bar_color           = m_default_style[index].status_bar_color;
+		rLayout.back_color                 = m_default_style[index].back_color;
+		rLayout.transparent_color          = m_default_style[index].transparent_color;
+		rLayout.status_bar_color           = m_default_style[index].status_bar_color;
         for (auto iter = m_default_style[index].M_LayoutItems.begin(); iter != m_default_style[index].M_LayoutItems.end(); ++iter)
         {
-            rTaskbar_M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;
-            rTaskbar_M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
+            rTaskbar_M_LayoutItems[iter->first].PrefixColor     = iter->second.PrefixColor;
+            rTaskbar_M_LayoutItems[iter->first].ValueColor      = iter->second.ValueColor;
         }
-		if (data.transparent_color == data.back_color)
+		if (rLayout.transparent_color == rLayout.back_color)
 		{
-			CCommon::TransparentColorConvert(data.back_color);
-			CCommon::TransparentColorConvert(data.transparent_color);
+			CCommon::TransparentColorConvert(rLayout.back_color);
+			CCommon::TransparentColorConvert(rLayout.transparent_color);
 		}
 	}
 }
@@ -159,20 +159,20 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
 	if (index < 0 || index >= TASKBAR_DEFAULT_STYLE_NUM)
 		return;
 
-    TaskBarSettingData&                         rTaskbarData            = data;
-    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    CLayout&                                    rLayout                 = data.layout;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rLayout.M_LayoutItems;
 
-	m_default_style[index].back_color = data.back_color;
-	m_default_style[index].transparent_color = data.transparent_color;
-	m_default_style[index].status_bar_color = data.status_bar_color;
+	m_default_style[index].back_color           = rLayout.back_color;
+	m_default_style[index].transparent_color    = rLayout.transparent_color;
+	m_default_style[index].status_bar_color     = rLayout.status_bar_color;
     for (auto iter = rTaskbar_M_LayoutItems.begin(); iter != rTaskbar_M_LayoutItems.end(); ++iter)
     {
-        m_default_style[index].M_LayoutItems[iter->first].PrefixColor = iter->second.PrefixColor;
-        m_default_style[index].M_LayoutItems[iter->first].ValueColor = iter->second.ValueColor;
+        m_default_style[index].M_LayoutItems[iter->first].PrefixColor   = iter->second.PrefixColor;
+        m_default_style[index].M_LayoutItems[iter->first].ValueColor    = iter->second.ValueColor;
     }
 }
 
-bool CTaskbarDefaultStyle::IsTaskBarStyleDataValid(const TaskBarStyleData& data)
+bool CTaskbarDefaultStyle::IsTaskBarStyleDataValid(const CLayout& data)
 {
     for (const auto& item : data.M_LayoutItems)
     {

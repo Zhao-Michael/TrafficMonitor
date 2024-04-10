@@ -27,8 +27,8 @@ CTaskBarSettingsDlg::~CTaskBarSettingsDlg()
 
 bool CTaskBarSettingsDlg::IsStyleModified()
 {
-    TaskBarSettingData&                         rTaskbarData            = m_data;
-    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
+    CLayout&                                    rLayout                 = m_data.layout;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rLayout.M_LayoutItems;
     bool modified{false};
     for (auto iter = rTaskbar_M_LayoutItems.begin(); iter != rTaskbar_M_LayoutItems.end(); ++iter)
     {
@@ -43,14 +43,16 @@ bool CTaskBarSettingsDlg::IsStyleModified()
             break;
         }
     }
-    modified |= (theApp.m_taskbar_data.back_color != m_data.back_color);
-    modified |= (theApp.m_taskbar_data.transparent_color != m_data.transparent_color);
-    modified |= (theApp.m_taskbar_data.status_bar_color != m_data.status_bar_color);
+    modified |= (theApp.m_taskbar_data.layout.back_color           != rLayout.back_color);
+    modified |= (theApp.m_taskbar_data.layout.transparent_color    != rLayout.transparent_color);
+    modified |= (theApp.m_taskbar_data.layout.status_bar_color     != rLayout.status_bar_color);
     return modified && m_style_modified;
 }
 
 void CTaskBarSettingsDlg::DrawStaticColor()
 {
+    CLayout&                                    rLayout                 = m_data.layout;
+    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rLayout.M_LayoutItems;
     //CCommon::FillStaticColor(m_text_color_static, m_data.text_color);
     //CCommon::FillStaticColor(m_back_color_static, m_data.back_color);
 #ifdef WITHOUT_TEMPERATURE
@@ -60,7 +62,7 @@ void CTaskBarSettingsDlg::DrawStaticColor()
 #endif
     int i{};
     m_text_color_static.SetColorNum(color_num);
-    for (const auto& item : m_data.layout.M_LayoutItems)
+    for (const auto& item : rTaskbar_M_LayoutItems)
     {
         m_text_color_static.SetFillColor(i, item.second.PrefixColor);
         m_text_color_static.SetFillColor(i + 1, item.second.ValueColor);
@@ -68,9 +70,9 @@ void CTaskBarSettingsDlg::DrawStaticColor()
     }
     m_text_color_static.Invalidate();
 
-    m_back_color_static.SetFillColor(m_data.back_color);
-    //m_trans_color_static.SetFillColor(m_data.transparent_color);
-    m_status_bar_color_static.SetFillColor(m_data.status_bar_color);
+    m_back_color_static.SetFillColor(rLayout.back_color);
+    //m_trans_color_static.SetFillColor(rLayout.transparent_color);
+    m_status_bar_color_static.SetFillColor(rLayout.status_bar_color);
 }
 
 void CTaskBarSettingsDlg::IniUnitCombo()
@@ -424,6 +426,7 @@ void CTaskBarSettingsDlg::OnBnClickedHidePercentageCheck()
 afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lParam)
 {
     TaskBarSettingData&                         rTaskbarData            = m_data;
+    CLayout&                                    rLayout                 = rTaskbarData.layout;
     std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
 
     switch (::GetDlgCtrlID(((CWnd*)wParam)->m_hWnd))
@@ -442,18 +445,18 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     case IDC_TEXT_COLOR_STATIC2:        //点击“背景颜色”时
     {
         //设置背景颜色
-        CMFCColorDialogEx colorDlg(m_data.back_color, 0, this);
+        CMFCColorDialogEx colorDlg(rLayout.back_color, 0, this);
         if (colorDlg.DoModal() == IDOK)
         {
             bool background_transparent = m_data.IsTaskbarTransparent();
-            m_data.back_color = colorDlg.GetColor();
-            if (m_data.back_color == rTaskbar_M_LayoutItems.begin()->second.PrefixColor)
+            rLayout.back_color = colorDlg.GetColor();
+            if (rLayout.back_color == rTaskbar_M_LayoutItems.begin()->second.PrefixColor)
                 MessageBox(CCommon::LoadText(IDS_SAME_BACK_TEXT_COLOR_WARNING), NULL, MB_ICONWARNING);
             if (background_transparent)
             {
-                CCommon::TransparentColorConvert(m_data.back_color);
+                CCommon::TransparentColorConvert(rLayout.back_color);
                 //如果当前设置了背景透明，则更改了背景色后同时将透明色设置成和背景色一样的颜色，以保持背景透明
-                m_data.transparent_color = m_data.back_color;
+                rLayout.transparent_color = rLayout.back_color;
             }
             DrawStaticColor();
             m_style_modified = true;
@@ -462,20 +465,20 @@ afx_msg LRESULT CTaskBarSettingsDlg::OnStaticClicked(WPARAM wParam, LPARAM lPara
     }
     //case IDC_TRANSPARENT_COLOR_STATIC:        //点击“透明色”时
     //{
-    //  CMFCColorDialogEx colorDlg(m_data.transparent_color, 0, this);
+    //  CMFCColorDialogEx colorDlg(rLayout.transparent_color, 0, this);
     //  if (colorDlg.DoModal() == IDOK)
     //  {
-    //      m_data.transparent_color = colorDlg.GetColor();
+    //      rLayout.transparent_color = colorDlg.GetColor();
     //      DrawStaticColor();
     //  }
     //  break;
     //}
     case IDC_TEXT_COLOR_STATIC3:        //点击“状态条颜色”时
     {
-        CMFCColorDialogEx colorDlg(m_data.status_bar_color, 0, this);
+        CMFCColorDialogEx colorDlg(rLayout.status_bar_color, 0, this);
         if (colorDlg.DoModal() == IDOK)
         {
-            m_data.status_bar_color = colorDlg.GetColor();
+            rLayout.status_bar_color = colorDlg.GetColor();
             DrawStaticColor();
             m_style_modified = true;
         }

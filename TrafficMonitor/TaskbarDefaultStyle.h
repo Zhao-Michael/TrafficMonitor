@@ -7,13 +7,6 @@
 class CTaskbarDefaultStyle
 {
 public:
-	struct TaskBarStyleData
-	{
-		COLORREF back_color{};
-		COLORREF transparent_color{};
-		COLORREF status_bar_color{};
-		std::map<CommonDisplayItem, LayoutItem>     M_LayoutItems{};                          //存放所有项目的属性配置
-	};
 
 	CTaskbarDefaultStyle();
 	~CTaskbarDefaultStyle();
@@ -25,9 +18,9 @@ public:
 	//static void ApplyDefaultLightStyle(TaskBarSettingData& data);		//应用默认的浅色模式预设
 	void ModifyDefaultStyle(int index, TaskBarSettingData& data);     //将当前颜色设置保存到一个预设方案
 
-    static bool IsTaskBarStyleDataValid(const TaskBarStyleData& data);     //判断一个颜色模式是否有效
+    static bool IsTaskBarStyleDataValid(const CLayout& data);     //判断一个颜色模式是否有效
 
 private:
-	TaskBarStyleData m_default_style[TASKBAR_DEFAULT_STYLE_NUM];    //预设样式
+	CLayout m_default_style[TASKBAR_DEFAULT_STYLE_NUM];    //预设样式
 
 };

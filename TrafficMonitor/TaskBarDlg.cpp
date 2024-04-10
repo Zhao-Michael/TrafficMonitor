@@ -63,6 +63,8 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
         return;
 
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
+    CLayout&                rLayout         = rTaskbarData.layout;
+
     if (m_supported_render_enums.IsD2D1Enabled())
     {
         auto last_update_layered_window_error = rTaskbarData.update_layered_window_error_code;
@@ -110,9 +112,9 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
                   // 这里构造绘图对象
                   EmplaceAt(p_draw_common);
                   p_draw_common->Create(p_draw_buffer->GetMemDC(), nullptr);
-                  p_draw_common->FillRect(draw_rect, rTaskbarData.back_color); // 填充背景色
+                  p_draw_common->FillRect(draw_rect, rLayout.back_color); // 填充背景色
                   p_draw_common->SetFont(&m_font);
-                  p_draw_common->SetBackColor(rTaskbarData.back_color);
+                  p_draw_common->SetBackColor(rLayout.back_color);
               }},
              {DrawCommonHelper::RenderType::D2D1_WITH_DCOMPOSITION,
               [&](IDrawBuffer* p_draw_buffer_interface, IDrawCommon* p_draw_common_interface)
@@ -138,7 +140,7 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
                   // 仅透明时，且UpdateLayeredWindowIndirect失败时，启用此渲染器，默认初始化为全黑，alpha=1
                   p_draw_common->FillRect(draw_rect, 0x00000000, 1);
                   p_draw_common->SetFont(&m_font);
-                  p_draw_common->SetBackColor(rTaskbarData.back_color);
+                  p_draw_common->SetBackColor(rLayout.back_color);
                   // 构造buffer
                   EmplaceAt(p_draw_buffer, this->m_d2d1_device_context_support.Get());
               }},
@@ -163,7 +165,7 @@ void CTaskBarDlg::ShowInfo(CDC* pDC)
                   // 仅透明时启用此渲染器，默认初始化为全黑，alpha=1
                   p_draw_common->FillRect(draw_rect, 0x00000000, 1);
                   p_draw_common->SetFont(&m_font);
-                  p_draw_common->SetBackColor(rTaskbarData.back_color);
+                  p_draw_common->SetBackColor(rLayout.back_color);
                   // 构造buffer
                   CSize draw_size{draw_rect.Width(), draw_rect.Height()};
                   EmplaceAt(p_draw_buffer,
@@ -470,6 +472,7 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
     if (item == nullptr)
         return;
     TaskBarSettingData&                         rTaskbarData            = theApp.m_taskbar_data;
+    CLayout&                                    rLayout                 = rTaskbarData.layout;
     std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rTaskbarData.layout.M_LayoutItems;
     m_item_rects[item] = rect;
     //设置要绘制的文本颜色
@@ -479,7 +482,7 @@ void CTaskBarDlg::DrawPluginItem(IDrawCommon& drawer, IPluginItem* item, CRect r
     if (item->IsCustomDraw())
     {
         //根据背景色的亮度判断深色还是浅色模式
-        const COLORREF& bk{ rTaskbarData.back_color };
+        const COLORREF& bk{ rLayout.back_color };
         int background_brightness{ (GetRValue(bk) + GetGValue(bk) + GetBValue(bk)) / 3 };
         //由插件自绘
         ITMPlugin* plugin = theApp.m_plugin_manager.GetITMPluginByIPlguinItem(item);
@@ -583,11 +586,12 @@ void CTaskBarDlg::TryDrawHorizontalHistogram(IDrawCommon& drawer, const CRect& r
 {
     //注意：当显示网速占用时，如果上传下载的流量很少导致数值接近为0时，则柱状图或滚动图几乎看不到。其它监控项也类似。
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
+    CLayout&                rLayout         = rTaskbarData.layout;
     CSize                   fill_size       = CSize(rect_bar.Width() * usage_percent / 100, rect_bar.Height()); //横向的柱状图
     CRect                   rect_fill(rect_bar.TopLeft(), fill_size);
     if (rTaskbarData.b_show_graph_dashed_box)
-        drawer.DrawRectOutLine(rect_bar, rTaskbarData.status_bar_color, 1, true);
-    drawer.FillRect(rect_fill, rTaskbarData.status_bar_color);
+        drawer.DrawRectOutLine(rect_bar, rLayout.status_bar_color, 1, true);
+    drawer.FillRect(rect_fill, rLayout.status_bar_color);
 }
 
 bool CTaskBarDlg::AdjustWindowPos()
@@ -721,16 +725,16 @@ bool CTaskBarDlg::AdjustWindowPos()
 void CTaskBarDlg::ApplyWindowTransparentColor()
 {
 #ifndef COMPILE_FOR_WINXP
-    TaskBarSettingData& rTaskbarData = theApp.m_taskbar_data;
+    CLayout& rLayout = theApp.m_taskbar_data.layout;
     if (theApp.m_is_windows11_taskbar)      //Windows11下背景色不使用纯黑色，以解决深色模式下右键菜单无法弹出的问题
     {
-        if (rTaskbarData.transparent_color == 0 && rTaskbarData.back_color == 0)
+        if (rLayout.transparent_color == 0 && rLayout.back_color == 0)
         {
-            rTaskbarData.transparent_color = 1;
-            rTaskbarData.back_color = 1;
+            rLayout.transparent_color = 1;
+            rLayout.back_color = 1;
         }
     }
-    if ((rTaskbarData.transparent_color != 0) && theApp.m_taksbar_transparent_color_enable)
+    if ((rLayout.transparent_color != 0) && theApp.m_taksbar_transparent_color_enable)
     {
         auto render_type = m_supported_render_enums.GetAutoFitEnum();
         switch (render_type)
@@ -747,7 +751,7 @@ void CTaskBarDlg::ApplyWindowTransparentColor()
             // GDI绘图使用色键抠像
             // 仅在透明且不使用自动决定背景颜色时启动D2D渲染器
             SetWindowLong(m_hWnd, GWL_EXSTYLE, GetWindowLong(m_hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-            SetLayeredWindowAttributes(rTaskbarData.transparent_color, 0, LWA_COLORKEY);
+            SetLayeredWindowAttributes(rLayout.transparent_color, 0, LWA_COLORKEY);
         }
     }
     else
@@ -1245,7 +1249,7 @@ BOOL CTaskBarDlg::OnInitDialog()
     m_error_code = GetLastError();
     AdjustWindowPos();
 
-    SetBackgroundColor(theApp.m_taskbar_data.back_color);
+    SetBackgroundColor(theApp.m_taskbar_data.layout.back_color);
 
     //初始化鼠标提示
     if (IsWindow(GetSafeHwnd()) && m_tool_tips.Create(this, TTS_ALWAYSTIP) && IsWindow(m_tool_tips.GetSafeHwnd()))
@@ -1623,9 +1627,10 @@ void CTaskBarDlg::TryDrawHorizontalScrollChart(IDrawCommon& drawer, const CRect&
 {
     //注意：当显示网速占用时，如果上传下载的流量很少导致数值接近为0时，则柱状图或滚动图几乎看不到。其它监控项也类似。
     TaskBarSettingData&     rTaskbarData    = theApp.m_taskbar_data;
+    CLayout&                rLayout         = rTaskbarData.layout;
     std::list<int>&         list            = m_map_history_data[item_type];
     if (rTaskbarData.b_show_graph_dashed_box)
-        drawer.DrawRectOutLine(value_rect, rTaskbarData.status_bar_color, 1, true);
+        drawer.DrawRectOutLine(value_rect, rLayout.status_bar_color, 1, true);
     int i{ -1 };
     for (const auto& item : list)
     {
@@ -1637,7 +1642,7 @@ void CTaskBarDlg::TryDrawHorizontalScrollChart(IDrawCommon& drawer, const CRect&
         //从右往左画线
         CPoint start_point = CPoint(value_rect.right - i, value_rect.bottom);
         int height = item * value_rect.Height() / 100;
-        drawer.DrawLine(start_point, height, rTaskbarData.status_bar_color);
+        drawer.DrawLine(start_point, height, rLayout.status_bar_color);
     }
 }
 

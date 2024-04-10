@@ -78,11 +78,6 @@ struct MainWndSettingData : public PublicSettingData
 //选项设置中“任务栏窗口设置”的数据
 struct TaskBarSettingData : public PublicSettingData
 {
-    //颜色相关
-    COLORREF    back_color          { RGB(0, 0, 0) };       //背景颜色
-    COLORREF    transparent_color   { RGB(0, 0, 0) };       //透明色
-    COLORREF    status_bar_color    { RGB(0, 0, 0) };       // CPU/内存 状态条颜色
-
     //缺省颜色
     int dft_back_color = 0;                                 //默认背景颜色
     int dft_transparent_color = 0;                          //默认透明色

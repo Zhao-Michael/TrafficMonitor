@@ -178,14 +178,14 @@ void CTrafficMonitorApp::LoadConfig()
     //      (三)载入任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    rTaskbarData.back_color                         = ini.GetInt(_T("taskbar"), _T("taskbar_back_color"), rTaskbarData.dft_back_color, 16);
-    rTaskbarData.transparent_color                  = ini.GetInt(_T("taskbar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
+    rTaskbarData.layout.back_color                         = ini.GetInt(_T("taskbar"), _T("taskbar_back_color"), rTaskbarData.dft_back_color, 16);
+    rTaskbarData.layout.transparent_color                  = ini.GetInt(_T("taskbar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
     if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
     {
-        CCommon::TransparentColorConvert(rTaskbarData.back_color);
-        CCommon::TransparentColorConvert(rTaskbarData.transparent_color);
+        CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
+        CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
     }
-    rTaskbarData.status_bar_color                 = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
+    rTaskbarData.layout.status_bar_color          = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
     rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"taskbar_display_item", TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
@@ -216,9 +216,9 @@ void CTrafficMonitorApp::LoadConfig()
 
     //rTaskbarData.swap_up_down = ini.GetBool(_T("taskbar"), _T("taskbar_swap_up_down"), false);
 
-    if (rTaskbarData.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
+    if (rTaskbarData.layout.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
     {
-        rTaskbarData.back_color                                 = rTaskbarData.dft_back_color;
+        rTaskbarData.layout.back_color                      = rTaskbarData.dft_back_color;
         rTaskbar_M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
     }
 
@@ -449,9 +449,9 @@ void CTrafficMonitorApp::SaveConfig()
     //      (三)保存任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.back_color, 16);
-    ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.transparent_color, 16);
-    ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.status_bar_color, 16);
+    ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.layout.back_color, 16);
+    ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.layout.transparent_color, 16);
+    ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.layout.status_bar_color, 16);
     ini.WriteInt            (L"taskbar",    L"taskbar_display_item",    rTaskbarData.m_tbar_display_item);
     //任务栏窗口字体设置
     ini.SaveFontData(L"taskbar", rTaskbarData.layout.font_info);
