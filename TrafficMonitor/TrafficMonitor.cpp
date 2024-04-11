@@ -264,7 +264,7 @@ void CTrafficMonitorApp::LoadConfig()
 
     //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
     default_font.size = 9;
-    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, m_config_path, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
+    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, m_config_layouts_path, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
     if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
     {
         CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
@@ -277,7 +277,7 @@ void CTrafficMonitorApp::LoadConfig()
     }
 
     //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_path, default_font, default_color, 0, 0, 0);
+    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_layouts_path, default_font, default_color, 0, 0, 0);
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -446,9 +446,9 @@ void CTrafficMonitorApp::SaveConfig()
     else
     {
         //(a)保存任务栏窗口字体设置(b)保存用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-        rTaskbarData.layout.SaveConfig(LIAO_TASKBAR, m_config_path);
+        rTaskbarData.layout.SaveConfig(LIAO_TASKBAR, m_config_layouts_path);
         //(a)保存主窗口字体设置(b)保存用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-        rMainWndData.layout.SaveConfig(LIAO_MAINWND, m_config_path);
+        rMainWndData.layout.SaveConfig(LIAO_MAINWND, m_config_layouts_path);
     }
 }
 
@@ -927,7 +927,7 @@ BOOL CTrafficMonitorApp::InitInstance()
 #endif
     //AppData里面的程序配置文件路径
     m_config_path           = m_config_dir + L"config.ini";
-//    m_config_layout_path    = m_config_dir + L"config_layout.ini";
+    m_config_layouts_path   = m_config_dir + L"config_layouts.ini";
     m_history_traffic_path  = m_config_dir + L"history_traffic.dat";
     m_log_path              = m_config_dir + L"error.log";
 

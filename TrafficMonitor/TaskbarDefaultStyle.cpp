@@ -35,7 +35,7 @@ void CTaskbarDefaultStyle::LoadConfig()
         default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
         default_font.size = 9;
         //载入用于TaskbarDefaultStyle的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-        m_default_style[i].LoadConfig(eOwner, theApp.m_config_path, default_font, default_text_color, default_back_color, default_transparent_color, default_status_bar_color);
+        m_default_style[i].LoadConfig(eOwner, theApp.m_config_layouts_path, default_font, default_text_color, default_back_color, default_transparent_color, default_status_bar_color);
 	}
 }
 
@@ -58,7 +58,7 @@ void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
         if (IsTaskBarStyleDataValid(m_default_style[i]))           //保存前检查当前颜色预设是否有效
         {
             //保存用于TaskbarDefaultStyle的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-            m_default_style[i].SaveConfig(eOwner, theApp.m_config_path);
+            m_default_style[i].SaveConfig(eOwner, theApp.m_config_layouts_path);
         }
         else
         {

@@ -38,7 +38,7 @@ public:
     wstring m_appdata_dir;
     wstring m_config_dir;               //配置文件所在目录
     wstring m_config_path;              //配置文件路径(包含文件名)
-//    wstring m_config_layout_path;       //配置文件路径(包含文件名)
+    wstring m_config_layouts_path;      //配置文件路径(包含文件名)
     wstring m_skin_dir;                 //皮肤目录
     wstring m_history_traffic_path;
     wstring m_log_path;
