@@ -51,6 +51,7 @@ void CSkinFile::LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_it
 
 void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele)
 {
+    layout.name             = CCommon::StrToUnicode(CTinyXml2Helper::ElementName(ele), true);
     layout.width            = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout.height           = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
     layout.DrawRectHeight   = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "text_height")));

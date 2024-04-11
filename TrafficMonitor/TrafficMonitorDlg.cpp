@@ -839,7 +839,15 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     wstring skin_cfg_path{ theApp.m_skin_dir + m_skins[m_skin_selected] + L"\\skin.xml" };
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
 
-    //接下来是比在皮肤预览窗口切换皮肤预览后，额外要做的事情。
+    //接下来是在加载皮肤后，额外要做的事情。
+    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
+
+    CLayout layout_skin = {};
+    if (rMainWndData.m_show_more_info)
+        layout_skin = m_skin.GetLayoutManager().layout_l;
+    else
+        layout_skin = m_skin.GetLayoutManager().layout_s;
+    rMainWndData.layout.name = layout_skin.name;
 }
 
 void CTrafficMonitorDlg::LoadBackGroundImage()
@@ -2236,16 +2244,17 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //      切换皮肤布局(包括切换皮肤和皮肤内切换布局两种情况)后需要做些改变：
-    //      (1)切换到皮肤配置文件中此布局中设置的颜色。
-    //      (2)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
-    //      (3)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
+    //      ///////////////(1)从新皮肤布局中复制必要的数据。
+    //      (2)切换到皮肤配置文件中此布局中设置的颜色。
+    //      (3)如果允许皮肤覆盖显示项标签设置，则加载皮肤配置中的的显示标签。  //老版本ini格式的皮肤配置中没有标签配置，所以不会切换。
+    //      (4)如果允许皮肤覆盖     字体设置，则加载皮肤配置中的的字体。      //老版本ini格式的皮肤配置中没有字体配置，所以不会切换。
     ////////////////////////////////////////////////////////////////////////////////////////
     //丢弃当前GUI配置的颜色，切换到皮肤自带的颜色。
-    CLayout layout = {};
+    CLayout layout_skin = {};
     if (rMainWndData.m_show_more_info)
-        layout = m_skin.GetLayoutManager().layout_l;
+        layout_skin = m_skin.GetLayoutManager().layout_l;
     else
-        layout = m_skin.GetLayoutManager().layout_s;
+        layout_skin = m_skin.GetLayoutManager().layout_s;
     for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
     {
         /////////////////////////////////////////////////////////////////////////////////////
@@ -2254,29 +2263,29 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
         /////////////////////////////////////////////////////////////////////////////////////
 
         //更换颜色
-        rMainWnd_M_LayoutItems[item].PrefixColor    = layout.M_LayoutItems[item].PrefixColor;
-        rMainWnd_M_LayoutItems[item].ValueColor     = layout.M_LayoutItems[item].ValueColor;
+        rMainWnd_M_LayoutItems[item].PrefixColor    = layout_skin.M_LayoutItems[item].PrefixColor;
+        rMainWnd_M_LayoutItems[item].ValueColor     = layout_skin.M_LayoutItems[item].ValueColor;
         //如果允许皮肤覆盖显示项前缀设置，则加载皮肤配置中的的显示前缀。
         if (theApp.m_general_data.allow_skin_cover_text)
         {
             //更换前缀，即使皮肤配置中的前缀为空。
-            rMainWnd_M_LayoutItems[item].Prefix     = layout.M_LayoutItems[item].Prefix;
+            rMainWnd_M_LayoutItems[item].Prefix     = layout_skin.M_LayoutItems[item].Prefix;
         }
     }
     //如果允许皮肤覆盖字体设置，则加载皮肤配置中的的字体。
     if (theApp.m_general_data.allow_skin_cover_font)
     {
         FontInfo& rFontInfo = rMainWndData.layout.font_info;
-        if (!layout.font_info.name.IsEmpty())
+        if (!layout_skin.font_info.name.IsEmpty())
         {
             //更换字体
-            rFontInfo.name          = layout.font_info.name;
-            rFontInfo.bold          = layout.font_info.bold;
-            rFontInfo.italic        = layout.font_info.italic;
-            rFontInfo.underline     = layout.font_info.underline;
-            rFontInfo.strike_out    = layout.font_info.strike_out;
-            if (layout.font_info.size >= MIN_FONT_SIZE && layout.font_info.size <= MAX_FONT_SIZE)
-                rFontInfo.size      = layout.font_info.size;
+            rFontInfo.name          = layout_skin.font_info.name;
+            rFontInfo.bold          = layout_skin.font_info.bold;
+            rFontInfo.italic        = layout_skin.font_info.italic;
+            rFontInfo.underline     = layout_skin.font_info.underline;
+            rFontInfo.strike_out    = layout_skin.font_info.strike_out;
+            if (layout_skin.font_info.size >= MIN_FONT_SIZE && layout_skin.font_info.size <= MAX_FONT_SIZE)
+                rFontInfo.size      = layout_skin.font_info.size;
             SetTextFont();          //设置字体
         }
     }
