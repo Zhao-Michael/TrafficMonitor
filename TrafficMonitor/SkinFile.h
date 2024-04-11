@@ -68,5 +68,5 @@ private:
     CFont  m_font;                                      //用于皮肤预览的字体对象
     CImage m_background_s;
     CImage m_background_l;
-
+    wstring skin_file_path;                             //皮肤配置文件的绝对路径
 };

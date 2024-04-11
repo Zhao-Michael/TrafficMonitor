@@ -847,7 +847,8 @@ void CTrafficMonitorDlg::LoadSkinLayout()
         layout_skin = m_skin.GetLayoutManager().layout_l;
     else
         layout_skin = m_skin.GetLayoutManager().layout_s;
-    rMainWndData.layout.name = layout_skin.name;
+    rMainWndData.layout.SkinName    = layout_skin.SkinName;
+    rMainWndData.layout.name        = layout_skin.name;
 }
 
 void CTrafficMonitorDlg::LoadBackGroundImage()

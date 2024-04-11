@@ -51,6 +51,8 @@ void CSkinFile::LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_it
 
 void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele)
 {
+    CFilePathHelper file_path_helper{ skin_file_path };
+    layout.SkinName         = file_path_helper.GetFolderName();
     layout.name             = CCommon::StrToUnicode(CTinyXml2Helper::ElementName(ele), true);
     layout.width            = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "width")));
     layout.height           = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
@@ -223,6 +225,7 @@ void CSkinFile::LoadFromXml(const wstring& file_path)
     m_skin_info         = SkinInfo();
     m_layout_manager    = LayoutManager();
     m_preview_info      = PreviewInfo();
+    skin_file_path      = file_path;
 
     tinyxml2::XMLDocument doc;
     if (CTinyXml2Helper::LoadXmlFile(doc, file_path.c_str()))
