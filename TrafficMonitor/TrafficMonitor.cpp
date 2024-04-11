@@ -192,14 +192,6 @@ void CTrafficMonitorApp::LoadConfig()
     if (!rGeneralData.IsHardwareEnable(HI_MBD))
         rTaskbarData.m_tbar_display_item &= ~TDI_MAIN_BOARD_TEMP;
 
-    //rTaskbarData.swap_up_down = ini.GetBool(_T("taskbar"), _T("taskbar_swap_up_down"), false);
-
-    if (rTaskbarData.layout.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
-    {
-        rTaskbarData.layout.back_color                      = rTaskbarData.dft_back_color;
-        rTaskbar_M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
-    }
-
     //(1)选项对话框中的任务栏窗口设置
     //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
     default_font = FontInfo{};
@@ -211,14 +203,17 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
         CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
     }
-
-
+    if (rTaskbarData.layout.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
+    {
+        rTaskbarData.layout.back_color                      = rTaskbarData.dft_back_color;
+        rTaskbar_M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
+    }
     //任务栏选项设置
-    rTaskbar_LIVA.hide_unit                              = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
-    rTaskbar_LIVA.hide_percent                           = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
-    rTaskbar_LIVA.separate_value_unit_with_space         = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
-    rTaskbar_LIVA.speed_short_mode                       = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
-    rTaskbar_LIVA.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),              0));
+    rTaskbar_LIVA.hide_unit                             = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
+    rTaskbar_LIVA.hide_percent                          = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
+    rTaskbar_LIVA.separate_value_unit_with_space        = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
+    rTaskbar_LIVA.speed_short_mode                      = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
+    rTaskbar_LIVA.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),             0));
     rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_on_left"),             false);
     rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_snap"),                false);
     rTaskbarData.value_right_align                      = ini.GetBool(_T("taskbar"), _T("value_right_align"),               false);
