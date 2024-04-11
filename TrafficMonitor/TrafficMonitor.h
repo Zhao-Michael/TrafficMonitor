@@ -110,7 +110,6 @@ public:
 public:
     CTrafficMonitorApp();
 
-//    void SaveConfig_layout();
     void LoadConfig();
     void SaveConfig();
     void LoadPluginDisabledSettings();

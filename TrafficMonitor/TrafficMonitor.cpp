@@ -124,32 +124,16 @@ void CTrafficMonitorApp::LoadConfig()
     //      (二)载入主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
-    //载入主窗口全局字体设置
+    //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
     FontInfo default_font{};
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
     default_font.size = 10;
-    ini.LoadFontData(_T("config"), rMainWndData.layout.font_info, default_font);
-
     //判断皮肤是否存在
     std::vector<wstring> skin_files;
     CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
     bool is_skin_exist = (!skin_files.empty());
-    COLORREF default_color = is_skin_exist ? 16384 : 16777215;
-    //载入用于主窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)  //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("up_string"),                 rMainWnd_M_LayoutItems, TDI_UP,                 nullptr,    CCommon::LoadText(IDS_UPLOAD_DISP,      _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("down_string"),               rMainWnd_M_LayoutItems, TDI_DOWN,               nullptr,    CCommon::LoadText(IDS_DOWNLOAD_DISP,    _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("cpu_string"),                rMainWnd_M_LayoutItems, TDI_CPU,                nullptr,    L"CPU: $",                                          default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("memory_string"),             rMainWnd_M_LayoutItems, TDI_MEMORY,             nullptr,    CCommon::LoadText(IDS_MEMORY_DISP,      _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("gpu_string"),                rMainWnd_M_LayoutItems, TDI_GPU_USAGE,          nullptr,    CCommon::LoadText(IDS_GPU_DISP,         _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("cpu_temp_string"),           rMainWnd_M_LayoutItems, TDI_CPU_TEMP,           nullptr,    L"CPU: $",                                          default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("gpu_temp_string"),           rMainWnd_M_LayoutItems, TDI_GPU_TEMP,           nullptr,    CCommon::LoadText(IDS_GPU_DISP,         _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("hdd_temp_string"),           rMainWnd_M_LayoutItems, TDI_HDD_TEMP,           nullptr,    CCommon::LoadText(IDS_HDD_DISP,         _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("main_board_temp_string"),    rMainWnd_M_LayoutItems, TDI_MAIN_BOARD_TEMP,    nullptr,    CCommon::LoadText(IDS_MAINBOARD_DISP,   _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("hdd_string"),                rMainWnd_M_LayoutItems, TDI_HDD_USAGE,          nullptr,    CCommon::LoadText(IDS_HDD_DISP,         _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("total_speed_string"),        rMainWnd_M_LayoutItems, TDI_TOTAL_SPEED,        nullptr,    _T("↑↓: $"),                                        default_color);
-    ini.LoadLayoutItemAttributes(LIAO_MAINWND, _T("cpu_freq_string"),           rMainWnd_M_LayoutItems, TDI_CPU_FREQ,           nullptr,    CCommon::LoadText(IDS_CPU_FREQ,         _T(": $")), default_color);
-    //载入用于主窗口的插件显示项标签、标签颜色、数值颜色设置
-    ini.LoadPluginItemsAttributes(LIAO_MAINWND, rMainWnd_M_LayoutItems);
+    COLORREF default_color = is_skin_exist ? 16384 : 16777215;          //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
+    rMainWndData.layout.LoadConfig(LIAO_MAINWND, ini, default_font, default_color, 0, 0, 0);
 
     //载入其它设置
     rMainWnd_LIVA.hide_unit                     = ini.GetBool(_T("config"), _T("hide_unit"),            false);
@@ -180,15 +164,7 @@ void CTrafficMonitorApp::LoadConfig()
     //      (三)载入任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    rTaskbarData.layout.back_color                         = ini.GetInt(_T("taskbar"), _T("taskbar_back_color"), rTaskbarData.dft_back_color, 16);
-    rTaskbarData.layout.transparent_color                  = ini.GetInt(_T("taskbar"), _T("transparent_color"), rTaskbarData.dft_transparent_color, 16);
-    if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
-    {
-        CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
-        CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
-    }
-    rTaskbarData.layout.status_bar_color          = ini.GetInt(_T("taskbar"), _T("status_bar_color"), rTaskbarData.dft_status_bar_color, 16);
-    rTaskbarData.m_tbar_display_item              = ini.GetInt  (L"taskbar",    L"taskbar_display_item", TDI_UP | TDI_DOWN);
+    rTaskbarData.m_tbar_display_item            = ini.GetInt(_T("taskbar"), _T("taskbar_display_item"), TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
 #ifdef WITHOUT_TEMPERATURE
@@ -224,26 +200,18 @@ void CTrafficMonitorApp::LoadConfig()
         rTaskbar_M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
     }
 
-    //任务栏窗口字体设置
+    //(1)选项对话框中的任务栏窗口设置
+    //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
     default_font = FontInfo{};
     default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
     default_font.size = 9;
-    ini.LoadFontData(_T("taskbar"), rTaskbarData.layout.font_info, default_font);
-    //载入用于任务栏窗口的内置显示项所有属性设置(当前版本情况：只支持全局性设置)
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("up_string"),               rTaskbar_M_LayoutItems, TDI_UP, nullptr, L"↑: $", default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("down_string"),             rTaskbar_M_LayoutItems, TDI_DOWN, nullptr, L"↓: $", default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_string"),              rTaskbar_M_LayoutItems, TDI_CPU, nullptr, L"CPU: $", default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("memory_string"),           rTaskbar_M_LayoutItems, TDI_MEMORY, nullptr, CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("gpu_string"),              rTaskbar_M_LayoutItems, TDI_GPU_USAGE, nullptr, CCommon::LoadText(IDS_GPU_DISP, _T(": $")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_temp_string"),         rTaskbar_M_LayoutItems, TDI_CPU_TEMP, nullptr, L"CPU: $", default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("gpu_temp_string"),         rTaskbar_M_LayoutItems, TDI_GPU_TEMP, nullptr, CCommon::LoadText(IDS_GPU_DISP, _T(": ")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("hdd_temp_string"),         rTaskbar_M_LayoutItems, TDI_HDD_TEMP, nullptr, CCommon::LoadText(IDS_HDD_DISP, _T(": ")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("main_board_temp_string"),  rTaskbar_M_LayoutItems, TDI_MAIN_BOARD_TEMP, nullptr, CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": ")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("hdd_string"),              rTaskbar_M_LayoutItems, TDI_HDD_USAGE, nullptr, CCommon::LoadText(IDS_HDD_DISP, _T(": ")), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("total_speed_string"),      rTaskbar_M_LayoutItems, TDI_TOTAL_SPEED, nullptr, _T("↑↓: $"), default_color);
-    ini.LoadLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_freq_string"),         rTaskbar_M_LayoutItems, TDI_CPU_FREQ, nullptr, CCommon::LoadText(IDS_CPU_FREQ, _T(": $")), default_color);
-    //载入插件项目的标签、标签颜色、数值颜色设置
-    ini.LoadPluginItemsAttributes(LIAO_TASKBAR, rTaskbar_M_LayoutItems);
+    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, ini, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
+    if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
+    {
+        CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
+        CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
+    }
+
 
     //任务栏选项设置
     rTaskbar_LIVA.hide_unit                              = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
@@ -315,38 +283,6 @@ void CTrafficMonitorApp::LoadConfig()
     rAppData.taskbar_left_space_win11 = ini.GetInt(L"taskbar", L"taskbar_left_space_win11", 160);
 }
 
-/*
-void CTrafficMonitorApp::SaveConfig_layout()
-{
-    CIniHelper ini{ m_config_layout_path };
-    GeneralSettingData& rGeneralData    = m_general_data;
-    MainWndSettingData& rMainWndData    = m_main_wnd_data;
-    TaskBarSettingData& rTaskbarData    = m_taskbar_data;
-    AppSettingData&     rAppData        = m_cfg_data;
-    std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems = rMainWndData.layout.M_LayoutItems;
-    std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems = rTaskbarData.layout.M_LayoutItems;
-
-    //保存主窗口全局字体设置
-    ini.SaveFontData(L"config", rMainWndData.font);
-    //保存用于主窗口的内置显示项标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("up_string"), rMainWnd_M_LayoutItems[TDI_UP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("down_string"), rMainWnd_M_LayoutItems[TDI_DOWN]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_string"), rMainWnd_M_LayoutItems[TDI_CPU]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("memory_string"), rMainWnd_M_LayoutItems[TDI_MEMORY]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("gpu_string"), rMainWnd_M_LayoutItems[TDI_GPU_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_temp_string"), rMainWnd_M_LayoutItems[TDI_CPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("gpu_temp_string"), rMainWnd_M_LayoutItems[TDI_GPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("hdd_temp_string"), rMainWnd_M_LayoutItems[TDI_HDD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("main_board_temp_string"), rMainWnd_M_LayoutItems[TDI_MAIN_BOARD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("hdd_string"), rMainWnd_M_LayoutItems[TDI_HDD_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("total_speed_string"), rMainWnd_M_LayoutItems[TDI_TOTAL_SPEED]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_freq_string"), rMainWnd_M_LayoutItems[TDI_CPU_FREQ]);
-    //保存用于主窗口的插件的标签、标签颜色、数值颜色设置
-    ini.SavePluginItemsAttributes(LIAO_MAINWND, rMainWnd_M_LayoutItems);
-
-    ini.Save();
-}
-*/
 void CTrafficMonitorApp::SaveConfig()
 {
     CIniHelper ini{ m_config_path };
@@ -406,25 +342,8 @@ void CTrafficMonitorApp::SaveConfig()
     //      (二)保存主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
-    //保存主窗口全局字体设置
-    ini.SaveFontData(L"config", rMainWndData.layout.font_info);
-    //保存用于主窗口的内置显示项标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("up_string"),                 rMainWnd_M_LayoutItems[TDI_UP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("down_string"),               rMainWnd_M_LayoutItems[TDI_DOWN]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_string"),                rMainWnd_M_LayoutItems[TDI_CPU]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("memory_string"),             rMainWnd_M_LayoutItems[TDI_MEMORY]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("gpu_string"),                rMainWnd_M_LayoutItems[TDI_GPU_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_temp_string"),           rMainWnd_M_LayoutItems[TDI_CPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("gpu_temp_string"),           rMainWnd_M_LayoutItems[TDI_GPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("hdd_temp_string"),           rMainWnd_M_LayoutItems[TDI_HDD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("main_board_temp_string"),    rMainWnd_M_LayoutItems[TDI_MAIN_BOARD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("hdd_string"),                rMainWnd_M_LayoutItems[TDI_HDD_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("total_speed_string"),        rMainWnd_M_LayoutItems[TDI_TOTAL_SPEED]);
-    ini.SaveLayoutItemAttributes(LIAO_MAINWND, _T("cpu_freq_string"),           rMainWnd_M_LayoutItems[TDI_CPU_FREQ]);
-    //保存用于主窗口的插件的标签、标签颜色、数值颜色设置
-    ini.SavePluginItemsAttributes(LIAO_MAINWND, rMainWnd_M_LayoutItems);
-
-//    SaveConfig_layout();
+    //(a)保存主窗口字体设置(b)保存用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
+    rMainWndData.layout.SaveConfig(LIAO_MAINWND, ini);
 
     //保存其它设置
     ini.WriteBool           (L"config",     L"hide_unit",                       rMainWnd_LIVA.hide_unit);
@@ -453,28 +372,11 @@ void CTrafficMonitorApp::SaveConfig()
     //      (三)保存任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //任务栏窗口设置
-    ini.WriteInt            (L"taskbar",    L"taskbar_back_color",      rTaskbarData.layout.back_color, 16);
-    ini.WriteInt            (L"taskbar",    L"transparent_color",       rTaskbarData.layout.transparent_color, 16);
-    ini.WriteInt            (L"taskbar",    L"status_bar_color",        rTaskbarData.layout.status_bar_color, 16);
     ini.WriteInt            (L"taskbar",    L"taskbar_display_item",    rTaskbarData.m_tbar_display_item);
-    //任务栏窗口字体设置
-    ini.SaveFontData(L"taskbar", rTaskbarData.layout.font_info);
-    //ini.WriteBool(L"taskbar", L"taskbar_swap_up_down", rTaskbarData.swap_up_down);
-    //保存用于任务栏窗口的内置显示项标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("up_string"),               rTaskbar_M_LayoutItems[TDI_UP]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("down_string"),             rTaskbar_M_LayoutItems[TDI_DOWN]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_string"),              rTaskbar_M_LayoutItems[TDI_CPU]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("memory_string"),           rTaskbar_M_LayoutItems[TDI_MEMORY]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("gpu_string"),              rTaskbar_M_LayoutItems[TDI_GPU_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_temp_string"),         rTaskbar_M_LayoutItems[TDI_CPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("gpu_temp_string"),         rTaskbar_M_LayoutItems[TDI_GPU_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("hdd_temp_string"),         rTaskbar_M_LayoutItems[TDI_HDD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("main_board_temp_string"),  rTaskbar_M_LayoutItems[TDI_MAIN_BOARD_TEMP]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("hdd_string"),              rTaskbar_M_LayoutItems[TDI_HDD_USAGE]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("total_speed_string"),      rTaskbar_M_LayoutItems[TDI_TOTAL_SPEED]);
-    ini.SaveLayoutItemAttributes(LIAO_TASKBAR, _T("cpu_freq_string"),         rTaskbar_M_LayoutItems[TDI_CPU_FREQ]);
-    //保存插件项目的标签、标签颜色、数值颜色设置
-    ini.SavePluginItemsAttributes(LIAO_TASKBAR, rTaskbar_M_LayoutItems);
+
+    //(1)选项对话框中的任务栏窗口设置
+    //(a)保存任务栏窗口字体设置(b)保存用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
+    rTaskbarData.layout.SaveConfig(LIAO_TASKBAR, ini);
 
     //任务栏选项设置
     ini.WriteBool(L"taskbar", L"taskbar_hide_unit",                     rTaskbar_LIVA.hide_unit);

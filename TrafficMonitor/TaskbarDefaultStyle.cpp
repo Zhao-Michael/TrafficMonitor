@@ -31,30 +31,12 @@ void CTaskbarDefaultStyle::LoadConfig()
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_4;
         else;
 
-        wchar_t buff[64];
-        swprintf_s(buff, L"%d", i + 1);
-        wstring key_name = buff;
-        m_default_style[i].back_color               = ini.GetInt(   (L"taskbar_default_style_" + key_name).c_str(), L"back_color",          default_back_color, 16);
-        m_default_style[i].transparent_color        = ini.GetInt(   (L"taskbar_default_style_" + key_name).c_str(), L"transparent_color",   default_transparent_color,  16);
-        m_default_style[i].status_bar_color         = ini.GetInt(   (L"taskbar_default_style_" + key_name).c_str(), L"status_bar_color",    default_status_bar_color,   16);
-
-        //载入用于TaskbarDefaultStyle的内置显示项所有属性设置(当前版本情况：只支持全局性设置)
-        std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = m_default_style[i].M_LayoutItems;
-        ini.LoadLayoutItemAttributes(eOwner, _T("up_string"),               rM_LayoutItems, TDI_UP, nullptr, L"↑: $", default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("down_string"),             rM_LayoutItems, TDI_DOWN, nullptr, L"↓: $", default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("cpu_string"),              rM_LayoutItems, TDI_CPU, nullptr, L"CPU: $", default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("memory_string"),           rM_LayoutItems, TDI_MEMORY, nullptr, CCommon::LoadText(IDS_MEMORY_DISP, _T(": $")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("gpu_string"),              rM_LayoutItems, TDI_GPU_USAGE, nullptr, CCommon::LoadText(IDS_GPU_DISP, _T(": $")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("cpu_temp_string"),         rM_LayoutItems, TDI_CPU_TEMP, nullptr, L"CPU: $", default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("gpu_temp_string"),         rM_LayoutItems, TDI_GPU_TEMP, nullptr, CCommon::LoadText(IDS_GPU_DISP, _T(": ")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("hdd_temp_string"),         rM_LayoutItems, TDI_HDD_TEMP, nullptr, CCommon::LoadText(IDS_HDD_DISP, _T(": ")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("main_board_temp_string"),  rM_LayoutItems, TDI_MAIN_BOARD_TEMP, nullptr, CCommon::LoadText(IDS_MAINBOARD_DISP, _T(": ")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("hdd_string"),              rM_LayoutItems, TDI_HDD_USAGE, nullptr, CCommon::LoadText(IDS_HDD_DISP, _T(": ")), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("total_speed_string"),      rM_LayoutItems, TDI_TOTAL_SPEED, nullptr, _T("↑↓: $"), default_text_color);
-        ini.LoadLayoutItemAttributes(eOwner, _T("cpu_freq_string"),         rM_LayoutItems, TDI_CPU_FREQ, nullptr, CCommon::LoadText(IDS_CPU_FREQ, _T(": $")), default_text_color);
-
-        //载入插件项目的显示文本设置(false表示任务栏窗口)
-        ini.LoadPluginItemsAttributes(eOwner, rM_LayoutItems);
+        //缺省字体和任务栏一致
+        FontInfo default_font{};
+        default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
+        default_font.size = 9;
+        //载入用于TaskbarDefaultStyle的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
+        m_default_style[i].LoadConfig(eOwner, ini, default_font, default_text_color, default_back_color, default_transparent_color, default_status_bar_color);
 	}
 }
 
@@ -77,28 +59,8 @@ void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
 		wstring key_name = buff;
         if (IsTaskBarStyleDataValid(m_default_style[i]))           //保存前检查当前颜色预设是否有效
         {
-
-            ini.WriteInt((L"taskbar_default_style_" + key_name).c_str(), L"back_color",              m_default_style[i].back_color, 16);
-            ini.WriteInt((L"taskbar_default_style_" + key_name).c_str(), L"transparent_color",       m_default_style[i].transparent_color, 16);
-            ini.WriteInt((L"taskbar_default_style_" + key_name).c_str(), L"status_bar_color",        m_default_style[i].status_bar_color, 16);
-
-            //保存用于任务栏窗口的内置显示项标签设置(当前版本情况：只支持全局性设置)
-            std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = m_default_style[i].M_LayoutItems;
-            ini.SaveLayoutItemAttributes(eOwner, _T("up_string"),               rM_LayoutItems[TDI_UP]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("down_string"),             rM_LayoutItems[TDI_DOWN]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("cpu_string"),              rM_LayoutItems[TDI_CPU]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("memory_string"),           rM_LayoutItems[TDI_MEMORY]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("gpu_string"),              rM_LayoutItems[TDI_GPU_USAGE]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("cpu_temp_string"),         rM_LayoutItems[TDI_CPU_TEMP]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("gpu_temp_string"),         rM_LayoutItems[TDI_GPU_TEMP]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("hdd_temp_string"),         rM_LayoutItems[TDI_HDD_TEMP]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("main_board_temp_string"),  rM_LayoutItems[TDI_MAIN_BOARD_TEMP]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("hdd_string"),              rM_LayoutItems[TDI_HDD_USAGE]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("total_speed_string"),      rM_LayoutItems[TDI_TOTAL_SPEED]);
-            ini.SaveLayoutItemAttributes(eOwner, _T("cpu_freq_string"),         rM_LayoutItems[TDI_CPU_FREQ]);
-
-            //保存插件项目的显示文本设置(false表示任务栏窗口)
-            ini.SavePluginItemsAttributes(eOwner, rM_LayoutItems);
+            //保存用于TaskbarDefaultStyle的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
+            m_default_style[i].SaveConfig(eOwner, ini);
         }
         else
         {
@@ -126,9 +88,10 @@ void CTaskbarDefaultStyle::ApplyDefaultStyle(int index, TaskBarSettingData & dat
         if (!IsTaskBarStyleDataValid(m_default_style[index]))
             return;
 
-		rLayout.back_color                 = m_default_style[index].back_color;
-		rLayout.transparent_color          = m_default_style[index].transparent_color;
-		rLayout.status_bar_color           = m_default_style[index].status_bar_color;
+        rLayout.font_info           = m_default_style[index].font_info;
+		rLayout.back_color          = m_default_style[index].back_color;
+		rLayout.transparent_color   = m_default_style[index].transparent_color;
+		rLayout.status_bar_color    = m_default_style[index].status_bar_color;
         for (auto iter = m_default_style[index].M_LayoutItems.begin(); iter != m_default_style[index].M_LayoutItems.end(); ++iter)
         {
             rTaskbar_M_LayoutItems[iter->first].PrefixColor     = iter->second.PrefixColor;
@@ -162,6 +125,7 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
     CLayout&                                    rLayout                 = data.layout;
     std::map<CommonDisplayItem, LayoutItem>&    rTaskbar_M_LayoutItems  = rLayout.M_LayoutItems;
 
+    m_default_style[index].font_info            = rLayout.font_info;
 	m_default_style[index].back_color           = rLayout.back_color;
 	m_default_style[index].transparent_color    = rLayout.transparent_color;
 	m_default_style[index].status_bar_color     = rLayout.status_bar_color;

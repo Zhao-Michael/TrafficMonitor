@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "CommonTypes.h"
 #include "TaskbarItemOrderHelper.h"
+#include "IniHelper.h"
 
 //皮肤布局
 class CLayout
@@ -46,4 +47,8 @@ public:
             return LayoutItem();
         }
     */
+
+    void LoadConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& ini, const FontInfo& default_font, COLORREF default_color,
+                    COLORREF default_back_color, COLORREF default_transparent_color, COLORREF default_status_bar_color);
+    void SaveConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& ini);
 };
