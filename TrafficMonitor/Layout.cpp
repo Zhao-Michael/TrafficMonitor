@@ -10,10 +10,10 @@ CLayout::~CLayout()
 {
 }
 
-void CLayout::LoadConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& ini, const FontInfo& default_font, COLORREF default_color,
+void CLayout::LoadConfig(const ELayoutItemAttributesOwner eOwner, const wstring& config_path, const FontInfo& default_font, COLORREF default_color,
                         COLORREF default_back_color, COLORREF default_transparent_color, COLORREF default_status_bar_color)
 {
-    //    CIniHelper ini{ m_config_layout_path };
+    CIniHelper ini{ config_path };
     std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = M_LayoutItems;
 
     wchar_t* AppName = nullptr;
@@ -95,16 +95,11 @@ void CLayout::LoadConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& in
     }
     else
         return;
-
-    //载入字体设置
-//    ini.LoadFontData(AppName, font_info, default_font);
-
-    //    ini.Save();
 }
 
-void CLayout::SaveConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& ini)
+void CLayout::SaveConfig(const ELayoutItemAttributesOwner eOwner, const wstring& config_path)
 {
-    //    CIniHelper ini{ m_config_layout_path };
+    CIniHelper ini{ config_path };
     std::map<CommonDisplayItem, LayoutItem>& rM_LayoutItems = M_LayoutItems;
 
     wchar_t* AppName = nullptr;
@@ -145,5 +140,5 @@ void CLayout::SaveConfig(const ELayoutItemAttributesOwner eOwner, CIniHelper& in
     //保存插件项的标签、标签颜色、数值颜色设置
     ini.SavePluginItemsAttributes(eOwner, rM_LayoutItems);
 
-    //    ini.Save();
+    ini.Save();
 }

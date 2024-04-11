@@ -57,6 +57,16 @@ void CTrafficMonitorApp::LoadConfig()
     LayoutItemValueAttributes&                  rMainWnd_LIVA           = rMainWndData.layout_item_value_attributes;
     LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
 
+    //缺省字体和颜色
+    FontInfo default_font{};
+    default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
+    default_font.size = 10;
+    //判断皮肤是否存在
+    std::vector<wstring> skin_files;
+    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
+    bool is_skin_exist = (!skin_files.empty());
+    COLORREF default_color = is_skin_exist ? 16384 : 16777215;          //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
+
     ////////////////////////////////////////////////////////////////////////////////////////
     //      (一)载入APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -121,19 +131,10 @@ void CTrafficMonitorApp::LoadConfig()
         CCommon::SetColorMode(ColorMode::Default);
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //      (二)载入主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
+    //      (二)加载主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
-    //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
-    //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    FontInfo default_font{};
-    default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
-    default_font.size = 10;
-    //判断皮肤是否存在
-    std::vector<wstring> skin_files;
-    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
-    bool is_skin_exist = (!skin_files.empty());
-    COLORREF default_color = is_skin_exist ? 16384 : 16777215;          //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-    rMainWndData.layout.LoadConfig(LIAO_MAINWND, ini, default_font, default_color, 0, 0, 0);
+    //(1)加载选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
+    //不再在这里加载
 
     //载入其它设置
     rMainWnd_LIVA.hide_unit                     = ini.GetBool(_T("config"), _T("hide_unit"),            false);
@@ -161,9 +162,9 @@ void CTrafficMonitorApp::LoadConfig()
     rMainWndData.m_position_y                   = ini.GetInt (_T("config"), _T("position_y"),       -1);
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //      (三)载入任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
+    //      (三)加载任务栏窗口设置 = 选项对话框中的任务栏窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
-    //任务栏窗口设置
+    //加载任务栏窗口设置
     rTaskbarData.m_tbar_display_item            = ini.GetInt(_T("taskbar"), _T("taskbar_display_item"), TDI_UP | TDI_DOWN);
 
     //不含温度监控的版本，不显示温度监控相关项目
@@ -192,28 +193,12 @@ void CTrafficMonitorApp::LoadConfig()
     if (!rGeneralData.IsHardwareEnable(HI_MBD))
         rTaskbarData.m_tbar_display_item &= ~TDI_MAIN_BOARD_TEMP;
 
-    //(1)选项对话框中的任务栏窗口设置
-    //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-    default_font = FontInfo{};
-    default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
-    default_font.size = 9;
-    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, ini, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
-    if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
-    {
-        CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
-        CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
-    }
-    if (rTaskbarData.layout.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
-    {
-        rTaskbarData.layout.back_color                      = rTaskbarData.dft_back_color;
-        rTaskbar_M_LayoutItems.begin()->second.PrefixColor  = rTaskbarData.dft_text_colors;
-    }
     //任务栏选项设置
     rTaskbar_LIVA.hide_unit                             = ini.GetBool(_T("taskbar"), _T("taskbar_hide_unit"),               false);
     rTaskbar_LIVA.hide_percent                          = ini.GetBool(_T("taskbar"), _T("taskbar_hide_percent"),            false);
     rTaskbar_LIVA.separate_value_unit_with_space        = ini.GetBool(_T("taskbar"), _T("separate_value_unit_with_space"),  true);
     rTaskbar_LIVA.speed_short_mode                      = ini.GetBool(_T("taskbar"), _T("taskbar_speed_short_mode"),        false);
-    rTaskbar_LIVA.speed_unit      = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),             0));
+    rTaskbar_LIVA.speed_unit     = static_cast<SpeedUnit>(ini.GetInt (_T("taskbar"), _T("taskbar_speed_unit"),              0));
     rTaskbarData.tbar_wnd_on_left                       = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_on_left"),             false);
     rTaskbarData.tbar_wnd_snap                          = ini.GetBool(_T("taskbar"), _T("taskbar_wnd_snap"),                false);
     rTaskbarData.value_right_align                      = ini.GetBool(_T("taskbar"), _T("value_right_align"),               false);
@@ -233,16 +218,16 @@ void CTrafficMonitorApp::LoadConfig()
     rTaskbarData.ValidWindowOffsetTop();
 
     if (m_win_version.IsWindows10OrLater())     //只有Win10才支持自动适应系统深色/浅色主题
-        rTaskbarData.auto_adapt_light_theme = ini.GetBool(L"taskbar", L"auto_adapt_light_theme", false);
+        rTaskbarData.auto_adapt_light_theme     = ini.GetBool(L"taskbar", L"auto_adapt_light_theme", false);
     else
-        rTaskbarData.auto_adapt_light_theme = false;
-    rTaskbarData.dark_default_style = ini.GetInt(L"taskbar", L"dark_default_style", 0);
-    rTaskbarData.light_default_style = ini.GetInt(L"taskbar", L"light_default_style", TASKBAR_DEFAULT_LIGHT_STYLE_INDEX);
+        rTaskbarData.auto_adapt_light_theme     = false;
+    rTaskbarData.dark_default_style             = ini.GetInt(L"taskbar", L"dark_default_style", 0);
+    rTaskbarData.light_default_style            = ini.GetInt(L"taskbar", L"light_default_style", TASKBAR_DEFAULT_LIGHT_STYLE_INDEX);
 
     if (m_win_version.IsWindows8OrLater())
-        rTaskbarData.auto_set_background_color = ini.GetBool(L"taskbar", L"auto_set_background_color", false);
+        rTaskbarData.auto_set_background_color  = ini.GetBool(L"taskbar", L"auto_set_background_color", false);
     else
-        rTaskbarData.auto_set_background_color = false;
+        rTaskbarData.auto_set_background_color  = false;
 
     //任务栏各监控项显示顺序设置
     rTaskbarData.item_order.Init();
@@ -261,21 +246,38 @@ void CTrafficMonitorApp::LoadConfig()
 
     //其他设置
     //rAppData.m_show_internet_ip = ini.GetBool(L"connection_details", L"show_internet_ip", false);
-    rAppData.m_use_log_scale = ini.GetBool(_T("histroy_traffic"), _T("use_log_scale"), true);
-    rAppData.m_sunday_first = ini.GetBool(_T("histroy_traffic"), _T("sunday_first"), true);
+    rAppData.m_use_log_scale                = ini.GetBool(_T("histroy_traffic"), _T("use_log_scale"), true);
+    rAppData.m_sunday_first                 = ini.GetBool(_T("histroy_traffic"), _T("sunday_first"), true);
     rAppData.m_view_type = static_cast<HistoryTrafficViewType>(ini.GetInt(_T("histroy_traffic"), _T("view_type"), static_cast<int>(HistoryTrafficViewType::HV_DAY)));
 
-    m_no_multistart_warning = ini.GetBool(_T("other"), _T("no_multistart_warning"), false);
-    m_notify_interval = ini.GetInt(_T("other"), _T("notify_interval"), 60);
-    m_exit_when_start_by_restart_manager = ini.GetBool(_T("other"), _T("exit_when_start_by_restart_manager"), true);
-    m_debug_log = ini.GetBool(_T("other"), _T("debug_log"), false);
+    m_no_multistart_warning                 = ini.GetBool(_T("other"), _T("no_multistart_warning"), false);
+    m_notify_interval                       = ini.GetInt(_T("other"), _T("notify_interval"), 60);
+    m_exit_when_start_by_restart_manager    = ini.GetBool(_T("other"), _T("exit_when_start_by_restart_manager"), true);
+    m_debug_log                             = ini.GetBool(_T("other"), _T("debug_log"), false);
     //由于Win7系统中设置任务栏窗口透明色会导致任务栏窗口不可见，因此默认在Win7中禁用透明色的设定
-    m_taksbar_transparent_color_enable = ini.GetBool(L"other", L"taksbar_transparent_color_enable", !m_win_version.IsWindows7());
-    m_last_light_mode = ini.GetBool(L"other", L"last_light_mode", CWindowsSettingHelper::IsWindows10LightTheme());
-    m_show_mouse_panetrate_tip = ini.GetBool(L"other", L"show_mouse_panetrate_tip", true);
-    m_show_dot_net_notinstalled_tip = ini.GetBool(L"other", L"show_dot_net_notinstalled_tip", true);
+    m_taksbar_transparent_color_enable      = ini.GetBool(L"other", L"taksbar_transparent_color_enable", !m_win_version.IsWindows7());
+    m_last_light_mode                       = ini.GetBool(L"other", L"last_light_mode", CWindowsSettingHelper::IsWindows10LightTheme());
+    m_show_mouse_panetrate_tip              = ini.GetBool(L"other", L"show_mouse_panetrate_tip", true);
+    m_show_dot_net_notinstalled_tip         = ini.GetBool(L"other", L"show_dot_net_notinstalled_tip", true);
 
-    rAppData.taskbar_left_space_win11 = ini.GetInt(L"taskbar", L"taskbar_left_space_win11", 160);
+    rAppData.taskbar_left_space_win11       = ini.GetInt(L"taskbar", L"taskbar_left_space_win11", 160);
+
+    //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
+    default_font.size = 9;
+    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, m_config_path, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
+    if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
+    {
+        CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
+        CCommon::TransparentColorConvert(rTaskbarData.layout.transparent_color);
+    }
+    if (rTaskbarData.layout.back_color == 0 && !rTaskbar_M_LayoutItems.empty() && rTaskbar_M_LayoutItems.begin()->second.PrefixColor == 0)     //万一读取到的背景色和文本颜色都为0（黑色），则将文本色和背景色设置成默认颜色
+    {
+        rTaskbarData.layout.back_color = rTaskbarData.dft_back_color;
+        rTaskbar_M_LayoutItems.begin()->second.PrefixColor = rTaskbarData.dft_text_colors;
+    }
+
+    //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
+    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_path, default_font, default_color, 0, 0, 0);
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -337,8 +339,6 @@ void CTrafficMonitorApp::SaveConfig()
     //      (二)保存主窗口设置 = 选项对话框中的主窗口设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
     //(1)选项对话框中的主窗口设置(当前版本情况：只支持全局性设置)
-    //(a)保存主窗口字体设置(b)保存用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    rMainWndData.layout.SaveConfig(LIAO_MAINWND, ini);
 
     //保存其它设置
     ini.WriteBool           (L"config",     L"hide_unit",                       rMainWnd_LIVA.hide_unit);
@@ -370,8 +370,6 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteInt            (L"taskbar",    L"taskbar_display_item",    rTaskbarData.m_tbar_display_item);
 
     //(1)选项对话框中的任务栏窗口设置
-    //(a)保存任务栏窗口字体设置(b)保存用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-    rTaskbarData.layout.SaveConfig(LIAO_TASKBAR, ini);
 
     //任务栏选项设置
     ini.WriteBool(L"taskbar", L"taskbar_hide_unit",                     rTaskbar_LIVA.hide_unit);
@@ -444,6 +442,13 @@ void CTrafficMonitorApp::SaveConfig()
         }
         m_cannot_save_config_warning = false;
         return;
+    }
+    else
+    {
+        //(a)保存任务栏窗口字体设置(b)保存用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
+        rTaskbarData.layout.SaveConfig(LIAO_TASKBAR, m_config_path);
+        //(a)保存主窗口字体设置(b)保存用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
+        rMainWndData.layout.SaveConfig(LIAO_MAINWND, m_config_path);
     }
 }
 
