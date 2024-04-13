@@ -839,16 +839,7 @@ void CTrafficMonitorDlg::LoadSkinLayout()
     wstring skin_cfg_path{ theApp.m_skin_dir + m_skins[m_skin_selected] + L"\\skin.xml" };
     m_skin.LoadCfgAndBGImage(skin_cfg_path);
 
-    //接下来是在加载皮肤后，额外要做的事情。
-    MainWndSettingData& rMainWndData = theApp.m_main_wnd_data;
-
-    CLayout layout_skin = {};
-    if (rMainWndData.m_show_more_info)
-        layout_skin = m_skin.GetLayoutManager().layout_l;
-    else
-        layout_skin = m_skin.GetLayoutManager().layout_s;
-    rMainWndData.layout.SkinName    = layout_skin.SkinName;
-    rMainWndData.layout.name        = layout_skin.name;
+    SwitchGUILayout();
 }
 
 void CTrafficMonitorDlg::LoadBackGroundImage()
@@ -1066,8 +1057,6 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
         SetWindowPos(nullptr, rMainWndData.m_position_x, rMainWndData.m_position_y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
     CheckWindowPos();
     LoadBackGroundImage();  //载入背景图片
-
-    SetTextFont();          //设置字体
 
     //获取启动时的时间
     GetLocalTime(&m_start_time);
@@ -2238,8 +2227,33 @@ void CTrafficMonitorDlg::OnDestroy()
     // TODO: 在此处添加消息处理程序代码
 }
 
-void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
+void CTrafficMonitorDlg::SwitchGUILayout()
 {
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //接下来是在加载皮肤后额外要做的事情:(1)切换前先保存旧布局的GUI设置(2)加载新布局的GUI设置(3)设置字体
+    ////////////////////////////////////////////////////////////////////////////////////////
+    MainWndSettingData&     rMainWndData    = theApp.m_main_wnd_data;
+    CLayout&                rLayout         = rMainWndData.layout;
+    CLayout                 layout_skin     = {};
+    if (!rLayout.SkinName.empty() && !rLayout.name.empty())             //切换前先保存旧布局设置
+    {
+        //(a)保存主窗口字体设置(b)保存用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
+        rMainWndData.layout.SaveConfig(LIAO_MAINWND, theApp.m_config_layouts_path);
+    }
+
+    if (rMainWndData.m_show_more_info)
+        layout_skin = m_skin.GetLayoutManager().layout_l;
+    else
+        layout_skin = m_skin.GetLayoutManager().layout_s;
+    rLayout.SkinName    = layout_skin.SkinName;
+    rLayout.name        = layout_skin.name;
+
+    //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
+    if (!rLayout.LoadConfig(LIAO_MAINWND, theApp.m_config_layouts_path, theApp.m_main_wnd_default_font, theApp.m_default_color, 0, 0, 0))
+        rLayout.LoadConfig(layout_skin);
+
+    SetTextFont();          //设置字体
+/*
     MainWndSettingData&                         rMainWndData            = theApp.m_main_wnd_data;
     std::map<CommonDisplayItem, LayoutItem>&    rMainWnd_M_LayoutItems  = rMainWndData.layout.M_LayoutItems;
 
@@ -2290,6 +2304,7 @@ void CTrafficMonitorDlg::LoadAttributesSettingsWhenLayoutSwitched()
             SetTextFont();          //设置字体
         }
     }
+*/
 }
 
 void CTrafficMonitorDlg::OnShowCpuMemory()
@@ -2313,9 +2328,9 @@ void CTrafficMonitorDlg::OnShowCpuMemory()
         MoveWindow(rect);
         CheckWindowPos();
     }
+    SwitchGUILayout();
     SetItemPosition();          //初始化窗口位置
     LoadBackGroundImage();      //载入背景图片
-//    LoadAttributesSettingsWhenLayoutSwitched();       //暂时不使用，以后要改。
     Invalidate(FALSE);          //重绘界面
     theApp.SaveConfig();
 }
@@ -2471,7 +2486,7 @@ void CTrafficMonitorDlg::OnChangeSkin()
         LoadSkinLayout();                               //根据当前选择的皮肤获取布局数据
         SetItemPosition();                              //初始化窗口位置
         LoadBackGroundImage();                          //载入背景图片
-        LoadAttributesSettingsWhenLayoutSwitched();
+
         Invalidate(FALSE);                              //更换皮肤后立即刷新窗口信息
 
         theApp.SaveConfig();
@@ -2677,7 +2692,6 @@ afx_msg LRESULT CTrafficMonitorDlg::OnDpichanged(WPARAM wParam, LPARAM lParam)
     SetItemPosition();      //初始化窗口位置
     LoadBackGroundImage();  //载入背景图片
 
-    SetTextFont();          //重新加载字体
     Invalidate(FALSE);      //重绘界面
 
     return 0;

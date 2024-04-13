@@ -14,6 +14,7 @@ public:
 	void SetSaveAsUTF8(bool utf8);
 
 	void RemoveSpecialChar(wstring& rtn);
+	BOOL FindAppName(const wchar_t* AppName);
 	void WriteString(const wchar_t* AppName, const wchar_t* KeyName, const wstring& str);
 	wstring GetString(const wchar_t* AppName, const wchar_t* KeyName, const wchar_t* default_str) const;
 	void WriteInt(const wchar_t * AppName, const wchar_t * KeyName, int value);
@@ -29,14 +30,13 @@ public:
     void WriteStringList(const wchar_t* AppName, const wchar_t* KeyName, const vector<wstring>& values);      //写入一个字符串列表，由于保存到ini文件中时字符串前后会加上引号，所以字符串中不能包含引号
     void GetStringList(const wchar_t* AppName, const wchar_t* KeyName, vector<wstring>& values, const vector<wstring>& default_value) const;
 
-	void SaveFontData(const wchar_t * AppName, const FontInfo& font);
 	void LoadFontData(const wchar_t * AppName, FontInfo& font, const FontInfo& default_font) const;
-
-	void LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
+	void SaveFontData(const wchar_t * AppName, const FontInfo& font);
+	void LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
 							EBuiltinDisplayItem item_type, IPluginItem* iplugin_item, const wchar_t* default_str, COLORREF default_color);
-	void SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, LayoutItem& layout_item);
-    void LoadPluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
-    void SavePluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
+	void SaveLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item);
+	void LoadPluginItemsAttributes(const wchar_t* AppName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
+	void SavePluginItemsAttributes(const wchar_t* AppName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items);
 
 	bool Save();		//将ini文件保存到文件，成功返回true
 

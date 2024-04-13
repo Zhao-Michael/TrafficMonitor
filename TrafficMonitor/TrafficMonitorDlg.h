@@ -168,6 +168,7 @@ protected:
     void ApplySettings(COptionsDlg& optionsDlg);
 
     void SetItemPosition();     //设置显示的4个项目的位置
+    void SwitchGUILayout();
     void LoadSkinLayout();      //从当前皮肤获取布局数据
 
     void LoadBackGroundImage();
@@ -213,7 +214,6 @@ protected:
 public:
     afx_msg void OnShowNotifyIcon();
     afx_msg void OnDestroy();
-    afx_msg void LoadAttributesSettingsWhenLayoutSwitched();
     afx_msg void OnShowCpuMemory();
     afx_msg void OnMousePenetrate();
     //afx_msg void OnTextColor();

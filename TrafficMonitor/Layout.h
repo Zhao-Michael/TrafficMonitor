@@ -50,7 +50,8 @@ public:
         }
     */
 
-    void LoadConfig(const ELayoutItemAttributesOwner eOwner, const wstring& config_path, const FontInfo& default_font, COLORREF default_color,
+    BOOL LoadConfig(const ELayoutItemAttributesOwner eOwner, const wstring& config_path, const FontInfo& default_font, COLORREF default_color,
                     COLORREF default_back_color, COLORREF default_transparent_color, COLORREF default_status_bar_color);
+    void LoadConfig(CLayout& layout);
     void SaveConfig(const ELayoutItemAttributesOwner eOwner, const wstring& config_path);
 };

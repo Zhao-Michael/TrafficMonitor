@@ -55,6 +55,19 @@ void CIniHelper::RemoveSpecialChar(wstring& rtn)
         rtn.pop_back();
 }
 
+BOOL CIniHelper::FindAppName(const wchar_t* AppName)
+{
+    wstring app_str{ L"[" };
+    app_str.append(AppName).append(L"]");
+    size_t app_pos{};
+    app_pos = m_ini_str.find(app_str);
+    if (app_pos == wstring::npos)       //找不到AppName，则在最后面添加
+    {
+        return false;
+    }
+    return true;
+}
+
 void CIniHelper::WriteString(const wchar_t * AppName, const wchar_t * KeyName, const wstring& str)
 {
     wstring write_str{ str };
@@ -199,18 +212,6 @@ void CIniHelper::GetStringList(const wchar_t* AppName, const wchar_t* KeyName, v
     SplitStringList(values, str_value);
 }
 
-void CIniHelper::SaveFontData(const wchar_t * AppName, const FontInfo & font)
-{
-    WriteString(AppName, L"font_name", wstring(font.name));
-    WriteInt(AppName, L"font_size", font.size);
-    bool style[4];
-    style[0] = font.bold;
-    style[1] = font.italic;
-    style[2] = font.underline;
-    style[3] = font.strike_out;
-    WriteBoolArray(AppName, L"font_style", style, 4);
-}
-
 bool CIniHelper::Save()
 {
     ofstream file_stream{ m_file_path };
@@ -242,7 +243,19 @@ void CIniHelper::LoadFontData(const wchar_t * AppName, FontInfo & font, const Fo
     font.strike_out = style[3];
 }
 
-void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
+void CIniHelper::SaveFontData(const wchar_t* AppName, const FontInfo& font)
+{
+    WriteString(AppName, L"font_name", wstring(font.name));
+    WriteInt(AppName, L"font_size", font.size);
+    bool style[4];
+    style[0] = font.bold;
+    style[1] = font.italic;
+    style[2] = font.underline;
+    style[3] = font.strike_out;
+    WriteBoolArray(AppName, L"font_style", style, 4);
+}
+
+void CIniHelper::LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items,
                             EBuiltinDisplayItem item_type, IPluginItem* iplugin_item, const wchar_t* default_str, COLORREF default_color)
 {
     LayoutItem* pLayoutItem = nullptr;
@@ -256,22 +269,6 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
         pLayoutItem         = &M_layout_items[iplugin_item];
         pLayoutItem->id     = iplugin_item->GetItemId();
     }
-
-    wchar_t* AppName = nullptr;
-    if (LIAO_MAINWND == eOwner)
-        AppName = _T("config");
-    else if (LIAO_TASKBAR == eOwner)
-        AppName = _T("taskbar");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
-        AppName = _T("taskbar_default_style_1");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)
-        AppName = _T("taskbar_default_style_2");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_3 == eOwner)
-        AppName = _T("taskbar_default_style_3");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_4 == eOwner)
-        AppName = _T("taskbar_default_style_4");
-    else
-        return;
 
     //每项的所有属性保存格式为： 标签，标签颜色，数值颜色
     wstring str = _GetString(AppName, KeyName, default_str);    //如果找不到AppName.KeyName =，则说明这项LayoutItem从来没自定义过，会返回default_str。
@@ -332,7 +329,7 @@ void CIniHelper::LoadLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     }
 }
 
-void CIniHelper::SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwner, const wchar_t* KeyName, LayoutItem& layout_item)
+void CIniHelper::SaveLayoutItemAttributes(const wchar_t* AppName, const wchar_t* KeyName, LayoutItem& layout_item)
 {
     CString str;
 
@@ -340,38 +337,22 @@ void CIniHelper::SaveLayoutItemAttributes(const ELayoutItemAttributesOwner eOwne
     tmp.Format(_T("\"%s\",0x%x,0x%x"), layout_item.Prefix, layout_item.PrefixColor, layout_item.ValueColor);      //saved as Hex data
     str += tmp;
 
-    wchar_t* AppName = nullptr;
-    if (LIAO_MAINWND == eOwner)
-        AppName = _T("config");
-    else if (LIAO_TASKBAR == eOwner)
-        AppName = _T("taskbar");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_1 == eOwner)
-        AppName = _T("taskbar_default_style_1");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_2 == eOwner)
-        AppName = _T("taskbar_default_style_2");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_3 == eOwner)
-        AppName = _T("taskbar_default_style_3");
-    else if (LIAO_TASKBAR_DEFAULT_STYLE_4 == eOwner)
-        AppName = _T("taskbar_default_style_4");
-    else
-        return;
-
     _WriteString(AppName, KeyName, wstring(str));
 }
 
-void CIniHelper::LoadPluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
+void CIniHelper::LoadPluginItemsAttributes(const wchar_t* AppName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
 {
     for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
     {
-        LoadLayoutItemAttributes(eOwner, plugin->GetItemId(), M_layout_items, TDI_UP, plugin, plugin->GetItemLableText(), 0xffffff);
+        LoadLayoutItemAttributes(AppName, plugin->GetItemId(), M_layout_items, TDI_UP, plugin, plugin->GetItemLableText(), 0xffffff);
     }
 }
 
-void CIniHelper::SavePluginItemsAttributes(const ELayoutItemAttributesOwner eOwner, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
+void CIniHelper::SavePluginItemsAttributes(const wchar_t* AppName, std::map<CommonDisplayItem, LayoutItem>& M_layout_items)
 {
     for (const auto& plugin : theApp.m_plugin_manager.GetAllIPluginItems())
     {
-        SaveLayoutItemAttributes(eOwner, plugin->GetItemId(), M_layout_items[plugin]);
+        SaveLayoutItemAttributes(AppName, plugin->GetItemId(), M_layout_items[plugin]);
     }
 }
 

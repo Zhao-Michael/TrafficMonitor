@@ -264,9 +264,6 @@ void CTrafficMonitorApp::LoadConfig()
         rTaskbarData.layout.back_color = rTaskbarData.dft_back_color;
         rTaskbar_M_LayoutItems.begin()->second.PrefixColor = rTaskbarData.dft_text_colors;
     }
-
-    //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_layouts_path, m_main_wnd_default_font, m_default_color, 0, 0, 0);
 }
 
 void CTrafficMonitorApp::SaveConfig()
