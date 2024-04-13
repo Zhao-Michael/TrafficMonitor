@@ -89,6 +89,16 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
     m_list_ctrl.SetEditColMethod(CMonitorItemAttributesSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
     m_list_ctrl.SetEditableCol({ 2 });                                                      //设置可编辑的列
 
+    if (!m_layout.name.empty())
+    {
+        CString str;
+        GetWindowText(str);
+        str += "(";
+        wstring     WindowTextName{};
+        WindowTextName = str.GetString() + m_layout.name;
+        WindowTextName += _T(")");
+        SetWindowText(WindowTextName.c_str());
+    }
     //初始化字体设置相关控件
     FontInfo& rFontInfo = m_layout.font_info;
     ((CButton*)GetDlgItem(IDC_FONT_NAME_EDIT))->EnableWindow(false);
