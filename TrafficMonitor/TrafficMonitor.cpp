@@ -57,16 +57,6 @@ void CTrafficMonitorApp::LoadConfig()
     LayoutItemValueAttributes&                  rMainWnd_LIVA           = rMainWndData.layout_item_value_attributes;
     LayoutItemValueAttributes&                  rTaskbar_LIVA           = rTaskbarData.layout_item_value_attributes;
 
-    //缺省字体和颜色
-    FontInfo default_font{};
-    default_font.name = CCommon::LoadText(IDS_DEFAULT_FONT);
-    default_font.size = 10;
-    //判断皮肤是否存在
-    std::vector<wstring> skin_files;
-    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
-    bool is_skin_exist = (!skin_files.empty());
-    COLORREF default_color = is_skin_exist ? 16384 : 16777215;          //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
-
     ////////////////////////////////////////////////////////////////////////////////////////
     //      (一)载入APP全局性设置 = 选项对话框中的常规设置 + 鼠标右键中的部分设置 + 其它设置
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -263,8 +253,7 @@ void CTrafficMonitorApp::LoadConfig()
     rAppData.taskbar_left_space_win11       = ini.GetInt(L"taskbar", L"taskbar_left_space_win11", 160);
 
     //(a)载入任务栏窗口字体设置(b)载入用于任务栏窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-    default_font.size = 9;
-    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, m_config_layouts_path, default_font, default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
+    rTaskbarData.layout.LoadConfig(LIAO_TASKBAR, m_config_layouts_path, m_taskbar_default_font, m_default_color, rTaskbarData.dft_back_color, rTaskbarData.dft_transparent_color, rTaskbarData.dft_status_bar_color);
     if (rTaskbarData.IsTaskbarTransparent()) //如果任务栏背景透明，则需要将颜色转换一下
     {
         CCommon::TransparentColorConvert(rTaskbarData.layout.back_color);
@@ -277,7 +266,7 @@ void CTrafficMonitorApp::LoadConfig()
     }
 
     //(a)载入主窗口字体设置(b)载入用于主窗口的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置(当前版本情况：只支持全局性设置)
-    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_layouts_path, default_font, default_color, 0, 0, 0);
+    rMainWndData.layout.LoadConfig(LIAO_MAINWND, m_config_layouts_path, m_main_wnd_default_font, m_default_color, 0, 0, 0);
 }
 
 void CTrafficMonitorApp::SaveConfig()
@@ -931,7 +920,7 @@ BOOL CTrafficMonitorApp::InitInstance()
     m_history_traffic_path  = m_config_dir + L"history_traffic.dat";
     m_log_path              = m_config_dir + L"error.log";
 
-    //#ifndef _DEBUG
+//#ifndef _DEBUG
     //  //原来的、程序所在目录下的配置文件的路径
     //  wstring config_path_old = m_module_dir + L"config.ini";
     //  wstring history_traffic_path_old = m_module_dir + L"history_traffic.dat";
@@ -940,7 +929,18 @@ BOOL CTrafficMonitorApp::InitInstance()
     //  CCommon::MoveAFile(config_path_old.c_str(), m_config_path.c_str());
     //  CCommon::MoveAFile(history_traffic_path_old.c_str(), m_history_traffic_path.c_str());
     //  CCommon::MoveAFile(log_path_old.c_str(), m_log_path.c_str());
-    //#endif // !_DEBUG
+//#endif // !_DEBUG
+
+    //初始化程序缺省值
+    m_main_wnd_default_font.name    = CCommon::LoadText(IDS_DEFAULT_FONT);
+    m_main_wnd_default_font.size    = 10;
+    m_taskbar_default_font.name     = CCommon::LoadText(IDS_DEFAULT_FONT);
+    m_taskbar_default_font.size     = 9;
+    //判断皮肤是否存在
+    std::vector<wstring> skin_files;
+    CCommon::GetFiles((theApp.m_skin_dir + L"\\*").c_str(), skin_files);
+    bool is_skin_exist = (!skin_files.empty());
+    m_default_color = is_skin_exist ? 16384 : 16777215;          //根据皮肤是否存在来设置默认的文本颜色，皮肤文件不存在时文本颜色默认为白色
 
     bool is_windows10_fall_creator = m_win_version.IsWindows10FallCreatorOrLater();
 

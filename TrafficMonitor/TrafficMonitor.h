@@ -98,6 +98,10 @@ public:
     CMenu                   m_taskbar_menu_plugin;                  //右击任务栏窗口插件区域的右键菜单
     CMenu                   m_taskbar_menu_plugin_sub_menu;
 
+    //缺省字体和颜色
+    FontInfo                m_main_wnd_default_font{}, m_taskbar_default_font{};
+    COLORREF                m_default_color{};
+
 #ifndef WITHOUT_TEMPERATURE
     //OpenHardwareMonitor 接口的指针
     std::shared_ptr<OpenHardwareMonitorApi::IOpenHardwareMonitor> m_pMonitor{};
