@@ -89,7 +89,7 @@ void CTrafficMonitorApp::LoadConfig()
     rGeneralData.cpu_core_name                  = ini.GetString(L"general",     L"cpu_core_name",           L"Core Average");
     rGeneralData.show_all_interface             = ini.GetBool  (L"general",     L"show_all_interface",      false);
     //载入获取CPU利用率的方式，默认使用GetSystemTimes获取
-    rGeneralData.m_get_cpu_usage_by_cpu_times   = ini.GetBool  (L"general",     L"get_cpu_usage_by_cpu_times", /*m_win_version.GetMajorVersion() < 10*/ true);
+    rGeneralData.m_get_cpu_usage_by_cpu_times   = ini.GetBool  (L"general",     L"get_cpu_usage_by_cpu_times", /*m_win_version.GetMajorVersion() < 10*/ false);
     rGeneralData.monitor_time_span              = ini.GetInt   (L"general",     L"monitor_time_span", 1000);
     if (rGeneralData.monitor_time_span < MONITOR_TIME_SPAN_MIN || rGeneralData.monitor_time_span > MONITOR_TIME_SPAN_MAX)
         rGeneralData.monitor_time_span = 1000;
