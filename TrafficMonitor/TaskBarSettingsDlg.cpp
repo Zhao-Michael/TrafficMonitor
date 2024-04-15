@@ -563,7 +563,6 @@ void CTaskBarSettingsDlg::OnDestroy()
     CTabDlg::OnDestroy();
 
     // TODO: 在此处添加消息处理程序代码
-    theApp.m_taskbar_default_style.SaveConfig();
 }
 
 

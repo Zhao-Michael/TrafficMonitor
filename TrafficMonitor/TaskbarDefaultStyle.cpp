@@ -10,7 +10,6 @@ CTaskbarDefaultStyle::CTaskbarDefaultStyle()
 
 CTaskbarDefaultStyle::~CTaskbarDefaultStyle()
 {
-	SaveConfig();
 }
 
 void CTaskbarDefaultStyle::LoadConfig()
@@ -36,32 +35,33 @@ void CTaskbarDefaultStyle::LoadConfig()
 	}
 }
 
-void CTaskbarDefaultStyle::SaveConfig() //const     //使用map后不能用const
+void CTaskbarDefaultStyle::SaveConfig(int index) //const     //使用map后不能用const
 {
-	for (int i = 0; i < TASKBAR_DEFAULT_STYLE_NUM; i++)
+//	for (unsigned char index = 0; index < TASKBAR_DEFAULT_STYLE_NUM; index++)
+    if (index >= 0 && index < TASKBAR_DEFAULT_STYLE_NUM)
 	{
         ELayoutItemAttributesOwner      eOwner = LIAO_TASKBAR_DEFAULT_STYLE_1;
-        if (i == 1)
+        if (index == 1)
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_2;
-        else if (i == 2)
+        else if (index == 2)
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_3;
-        else if (i == 3)
+        else if (index == 3)
             eOwner = LIAO_TASKBAR_DEFAULT_STYLE_4;
         else;
 
 		wchar_t buff[64];
-		swprintf_s(buff, L"%d", i + 1);
+		swprintf_s(buff, L"%d", index + 1);
 		wstring key_name = buff;
-        if (IsTaskBarStyleDataValid(m_default_style[i]))           //保存前检查当前颜色预设是否有效
+        if (IsTaskBarStyleDataValid(m_default_style[index]))           //保存前检查当前颜色预设是否有效
         {
             //保存用于TaskbarDefaultStyle的所有监控项(包括内置监控项和插件项)的标签、标签颜色、数值颜色设置
-            m_default_style[i].SaveConfig(eOwner, theApp.m_config_layouts_path);
+            m_default_style[index].SaveConfig(eOwner, theApp.m_config_layouts_path);
         }
         else
         {
             //写入日志
             CString log_str;
-            log_str.Format(_T("在保存预设%d时检测到背景色和文字颜色都为黑色，该预设未被保存。"), i);
+            log_str.Format(_T("在保存预设%d时检测到背景色和文字颜色都为黑色，该预设未被保存。"), index);
             CCommon::WriteLog(log_str, theApp.m_log_path.c_str());
             return;
         }
@@ -128,6 +128,8 @@ void CTaskbarDefaultStyle::ModifyDefaultStyle(int index, TaskBarSettingData & da
         m_default_style[index].M_LayoutItems[iter->first].PrefixColor   = iter->second.PrefixColor;
         m_default_style[index].M_LayoutItems[iter->first].ValueColor    = iter->second.ValueColor;
     }
+    //立即保存到配置文件，并且只在这里(也就是有修改时)才保存，没有修改时不应该重复保存。
+    SaveConfig(index);
 }
 
 bool CTaskbarDefaultStyle::IsTaskBarStyleDataValid(const CLayout& data)

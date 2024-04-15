@@ -12,8 +12,6 @@ public:
 	~CTaskbarDefaultStyle();
 
 	void LoadConfig();
-	void SaveConfig();// const;																			//使用map后不能用const
-
 	void ApplyDefaultStyle(int index, TaskBarSettingData& data); //const;		//应用一个颜色预设		//使用map后不能用const
 	//static void ApplyDefaultLightStyle(TaskBarSettingData& data);		//应用默认的浅色模式预设
 	void ModifyDefaultStyle(int index, TaskBarSettingData& data);     //将当前颜色设置保存到一个预设方案
@@ -22,5 +20,5 @@ public:
 
 private:
 	CLayout m_default_style[TASKBAR_DEFAULT_STYLE_NUM];    //预设样式
-
+	void SaveConfig(int index);// const;																			//使用map后不能用const
 };
