@@ -1044,11 +1044,16 @@ BOOL CTrafficMonitorDlg::OnInitDialog()
         });
     if (m_skins.empty())
         m_skins.push_back(L"");
-    m_skin_selected = 0;
+    m_skin_selected = -1;
     for (unsigned int i{}; i < m_skins.size(); i++)
     {
         if (m_skins[i] == rMainWndData.m_skin_name)
             m_skin_selected = i;
+    }
+    if (m_skin_selected < 0)            //程序第一次运行使用0号皮肤
+    {
+        m_skin_selected = 0;
+        rMainWndData.m_skin_name = m_skins[m_skin_selected];
     }
     
     LoadSkinLayout();       //根据当前选择的皮肤获取布局数据
