@@ -8,6 +8,7 @@ struct CommonDisplayItem
     bool                            is_plugin{};    //是否为插件项目
     EBuiltinDisplayItem             item_type{};    //内建的显示项目
     IPluginItem*                    plugin_item{};  //插件显示项目
+    wstring                         unique_id;      //唯一标识
 
     CommonDisplayItem() {}
     CommonDisplayItem(EBuiltinDisplayItem item);

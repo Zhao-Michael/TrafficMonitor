@@ -115,11 +115,14 @@ void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele
     );
 
     //初始化在皮肤配置文件中没有设置的监控项
+    if (layout.font_info.name.IsEmpty())
+        layout.font_info = theApp.m_main_wnd_default_font;
     for (const auto& item : theApp.m_plugin_manager.AllDisplayItemsWithPlugins())
     {
         LayoutItem& layout_item = layout.GetItem(item);
         if (layout_item.show)
             continue;
+        layout_item.unique_id   = item.unique_id;
         layout_item.PrefixColor = layout.PrefixColor;
         layout_item.ValueColor  = layout.ValueColor;
     }

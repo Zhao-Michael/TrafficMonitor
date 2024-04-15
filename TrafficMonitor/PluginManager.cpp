@@ -120,11 +120,15 @@ void CPluginManager::LoadPlugins()
     //初始化所有任务栏显示项目
     for (const auto& display_item : gS_AllBuiltinDisplayItems)
     {
-        S_all_display_items_with_plugins.insert(display_item);
+        CommonDisplayItem   item(display_item);
+        item.unique_id = CCommon::StrToUnicode(CCommon::GetDisplayItemXmlNodeName(display_item).c_str(), true);
+        S_all_display_items_with_plugins.insert(item);
     }
     for (const auto& display_item : V_PI_PluginItems)
     {
-        S_all_display_items_with_plugins.insert(display_item);
+        CommonDisplayItem   item(display_item);
+        item.unique_id = display_item->GetItemId();
+        S_all_display_items_with_plugins.insert(item);
     }
 }
 
