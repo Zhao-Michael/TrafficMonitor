@@ -261,13 +261,13 @@ void CIniHelper::LoadLayoutItemAttributes(const wchar_t* AppName, const wchar_t*
     LayoutItem* pLayoutItem = nullptr;
     if (nullptr == iplugin_item)
     {
-        pLayoutItem         = &M_layout_items[item_type];
-        pLayoutItem->id     = CCommon::StrToUnicode(CCommon::GetDisplayItemXmlNodeName(item_type).c_str());
+        pLayoutItem             = &M_layout_items[item_type];
+        pLayoutItem->unique_id  = CCommon::StrToUnicode(CCommon::GetDisplayItemXmlNodeName(item_type).c_str());
     }
     else
     {
-        pLayoutItem         = &M_layout_items[iplugin_item];
-        pLayoutItem->id     = iplugin_item->GetItemId();
+        pLayoutItem             = &M_layout_items[iplugin_item];
+        pLayoutItem->unique_id  = iplugin_item->GetItemId();
     }
 
     //每项的所有属性保存格式为： 标签，标签颜色，数值颜色

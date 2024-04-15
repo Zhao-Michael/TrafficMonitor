@@ -73,7 +73,7 @@ BOOL CLayoutSettingDlg::OnInitDialog()
     for (auto iter = rM_LayoutItems.begin(); iter != rM_LayoutItems.end(); ++iter)
     {
         LayoutItem& layout_item = iter->second;
-        wstring         item_id = layout_item.id;
+        wstring         item_id = layout_item.unique_id;
 
         CString item_name = iter->first.GetItemName();
         int index = m_list_ctrl.GetItemCount();

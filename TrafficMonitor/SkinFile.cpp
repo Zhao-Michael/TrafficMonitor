@@ -88,7 +88,7 @@ void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele
                         //如果是内置的"UP"等，就找到了。
                         //插件item不能map到内置的"UP"等，否则当内置项处理了。
                         LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[builtin_item], ele_layout_item);
-                        layout.M_LayoutItems[builtin_item].id = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
+                        layout.M_LayoutItems[builtin_item].unique_id = CCommon::StrToUnicode(layout_item_cfg_name.c_str(), true);
                         bFind = true;
                         break;
                     }
@@ -104,7 +104,7 @@ void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele
                         if (plugin_id == iplugin_item->GetItemId())
                         {
                             LoadLayoutItemFromXmlNode(layout, layout.M_LayoutItems[iplugin_item], ele_layout_item);
-                            layout.M_LayoutItems[iplugin_item].id = plugin_id;
+                            layout.M_LayoutItems[iplugin_item].unique_id = plugin_id;
                             bFind = true;
                             break;
                         }
