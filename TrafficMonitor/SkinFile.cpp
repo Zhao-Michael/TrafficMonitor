@@ -24,7 +24,12 @@ void CSkinFile::InitLayoutItemAttributes(LayoutItem&   layout_item)
 
 void CSkinFile::LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_item, tinyxml2::XMLElement* ele)
 {
-    layout_item.show            = CTinyXml2Helper::StringToBool(CTinyXml2Helper::ElementAttribute(ele, "show"));
+    const char* str = nullptr;
+    str = CTinyXml2Helper::ElementAttribute(ele, "show");
+    if (str[0] != '\0')
+        layout_item.show = CTinyXml2Helper::StringToBool(str);
+    else
+        layout_item.show = true;
     if (!layout_item.show)
         return;
     layout_item.height          = layout.DrawRectHeight;        //整个Layout统一这个高度
@@ -36,13 +41,12 @@ void CSkinFile::LoadLayoutItemFromXmlNode(CLayout& layout, LayoutItem& layout_it
         layout_item.Prefix      = _T("");                       //如果不显示前缀，则直接将所有前缀设置为空。
     else
         layout_item.Prefix      =         CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix"), true).c_str();
-    const char* str = nullptr;
-    str = CTinyXml2Helper::ElementAttribute(ele, "color_p");
+    str = CTinyXml2Helper::ElementAttribute(ele, "prefix_c");
     if (str[0] != '\0')
         layout_item.PrefixColor = CCommon::GetColorFromStr(CCommon::StrToUnicode(str).c_str());
     else
         layout_item.PrefixColor = layout.PrefixColor;
-    str = CTinyXml2Helper::ElementAttribute(ele, "color_v");
+    str = CTinyXml2Helper::ElementAttribute(ele, "value_c");
     if (str[0] != '\0')
         layout_item.ValueColor  = CCommon::GetColorFromStr(CCommon::StrToUnicode(str).c_str());
     else
@@ -58,8 +62,8 @@ void CSkinFile::LoadLayoutFromXmlNode(CLayout& layout, tinyxml2::XMLElement* ele
     layout.height           = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "height")));
     layout.DrawRectHeight   = theApp.DPI(atoi(                               CTinyXml2Helper::ElementAttribute(ele, "text_height")));
     layout.no_label         = CTinyXml2Helper::StringToBool(                 CTinyXml2Helper::ElementAttribute(ele, "no_label"));
-    layout.PrefixColor      = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_p")).c_str());
-    layout.ValueColor       = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "color_v")).c_str());
+    layout.PrefixColor      = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "prefix_c")).c_str());
+    layout.ValueColor       = CCommon::GetColorFromStr(CCommon::StrToUnicode(CTinyXml2Helper::ElementAttribute(ele, "value_c")).c_str());
     CTinyXml2Helper::IterateChildNode(ele, [&](tinyxml2::XMLElement* ele_layout_item)
         {
             BOOL bFind = false;

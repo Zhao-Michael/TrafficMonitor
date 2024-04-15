@@ -557,16 +557,16 @@ string CCommon::GetDisplayItemXmlNodeName(EBuiltinDisplayItem display_item)
         return "gpu";
         break;
     case TDI_CPU_TEMP:
-        return "cpu_temperature";
+        return "cpu_t";
         break;
     case TDI_GPU_TEMP:
-        return "gpu_temperature";
+        return "gpu_t";
         break;
     case TDI_HDD_TEMP:
-        return "hdd_temperature";
+        return "hdd_t";
         break;
     case TDI_MAIN_BOARD_TEMP:
-        return "main_board_temperature";
+        return "board_t";
         break;
     case TDI_HDD_USAGE:
         return "hdd";

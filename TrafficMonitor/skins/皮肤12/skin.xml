@@ -5,23 +5,23 @@
   <layout>
     <layout_l width="232" height="107" text_height="20">
       <font name="Microsoft YaHei" size="9" style="0"/>
-      <cpu             x="14"  y="3"  width="106" align="0" show="1" prefix="CPU: " color_v="16777215" color_p="16777215"/>
-      <memory          x="88"  y="3"  width="106" align="0" show="1" prefix="内存: " color_v="16777215" color_p="16777215"/>
-      <gpu             x="162" y="3"  width="106" align="0" show="1" prefix="显卡: " color_v="16777215" color_p="16777215"/>
-      <up              x="14"  y="27" width="106" align="0" show="1" prefix="上传: " color_v="16768959" color_p="16768959"/>
-      <down            x="122" y="27" width="106" align="0" show="1" prefix="下载: " color_v="10022341" color_p="10022341"/>
-      <cpu_temperature x="32"  y="57" width="94"  align="0" show="1" prefix="CPU温度: " color_v="16770992" color_p="16770992"/>
-      <gpu_temperature x="32"  y="83" width="94"  align="0" show="1" prefix="显卡温度: " color_v="16770992" color_p="16770992"/>
-      <hdd_temperature x="142" y="57" width="94"  align="0" show="1" prefix="硬盘温度: " color_v="16770992" color_p="16770992"/>
-      <main_board_temperature x="142" y="83" width="94" align="0" show="1" prefix="主板温度: " color_v="16770992" color_p="16770992"/>
+      <cpu      x="14"  y="3"  width="106" align="0" prefix="CPU: " prefix_c="16777215" value_c="16777215"/>
+      <memory   x="88"  y="3"  width="106" align="0" prefix="内存: " prefix_c="16777215" value_c="16777215"/>
+      <gpu      x="162" y="3"  width="106" align="0" prefix="显卡: " prefix_c="16777215" value_c="16777215"/>
+      <up       x="14"  y="27" width="106" align="0" prefix="上传: " prefix_c="16768959" value_c="16768959"/>
+      <down     x="122" y="27" width="106" align="0" prefix="下载: " prefix_c="10022341" value_c="10022341"/>
+      <cpu_t    x="32"  y="57" width="94"  align="0" prefix="CPU温度: " prefix_c="16770992" value_c="16770992"/>
+      <gpu_t    x="32"  y="83" width="94"  align="0" prefix="显卡温度: " prefix_c="16770992" value_c="16770992"/>
+      <hdd_t    x="142" y="57" width="94"  align="0" prefix="硬盘温度: " prefix_c="16770992" value_c="16770992"/>
+      <board_t  x="142" y="83" width="94"  align="0" prefix="主板温度: " prefix_c="16770992" value_c="16770992"/>
     </layout_l>
     <layout_s width="232" height="50" text_height="20">
       <font name="Microsoft YaHei" size="9" style="0"/>
-      <cpu             x="14"  y="3"  width="106" align="0" show="1" prefix="CPU: " color_v="16777215" color_p="16777215"/>
-      <memory          x="88"  y="3"  width="106" align="0" show="1" prefix="内存: " color_v="16777215" color_p="16777215"/>
-      <gpu             x="162" y="3"  width="106" align="0" show="1" prefix="显卡: " color_v="16777215" color_p="16777215"/>
-      <up              x="14"  y="27" width="106" align="0" show="1" prefix="上传: " color_v="16768959" color_p="16768959"/>
-      <down            x="122" y="27" width="106" align="0" show="1" prefix="下载: " color_v="10022341" color_p="10022341"/>
+      <cpu      x="14"  y="3"  width="106" align="0" prefix="CPU: " prefix_c="16777215" value_c="16777215"/>
+      <memory   x="88"  y="3"  width="106" align="0" prefix="内存: " prefix_c="16777215" value_c="16777215"/>
+      <gpu      x="162" y="3"  width="106" align="0" prefix="显卡: " prefix_c="16777215" value_c="16777215"/>
+      <up       x="14"  y="27" width="106" align="0" prefix="上传: " prefix_c="16768959" value_c="16768959"/>
+      <down     x="122" y="27" width="106" align="0" prefix="下载: " prefix_c="10022341" value_c="10022341"/>
     </layout_s>
   </layout>
   <preview width="250" height="170">
