@@ -99,10 +99,11 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
         WindowTextName += _T(")");
         SetWindowText(WindowTextName.c_str());
     }
-    //初始化字体设置相关控件
-    FontInfo& rFontInfo = m_layout.font_info;
+    //字体设置相关编辑框不允许编辑，只用来显示。
     ((CButton*)GetDlgItem(IDC_FONT_NAME_EDIT))->EnableWindow(false);
     ((CButton*)GetDlgItem(IDC_FONT_SIZE_EDIT))->EnableWindow(false);
+    //初始化字体设置相关控件
+    FontInfo& rFontInfo = m_layout.font_info;
     SetDlgItemText(IDC_FONT_NAME_EDIT, rFontInfo.name);
     SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(rFontInfo.size).c_str());
 
@@ -227,6 +228,8 @@ void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
     // TODO: 在此添加控件通知处理程序代码
     CTrafficMonitorDlg* tmDlg           = (CTrafficMonitorDlg*)theApp.m_pMainWnd;
     CLayout layout                      = tmDlg->GetSkinLayout();
+    SetDlgItemText(IDC_FONT_NAME_EDIT, layout.font_info.name);
+    SetDlgItemText(IDC_FONT_SIZE_EDIT, std::to_wstring(layout.font_info.size).c_str());
     int item_count = m_list_ctrl.GetItemCount();
     for (int index{}; index < item_count; index++)
     {

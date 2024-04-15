@@ -42,7 +42,7 @@ public:
 
     CLayout GetSkinLayout() const
     {
-        return m_skin.GetLayoutManager().layout_l;      //目前不区分，使用有更多显示项的layout_l。
+        if (theApp.m_main_wnd_data.m_show_more_info) return m_skin.GetLayoutManager().layout_l; else return m_skin.GetLayoutManager().layout_s;
     }
 
 protected:
