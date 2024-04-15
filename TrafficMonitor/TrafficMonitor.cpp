@@ -93,10 +93,8 @@ void CTrafficMonitorApp::LoadConfig()
     rGeneralData.monitor_time_span              = ini.GetInt   (L"general",     L"monitor_time_span", 1000);
     if (rGeneralData.monitor_time_span < MONITOR_TIME_SPAN_MIN || rGeneralData.monitor_time_span > MONITOR_TIME_SPAN_MAX)
         rGeneralData.monitor_time_span = 1000;
-    //最后三项配置
+    //最后一项配置
     rGeneralData.show_notify_icon               = ini.GetBool(_T("config"),   _T("show_notify_icon"),       true);
-    rGeneralData.allow_skin_cover_font          = ini.GetBool(_T("general"),  _T("allow_skin_cover_font"),  true);
-    rGeneralData.allow_skin_cover_text          = ini.GetBool(_T("general"),  _T("allow_skin_cover_text"),  true);
     //(2)鼠标右键中的部分设置
     rAppData.m_show_taskbar_wnd                 = ini.GetBool(_T("config"),   _T("show_taskbar_wnd"),       false);
     rAppData.m_hide_main_window                 = ini.GetBool(_T("config"),   _T("hide_main_window"),       false);
@@ -306,10 +304,8 @@ void CTrafficMonitorApp::SaveConfig()
     //CPU利用率的方式
     ini.WriteBool       (L"general",    L"get_cpu_usage_by_cpu_times",          rGeneralData.m_get_cpu_usage_by_cpu_times);
     ini.WriteInt        (L"general",    L"monitor_time_span",                   rGeneralData.monitor_time_span);
-    //最后三项配置
+    //最后一项配置
     ini.WriteBool       (L"config",     L"show_notify_icon",                    rGeneralData.show_notify_icon);
-    ini.WriteBool     (_T("general"), _T("allow_skin_cover_font"),              rGeneralData.allow_skin_cover_font);
-    ini.WriteBool     (_T("general"), _T("allow_skin_cover_text"),              rGeneralData.allow_skin_cover_text);
     //(2)鼠标右键中的部分设置
     ini.WriteBool       (L"config",     L"show_taskbar_wnd",                   rAppData.m_show_taskbar_wnd);
     ini.WriteInt        (L"config",     L"hide_main_window",                    rAppData.m_hide_main_window);

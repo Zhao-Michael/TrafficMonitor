@@ -115,9 +115,6 @@
 #define IDS_VALUE                       248
 #define IDS_COPY_TO_CLIPBOARD_FAILED    249
 #define IDS_SKIN_AUTHOUR                250
-#define IDS_OVERWRITE_FONT_TEXT_WARNING 251
-#define IDS_OVERWRITE_FONT_WARNING      252
-#define IDS_OVERWRITE_TEXT_WARNING      253
 #define IDS_SPEED_SHORT_MODE_TIP        254
 #define IDS_AUTO                        255
 #define IDS_FIXED_AS                    256
@@ -365,9 +362,7 @@
 #define IDC_SKIN_DOWNLOAD_STATIC        1053
 #define IDC_PREVIEW_GROUP_STATIC        1054
 #define IDC_NOTIFY_STATIC               1056
-#define IDC_ALLOW_SKIN_FONT_CHECK       1057
 #define IDC_CHECK2                      1058
-#define IDC_ALLOW_SKIN_DISP_STR_CHECK   1058
 #define IDC_VALUE_RIGHT_ALIGN_CHECK     1058
 #define IDC_ALWAYS_ON_TOP_CHECK         1058
 #define IDC_UP_STATIC                   1059
