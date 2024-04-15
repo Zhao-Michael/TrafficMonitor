@@ -3,12 +3,12 @@
 #include "DrawCommon.h"
 #include <set>
 
-class CMonitorItemAttributesSettingListCtrl : public CListCtrl
+class CLayoutSettingListCtrl : public CListCtrl
 {
-DECLARE_DYNAMIC(CMonitorItemAttributesSettingListCtrl)
+DECLARE_DYNAMIC(CLayoutSettingListCtrl)
 public:
-	CMonitorItemAttributesSettingListCtrl();
-	~CMonitorItemAttributesSettingListCtrl();
+	CLayoutSettingListCtrl();
+	~CLayoutSettingListCtrl();
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	//      编辑前缀等属性相关

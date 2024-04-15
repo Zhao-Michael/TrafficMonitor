@@ -214,12 +214,6 @@
     <Filter Include="源文件和头文件\公共的类\RenderAPISupport\DxgiSupport2">
       <UniqueIdentifier>{059ab3fb-f8b3-4cae-b5d3-72bd857e5197}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件和头文件\对话框类\属性设置对话框">
-      <UniqueIdentifier>{50898390-4c7a-4f54-93fc-c7b13acf48c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl">
-      <UniqueIdentifier>{68b8c93d-e1b6-4d3d-a8af-5a19d413a96e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件和头文件\皮肤与布局类">
       <UniqueIdentifier>{e75d1708-8d35-4b7d-bfa4-89714e9115f7}</UniqueIdentifier>
     </Filter>
@@ -228,6 +222,12 @@
     </Filter>
     <Filter Include="源文件和头文件\皮肤与布局类\Layout">
       <UniqueIdentifier>{518365ee-3cd4-4fff-ac88-eafb5ffd3604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\对话框类\布局设置对话框">
+      <UniqueIdentifier>{50898390-4c7a-4f54-93fc-c7b13acf48c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件和头文件\派生的控件类\LayoutSettingListCtrl">
+      <UniqueIdentifier>{68b8c93d-e1b6-4d3d-a8af-5a19d413a96e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -481,14 +481,14 @@
     <ClInclude Include="CommonTypes.h">
       <Filter>源文件和头文件\头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MIA_Dlg.h">
-      <Filter>源文件和头文件\对话框类\属性设置对话框</Filter>
-    </ClInclude>
-    <ClInclude Include="MIA_SettingListCtrl.h">
-      <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
-    </ClInclude>
     <ClInclude Include="Layout.h">
       <Filter>源文件和头文件\皮肤与布局类\Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutSettingDlg.h">
+      <Filter>源文件和头文件\对话框类\布局设置对话框</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutSettingListCtrl.h">
+      <Filter>源文件和头文件\派生的控件类\LayoutSettingListCtrl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -708,14 +708,14 @@
     <ClCompile Include="SupportedRenderEnums.cpp">
       <Filter>源文件和头文件\公共的类\DrawCommon</Filter>
     </ClCompile>
-    <ClCompile Include="MIA_Dlg.cpp">
-      <Filter>源文件和头文件\对话框类\属性设置对话框</Filter>
-    </ClCompile>
-    <ClCompile Include="MIA_SettingListCtrl.cpp">
-      <Filter>源文件和头文件\派生的控件类\MonitorItemAttributesSettingListCtrl</Filter>
-    </ClCompile>
     <ClCompile Include="Layout.cpp">
       <Filter>源文件和头文件\皮肤与布局类\Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutSettingDlg.cpp">
+      <Filter>源文件和头文件\对话框类\布局设置对话框</Filter>
+    </ClCompile>
+    <ClCompile Include="LayoutSettingListCtrl.cpp">
+      <Filter>源文件和头文件\派生的控件类\LayoutSettingListCtrl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

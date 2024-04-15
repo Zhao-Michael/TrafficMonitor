@@ -3,7 +3,7 @@
 #include "afxwin.h"
 #include "SpinEdit.h"
 #include "TabDlg.h"
-#include "MIA_Dlg.h"
+#include "LayoutSettingDlg.h"
 #include "ComboBox2.h"
 
 // CTaskBarSettingsDlg 对话框

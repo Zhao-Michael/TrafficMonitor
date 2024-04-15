@@ -3,46 +3,46 @@
 
 #include "stdafx.h"
 #include "TrafficMonitor.h"
-#include "MIA_Dlg.h"
+#include "LayoutSettingDlg.h"
 #include "afxdialogex.h"
 #include "CMFCColorDialogEx.h"
 #include "TrafficMonitorDlg.h"
 #include "SkinFile.h"
 
-// CMonitorItemAttributesDlg 对话框
+// CLayoutSettingDlg 对话框
 
-IMPLEMENT_DYNAMIC(CMonitorItemAttributesDlg, CBaseDialog)
+IMPLEMENT_DYNAMIC(CLayoutSettingDlg, CBaseDialog)
 
-CMonitorItemAttributesDlg::CMonitorItemAttributesDlg(CLayout& layout, bool bMainWnd, CWnd* pParent /*=NULL*/)
+CLayoutSettingDlg::CLayoutSettingDlg(CLayout& layout, bool bMainWnd, CWnd* pParent /*=NULL*/)
 	: CBaseDialog(IDD_MONITOR_ITEM_ATTRIBUTES_DIALOG, pParent), m_layout(layout), B_MainWnd(bMainWnd)
 {
 }
 
-CMonitorItemAttributesDlg::~CMonitorItemAttributesDlg()
+CLayoutSettingDlg::~CLayoutSettingDlg()
 {
 }
 
-CString CMonitorItemAttributesDlg::GetDialogName() const
+CString CLayoutSettingDlg::GetDialogName() const
 {
     return _T("MonitorItemAttributesDlg");
 }
 
-void CMonitorItemAttributesDlg::DoDataExchange(CDataExchange* pDX)
+void CLayoutSettingDlg::DoDataExchange(CDataExchange* pDX)
 {
     CBaseDialog::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST1, m_list_ctrl);
 }
 
-BEGIN_MESSAGE_MAP(CMonitorItemAttributesDlg, CBaseDialog)
-    ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CMonitorItemAttributesDlg::OnNMDblclkList1)
-    ON_BN_CLICKED(IDC_RESTORE_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton)
-    ON_BN_CLICKED(IDC_RESTORE_SKIN_DEFAULT_BUTTON, &CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton)
-    ON_BN_CLICKED(IDC_SET_FONT_BUTTON, &CMonitorItemAttributesDlg::OnBnClickedSetFontButton)
+BEGIN_MESSAGE_MAP(CLayoutSettingDlg, CBaseDialog)
+    ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &CLayoutSettingDlg::OnNMDblclkList1)
+    ON_BN_CLICKED(IDC_RESTORE_DEFAULT_BUTTON, &CLayoutSettingDlg::OnBnClickedRestoreDefaultButton)
+    ON_BN_CLICKED(IDC_RESTORE_SKIN_DEFAULT_BUTTON, &CLayoutSettingDlg::OnClickedRestoreSkinDefaultButton)
+    ON_BN_CLICKED(IDC_SET_FONT_BUTTON, &CLayoutSettingDlg::OnBnClickedSetFontButton)
 END_MESSAGE_MAP()
 
-// CMonitorItemAttributesDlg 消息处理程序
+// CLayoutSettingDlg 消息处理程序
 
-BOOL CMonitorItemAttributesDlg::OnInitDialog()
+BOOL CLayoutSettingDlg::OnInitDialog()
 {
 	CBaseDialog::OnInitDialog();
 
@@ -86,7 +86,7 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
         m_list_ctrl.SetItemColor(index, 3, layout_item.PrefixColor);
         m_list_ctrl.SetItemColor(index, 4, layout_item.ValueColor);
     }
-    m_list_ctrl.SetEditColMethod(CMonitorItemAttributesSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
+    m_list_ctrl.SetEditColMethod(CLayoutSettingListCtrl::EC_SPECIFIED);      //设置列表可编辑
     m_list_ctrl.SetEditableCol({ 2 });                                                      //设置可编辑的列
 
     if (!m_layout.name.empty())
@@ -114,7 +114,7 @@ BOOL CMonitorItemAttributesDlg::OnInitDialog()
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
-void CMonitorItemAttributesDlg::OnOK()
+void CLayoutSettingDlg::OnOK()
 {
     // TODO: 在此添加专用代码和/或调用基类
     std::map<CommonDisplayItem, LayoutItem>&    rM_LayoutItems  = m_layout.M_LayoutItems;
@@ -137,7 +137,7 @@ void CMonitorItemAttributesDlg::OnOK()
     CBaseDialog::OnOK();
 }
 
-void CMonitorItemAttributesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
+void CLayoutSettingDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
@@ -157,7 +157,7 @@ void CMonitorItemAttributesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 }
 
-void CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton()
+void CLayoutSettingDlg::OnBnClickedRestoreDefaultButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     int item_count = m_list_ctrl.GetItemCount();
@@ -223,7 +223,7 @@ void CMonitorItemAttributesDlg::OnBnClickedRestoreDefaultButton()
     }
 }
 
-void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
+void CLayoutSettingDlg::OnClickedRestoreSkinDefaultButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     CTrafficMonitorDlg* tmDlg           = (CTrafficMonitorDlg*)theApp.m_pMainWnd;
@@ -243,7 +243,7 @@ void CMonitorItemAttributesDlg::OnClickedRestoreSkinDefaultButton()
 }
 
 
-void CMonitorItemAttributesDlg::OnBnClickedSetFontButton()
+void CLayoutSettingDlg::OnBnClickedSetFontButton()
 {
     // TODO: 在此添加控件通知处理程序代码
     FontInfo& rFontInfo = m_layout.font_info;

@@ -1,45 +1,45 @@
 ﻿#include "stdafx.h"
-#include "MIA_SettingListCtrl.h"
+#include "LayoutSettingListCtrl.h"
 
-IMPLEMENT_DYNAMIC(CMonitorItemAttributesSettingListCtrl, CListCtrl)
+IMPLEMENT_DYNAMIC(CLayoutSettingListCtrl, CListCtrl)
 
-CMonitorItemAttributesSettingListCtrl::CMonitorItemAttributesSettingListCtrl()
+CLayoutSettingListCtrl::CLayoutSettingListCtrl()
 {
 }
 
-CMonitorItemAttributesSettingListCtrl::~CMonitorItemAttributesSettingListCtrl()
+CLayoutSettingListCtrl::~CLayoutSettingListCtrl()
 {
 }
 
-BEGIN_MESSAGE_MAP(CMonitorItemAttributesSettingListCtrl, CListCtrl)
-	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW,                &CMonitorItemAttributesSettingListCtrl::OnNMCustomdraw)
-    ON_EN_KILLFOCUS(IDC_ITEM_EDITBOX,               &CMonitorItemAttributesSettingListCtrl::OnEnKillfocusEdit1)
-    ON_NOTIFY_REFLECT_EX(NM_DBLCLK,                 &CMonitorItemAttributesSettingListCtrl::OnNMDblclk)
-    ON_NOTIFY_REFLECT(LVN_BEGINSCROLL,              &CMonitorItemAttributesSettingListCtrl::OnLvnBeginScroll)
-    ON_MESSAGE(WM_TABLET_QUERYSYSTEMGESTURESTATUS,  &CMonitorItemAttributesSettingListCtrl::OnTabletQuerysystemgesturestatus)
+BEGIN_MESSAGE_MAP(CLayoutSettingListCtrl, CListCtrl)
+	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW,                &CLayoutSettingListCtrl::OnNMCustomdraw)
+    ON_EN_KILLFOCUS(IDC_ITEM_EDITBOX,               &CLayoutSettingListCtrl::OnEnKillfocusEdit1)
+    ON_NOTIFY_REFLECT_EX(NM_DBLCLK,                 &CLayoutSettingListCtrl::OnNMDblclk)
+    ON_NOTIFY_REFLECT(LVN_BEGINSCROLL,              &CLayoutSettingListCtrl::OnLvnBeginScroll)
+    ON_MESSAGE(WM_TABLET_QUERYSYSTEMGESTURESTATUS,  &CLayoutSettingListCtrl::OnTabletQuerysystemgesturestatus)
 END_MESSAGE_MAP()
 
-void CMonitorItemAttributesSettingListCtrl::SetItemColor(int row, int col, COLORREF color)
+void CLayoutSettingListCtrl::SetItemColor(int row, int col, COLORREF color)
 {
     m_colors[row][col] = color;
 }
 
-COLORREF CMonitorItemAttributesSettingListCtrl::GetItemColor(int row, int col)
+COLORREF CLayoutSettingListCtrl::GetItemColor(int row, int col)
 {
     return m_colors[row][col];
 }
 
-void CMonitorItemAttributesSettingListCtrl::SetEditColMethod(eEditColMethod method)
+void CLayoutSettingListCtrl::SetEditColMethod(eEditColMethod method)
 {
     m_edit_col_method = method;
 }
 
-void CMonitorItemAttributesSettingListCtrl::SetEditableCol(const std::initializer_list<int>& paras)
+void CLayoutSettingListCtrl::SetEditableCol(const std::initializer_list<int>& paras)
 {
     m_edit_cols = paras;
 }
 
-void CMonitorItemAttributesSettingListCtrl::Edit(int row, int col)
+void CLayoutSettingListCtrl::Edit(int row, int col)
 {
     EnsureVisible(row, FALSE);				//编辑一行时确保该行可见
     m_editing = true;
@@ -58,7 +58,7 @@ void CMonitorItemAttributesSettingListCtrl::Edit(int row, int col)
     m_item_edit.SetSel(0, -1);
 }
 
-void CMonitorItemAttributesSettingListCtrl::EndEdit()
+void CLayoutSettingListCtrl::EndEdit()
 {
     if (m_editing)
     {
@@ -73,7 +73,7 @@ void CMonitorItemAttributesSettingListCtrl::EndEdit()
     }
 }
 
-void CMonitorItemAttributesSettingListCtrl::PreSubclassWindow()
+void CLayoutSettingListCtrl::PreSubclassWindow()
 {
     // TODO: 在此添加专用代码和/或调用基类
     m_item_edit.Create(WS_BORDER | ES_AUTOHSCROLL, CRect(), this, IDC_ITEM_EDITBOX);
@@ -82,7 +82,7 @@ void CMonitorItemAttributesSettingListCtrl::PreSubclassWindow()
     CListCtrl::PreSubclassWindow();
 }
 
-BOOL CMonitorItemAttributesSettingListCtrl::OnNMDblclk(NMHDR* pNMHDR, LRESULT* pResult)
+BOOL CLayoutSettingListCtrl::OnNMDblclk(NMHDR* pNMHDR, LRESULT* pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
@@ -101,13 +101,13 @@ BOOL CMonitorItemAttributesSettingListCtrl::OnNMDblclk(NMHDR* pNMHDR, LRESULT* p
     }
 }
 
-void CMonitorItemAttributesSettingListCtrl::OnEnKillfocusEdit1()
+void CLayoutSettingListCtrl::OnEnKillfocusEdit1()
 {
     //当文本编辑控件控件失去焦点时响应
     EndEdit();
 }
 
-void CMonitorItemAttributesSettingListCtrl::OnLvnBeginScroll(NMHDR* pNMHDR, LRESULT* pResult)
+void CLayoutSettingListCtrl::OnLvnBeginScroll(NMHDR* pNMHDR, LRESULT* pResult)
 {
     // 此功能要求 Internet Explorer 5.5 或更高版本。
     // 符号 _WIN32_IE 必须是 >= 0x0560。
@@ -118,12 +118,12 @@ void CMonitorItemAttributesSettingListCtrl::OnLvnBeginScroll(NMHDR* pNMHDR, LRES
     *pResult = 0;
 }
 
-afx_msg LRESULT CMonitorItemAttributesSettingListCtrl::OnTabletQuerysystemgesturestatus(WPARAM wParam, LPARAM lParam)
+afx_msg LRESULT CLayoutSettingListCtrl::OnTabletQuerysystemgesturestatus(WPARAM wParam, LPARAM lParam)
 {
     return 0;
 }
 
-void CMonitorItemAttributesSettingListCtrl::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
+void CLayoutSettingListCtrl::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	*pResult = CDRF_DODEFAULT;
 	LPNMLVCUSTOMDRAW lplvdr = reinterpret_cast<LPNMLVCUSTOMDRAW>(pNMHDR);
