@@ -1387,6 +1387,8 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
     }
 #endif
 
+    const auto& todayData = pThis->m_history_traffic.GetTraffics()[0];
+
     //通知插件获取数据，以及向插件传递监控数据
     for (const auto& pluginManageUnit : theApp.m_plugin_manager.GetAllPluginManageUnit())
     {
@@ -1405,6 +1407,10 @@ UINT CTrafficMonitorDlg::MonitorThreadCallback(LPVOID dwUser)
             monitor_info.hdd_temperature        = theApp.m_hdd_temperature;
             monitor_info.cpu_freq               = theApp.m_cpu_freq;
             monitor_info.main_board_temperature = theApp.m_main_board_temperature;
+
+            monitor_info.up_today = todayData.up_kBytes;
+            monitor_info.down_today = todayData.down_kBytes;
+
             pluginManageUnit.plugin->OnMonitorInfo(monitor_info);
         }
     }

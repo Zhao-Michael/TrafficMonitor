@@ -176,6 +176,8 @@ public:
         int hdd_temperature{};
         int main_board_temperature{};
         int cpu_freq{};
+        int up_today{};
+        int down_today{};
     };
 
     enum ExtendedInfoIndex

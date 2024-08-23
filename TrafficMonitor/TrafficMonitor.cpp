@@ -523,6 +523,7 @@ void CTrafficMonitorApp::CheckUpdate(bool message)
     wstring contents_zh_tw; //更新内容（繁体中文）
     CUpdateHelper update_helper;
     update_helper.SetUpdateSource(static_cast<CUpdateHelper::UpdateSource>(rGeneralData.update_source));
+    return;
     if (!update_helper.CheckForUpdate())
     {
         if (message)
