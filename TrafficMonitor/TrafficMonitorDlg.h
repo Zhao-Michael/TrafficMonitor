@@ -194,6 +194,7 @@ protected:
 public:
     //  afx_msg LRESULT OnNcHitTest(CPoint point);
     afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg void OnAppExit();
     //  afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
     afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
     afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CTrafficMonitorDlg, CDialog)
     ON_WM_TIMER()
     ON_WM_RBUTTONUP()
     ON_WM_LBUTTONDOWN()
+    ON_COMMAND(ID_APP_EXIT, &CTrafficMonitorDlg::OnAppExit)
     ON_COMMAND(ID_NETWORK_INFO, &CTrafficMonitorDlg::OnNetworkInfo)
     ON_COMMAND(ID_ALWAYS_ON_TOP, &CTrafficMonitorDlg::OnAlwaysOnTop)
     ON_WM_INITMENUPOPUP()
@@ -1791,6 +1792,18 @@ void CTrafficMonitorDlg::OnTimer(UINT_PTR nIDEvent)
     CDialog::OnTimer(nIDEvent);
 }
 
+void CTrafficMonitorDlg::OnAppExit()
+{
+    for (const auto& pluginManageUnit : theApp.m_plugin_manager.GetAllPluginManageUnit())
+    {
+        if (pluginManageUnit.plugin != nullptr)
+        {
+            pluginManageUnit.plugin->OnExited();
+        }
+    }
+
+    SendMessage(WM_CLOSE);
+}
 
 void CTrafficMonitorDlg::OnRButtonUp(UINT nFlags, CPoint point)
 {

@@ -301,6 +301,10 @@ public:
     */
     virtual int IsCommandChecked(int command_index) { return false; }
 
+    /**
+    * 当程序退出时通知插件
+    */
+    virtual void OnExited() {}
 };
 
 /*
@@ -325,5 +329,9 @@ public:
 *     4       | 新增 IPluginItem::OnKeboardEvent IPluginItem::OnItemInfo 函数
 * -------------------------------------------------------------------------
 *     5       | 新增 ITMPlugin::GetCommandName ITMPlugin::GetCommandIcon ITMPlugin::OnPluginCommand 函数
+* -------------------------------------------------------------------------
+*     6 :  新增    int up_today{};  int down_today{};
+* -------------------------------------------------------------------------
+*     7 :  新增程序退出通知插件  virtual void OnExited() {}
 * -------------------------------------------------------------------------
 */
